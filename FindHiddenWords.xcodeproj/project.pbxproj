@@ -85,6 +85,11 @@
 		D0E64EB425A899D7006BACC6 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EB325A899D7006BACC6 /* GameScene.swift */; };
 		D0E64EB925A899D7006BACC6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EB725A899D7006BACC6 /* Main.storyboard */; };
 		D0E64EBB25A899D7006BACC6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EBA25A899D7006BACC6 /* Assets.xcassets */; };
+		D0EFE8AD25AA258A00AF0882 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8AC25AA258A00AF0882 /* Reachability.framework */; };
+		D0EFE8B125AA259200AF0882 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8B025AA259200AF0882 /* Realm.framework */; };
+		D0EFE8B425AA259800AF0882 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8B325AA259800AF0882 /* RealmSwift.framework */; };
+		D0EFE8C225AA2C3B00AF0882 /* Games.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0EFE8C025AA2C3A00AF0882 /* Games.realm */; };
+		D0EFE8C325AA2C3B00AF0882 /* NewWordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -118,8 +123,6 @@
 		D0124FE525A8A42A000BCF89 /* Games.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Games.swift; sourceTree = "<group>"; };
 		D0124FE825A8A44A000BCF89 /* NewWorldListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewWorldListModel.swift; sourceTree = "<group>"; };
 		D0124FEB25A8A46E000BCF89 /* NoSuchWord.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = NoSuchWord.mp3; sourceTree = "<group>"; };
-		D0124FEE25A8ADE3000BCF89 /* NewWordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = NewWordList.realm; sourceTree = "<group>"; };
-		D0124FEF25A8ADE3000BCF89 /* Games.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Games.realm; sourceTree = "<group>"; };
 		D0124FF325A8AE58000BCF89 /* OKWord.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = OKWord.mp3; sourceTree = "<group>"; };
 		D0124FF825A8AEEA000BCF89 /* GoldSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GoldSprite.png; sourceTree = "<group>"; };
 		D0124FF925A8AEEA000BCF89 /* Connection0111.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Connection0111.png; sourceTree = "<group>"; };
@@ -162,6 +165,9 @@
 		D012501E25A8AEEA000BCF89 /* BlueOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueOctagon.png; sourceTree = "<group>"; };
 		D012501F25A8AEEA000BCF89 /* GrayOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GrayOctagon.png; sourceTree = "<group>"; };
 		D012502025A8AEEB000BCF89 /* GreenSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite.png; sourceTree = "<group>"; };
+		D0B94E5A25A8B3AB0058F9B8 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		D0B94E5E25A8B3B20058F9B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		D0B94E6125A8B3B80058F9B8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		D0E64EAA25A899D7006BACC6 /* FindHiddenWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FindHiddenWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0E64EAF25A899D7006BACC6 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -170,6 +176,11 @@
 		D0E64EB825A899D7006BACC6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D0E64EBA25A899D7006BACC6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D0E64EBC25A899D7006BACC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D0EFE8AC25AA258A00AF0882 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
+		D0EFE8B025AA259200AF0882 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		D0EFE8B325AA259800AF0882 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+		D0EFE8C025AA2C3A00AF0882 /* Games.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Games.realm; sourceTree = "<group>"; };
+		D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = NewWordList.realm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -177,6 +188,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D0EFE8B125AA259200AF0882 /* Realm.framework in Frameworks */,
+				D0EFE8AD25AA258A00AF0882 /* Reachability.framework in Frameworks */,
+				D0EFE8B425AA259800AF0882 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,8 +212,8 @@
 		D0124FF025A8ADFF000BCF89 /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
-				D0124FEF25A8ADE3000BCF89 /* Games.realm */,
-				D0124FEE25A8ADE3000BCF89 /* NewWordList.realm */,
+				D0EFE8C025AA2C3A00AF0882 /* Games.realm */,
+				D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */,
 			);
 			path = ReadOnlyDB;
 			sourceTree = "<group>";
@@ -215,13 +229,13 @@
 			path = RealmModels;
 			sourceTree = "<group>";
 		};
-		D0124FF625A8AE65000BCF89 /* Dounds */ = {
+		D0124FF625A8AE65000BCF89 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
 				D0124FEB25A8A46E000BCF89 /* NoSuchWord.mp3 */,
 				D0124FF325A8AE58000BCF89 /* OKWord.mp3 */,
 			);
-			path = Dounds;
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
@@ -272,11 +286,25 @@
 			path = Pic;
 			sourceTree = "<group>";
 		};
+		D0B94E5925A8B3AB0058F9B8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D0EFE8B325AA259800AF0882 /* RealmSwift.framework */,
+				D0EFE8B025AA259200AF0882 /* Realm.framework */,
+				D0EFE8AC25AA258A00AF0882 /* Reachability.framework */,
+				D0B94E6125A8B3B80058F9B8 /* RealmSwift.framework */,
+				D0B94E5E25A8B3B20058F9B8 /* Realm.framework */,
+				D0B94E5A25A8B3AB0058F9B8 /* Reachability.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D0E64EA125A899D7006BACC6 = {
 			isa = PBXGroup;
 			children = (
 				D0E64EAC25A899D7006BACC6 /* FindHiddenWords */,
 				D0E64EAB25A899D7006BACC6 /* Products */,
+				D0B94E5925A8B3AB0058F9B8 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -304,7 +332,6 @@
 				D0124FA425A8A10C000BCF89 /* GameViewController.swift */,
 				D0124FA725A8A138000BCF89 /* GenerateGameArray.swift */,
 				D0124FAA25A8A154000BCF89 /* Grid.swift */,
-				D0124FB025A8A1A3000BCF89 /* Language */,
 				D0124FBD25A8A23D000BCF89 /* MyAlertController.swift */,
 				D0124FC125A8A282000BCF89 /* MyButton.swift */,
 				D0124FC425A8A2BE000BCF89 /* MyFoundedWord.swift */,
@@ -319,8 +346,9 @@
 				D0E64EAF25A899D7006BACC6 /* GameScene.sks */,
 				D0E64EB125A899D7006BACC6 /* Actions.sks */,
 				D0E64EB325A899D7006BACC6 /* GameScene.swift */,
+				D0124FB025A8A1A3000BCF89 /* Language */,
 				D0124FF725A8AE87000BCF89 /* Pic */,
-				D0124FF625A8AE65000BCF89 /* Dounds */,
+				D0124FF625A8AE65000BCF89 /* Sounds */,
 				D0124FF125A8AE22000BCF89 /* RealmModels */,
 				D0124FF025A8ADFF000BCF89 /* ReadOnlyDB */,
 			);
@@ -337,6 +365,7 @@
 				D0E64EA625A899D7006BACC6 /* Sources */,
 				D0E64EA725A899D7006BACC6 /* Frameworks */,
 				D0E64EA825A899D7006BACC6 /* Resources */,
+				D0B94E6D25A8B5350058F9B8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -423,11 +452,13 @@
 				D012502525A8AEEB000BCF89 /* whiteSprite.png in Resources */,
 				D012504425A8AEEB000BCF89 /* LilaSprite.png in Resources */,
 				D012503025A8AEEB000BCF89 /* LandscapeBG.png in Resources */,
+				D0EFE8C225AA2C3B00AF0882 /* Games.realm in Resources */,
 				D012503A25A8AEEB000BCF89 /* Red Button.png in Resources */,
 				D012502425A8AEEB000BCF89 /* GreenOctagon.png in Resources */,
 				D012503925A8AEEB000BCF89 /* LightGraySprite.png in Resources */,
 				D012503125A8AEEB000BCF89 /* Connection0100.png in Resources */,
 				D012503525A8AEEB000BCF89 /* GreenLilaSprite.png in Resources */,
+				D0EFE8C325AA2C3B00AF0882 /* NewWordList.realm in Resources */,
 				D012502325A8AEEB000BCF89 /* Rosa Button.png in Resources */,
 				D0E64EB225A899D7006BACC6 /* Actions.sks in Resources */,
 				D012503225A8AEEB000BCF89 /* Connection0011.png in Resources */,
@@ -435,6 +466,29 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		D0B94E6D25A8B5350058F9B8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/Reachability.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D0E64EA625A899D7006BACC6 /* Sources */ = {
@@ -540,7 +594,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -595,7 +649,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -612,6 +666,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WT499VC842;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = FindHiddenWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -632,6 +690,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WT499VC842;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = FindHiddenWords/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
