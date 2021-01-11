@@ -98,7 +98,7 @@ class GameboardItem: SKSpriteNode {
         self.fontSize = GV.buttonFontSize
         self.blockSize = GV.blockSize
         let texture = SKTexture(imageNamed: "whiteSprite")
-        super.init(texture: texture, color: .white, size: CGSize(width: blockSize, height: blockSize))
+        super.init(texture: texture, color: .white, size: CGSize(width: blockSize * 0.9, height: blockSize * 0.9))
         label.fontName = "KohinoorTelugu-Regular"
 //        label.fontName = "Baskerville"
 //        label.fontName = "ChalkboardSE-Light"

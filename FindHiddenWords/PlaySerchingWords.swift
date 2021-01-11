@@ -1133,7 +1133,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
             }
             let (_, _, score) = getMyWordsForShow()
-            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(0))
+            var scoresDecoded = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)
+            let actMaxScore: Int! = Int(scoresDecoded[GV.size - 5])
+            if score > actMaxScore {
+                scoresDecoded[GV.size - 5] = String(score)
+                var scoreString = ""
+                for item in scoresDecoded {
+                    scoreString += String(item) + GV.outerSeparator
+                }
+                scoreString.removeLast()
+                try! realm.safeWrite {
+                    GV.basicData.maxScores = scoreString
+                }
+            }
+            let bestScore = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
+            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
@@ -1163,7 +1177,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     }
     
     private func saveChoosedWord()->Bool {
-        let returnValue = !allWords.contains(where: {$0 == choosedWord})//checkChoosedWordInFoundedWordsMyWords()
+        var returnValue = true
+        for item in allWords {
+            if choosedWord.word == item.word {
+                var equalLettersCount = 0
+                for letter in item.usedLetters {
+                    if choosedWord.usedLetters.contains(where: {$0 == letter}) {
+                        equalLettersCount += 1
+                    }
+                }
+                if equalLettersCount == item.word.count {
+                    returnValue = false
+                }
+            }
+        }
+//        returnValue = !allWords.contains(where: {$0 == choosedWord})//checkChoosedWordInFoundedWordsMyWords()
         if returnValue {
             let addString = choosedWord.toString()
             let separator = playedGame.myWords.count == 0 ? "" : GV.outerSeparator

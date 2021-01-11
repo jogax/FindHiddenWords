@@ -31,6 +31,7 @@ class BasicData: Object {
     @objc dynamic var deviceInfoSaved = false
     @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var deviceRecordInCloudID = ""
+    @objc dynamic var maxScores = "0/0/0/0/0/0/0/0/0/0"
 
     override  class func primaryKey() -> String {
         return "ID"
