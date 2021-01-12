@@ -443,3 +443,45 @@ public func generateNewRealm(oldRealmName: String, newRealmName: String) {
         }
     }
 }
+
+//private func generateAssets() {
+//    let assetSizes = [20, 29, 40, 58, 60, 76, 87, 80, 120, 152, 167, 180, 1024]
+//    for size in assetSizes {
+//        let node = SKSpriteNode(imageNamed: "AppIcon.png")
+////        node.size = CGSize(width: size, height: size)
+//        let toFileName = "AppIcon\(size).png"
+//        saveImage (toFile: toFileName, fromNode: node, size: size)
+//    }
+//}
+//
+//private func saveImage (toFile: String, from: SKScene? = nil, fromNode: SKSpriteNode? = nil, size: Int = 0, deviceSize: CGSize = CGSize(width: 0, height: 0)) {
+////        #if SIMULATOR
+//    var texture: SKTexture?
+//    if from != nil {
+//        texture = SKView().texture(from: from!)!
+//    } else {
+//        texture = SKView().texture(from: fromNode!)!
+//    }
+//    if texture != nil {
+//        let myCGImage = (texture!.cgImage())
+//        let image = UIImage(cgImage: myCGImage)
+//        var resizeFactor: CGFloat = CGFloat(size)
+//        if resizeFactor == 0 && deviceSize != CGSize(width: 0, height: 0) {
+//            resizeFactor = deviceSize.width / image.size.width
+//        }
+//        let newImage = image.resizeImage(newWidth: CGFloat(resizeFactor))
+////            let newImage = image.resizeImageUsingVImage(size: CGSize(width: GV.actWidth, height: GV.actHeight))
+//        if let pngImageData = newImage.pngData() {
+//            let filename = getDocumentsDirectory().appendingPathComponent(toFile)
+//            try? pngImageData.write(to: filename)
+//        }
+//    }
+////        #endif
+//}
+//
+//private func getDocumentsDirectory() -> URL {
+//    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+//    let documentsDirectory = paths[0]
+//    return documentsDirectory
+//}
+

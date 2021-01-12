@@ -87,10 +87,11 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
 
     
     override func didMove(to view: SKView) {
+//        generateAssets()
 //        generateNewRealm(oldRealmName: "OrigGames.realm", newRealmName: "RO_Games.realm")
-        #if SIMULATOR
-            GV.actDevice = DeviceType.getActDevice()
-        #endif
+//        #if SIMULATOR
+//            GV.actDevice = DeviceType.getActDevice()
+//        #endif
         
 //        let octagon = DrawImages.drawOctagon(size: CGSize(width: 250, height: 250))
 
@@ -822,6 +823,8 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         }
 
     }
+    
+    
     
 //    private func initiateGames() {
 //        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
