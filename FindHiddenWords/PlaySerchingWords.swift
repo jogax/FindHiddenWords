@@ -63,12 +63,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         case .ShowMyWords:
             let wordForShow = myWordsForShow!.words[indexPath.row]
 //            let length = wordForShow.word.lastChar() == "*" ? wordForShow.word.count - 1 : wordForShow.word.count
+            let numberOfRow =  "  \(indexPath.row + 1)".fixLength(length: 4)
+            cell.addColumn(text: numberOfRow)
             cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord, leadingBlanks: false)) // WordColumn
             cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt), color: color) // Counter column
             cell.addColumn(text: String(wordForShow.length).fixLength(length: lengthOfLength))
             cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
         case .ShowWordsOverPosition:
+            let numberOfRow =  "  \(indexPath.row + 1)".fixLength(length: 4)
             let wordForShow = wordList!.words[indexPath.row]
+            cell.addColumn(text: numberOfRow)
             cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
             cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt - 1), color: color)
             cell.addColumn(text: String(wordForShow.length).fixLength(length: lengthOfLength - 1))
@@ -644,7 +648,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
 //        var countGreenCells = 0
         var countGreenWords = 0
         for myLabel in myLabels {
-            countGreenWords +=  myLabel.founded ? 1 : 0
+            countGreenWords +=  myLabel.founded && myLabel.mandatory ? 1 : 0
         }
         if countGreenWords == mandatoryWords.count {
             congratulation()
@@ -663,7 +667,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         let letter = choosedWord.usedLetters.first!
         for label in myLabels {
             if !label.mandatory || label.founded {
-                let word = label.usedWord!.word + (label.founded ? "*" : "")
+                let word = label.usedWord!.word + (label.founded && label.mandatory ? "*" : "")
                 for actLetter in label.usedWord!.usedLetters {
                     if actLetter == letter {
                         if !returnWords.contains(where: {$0.word == word}) {
@@ -671,7 +675,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                                 maxLength = word.length
                             }
                             let length = label.usedWord!.word.count
-                            returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: 0, counter: 1))                        } else {
+                            returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: 0, counter: 1))
+                        } else {
                             for index in 0..<returnWords.count {
                                 if returnWords[index].word == word {
                                     returnWords[index].counter += 1
@@ -991,10 +996,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         var returnScore = 0
         for label in myLabels {
             if !label.mandatory || label.founded {
-                let word = label.usedWord!.word  + (label.founded ? "*" : "")
+                let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
                 let length = label.usedWord!.word.count
                 if !returnWords.contains(where: {$0.word == word}) {
-                    let score = label.founded ? 0 : word.length * 50
+                    let score = label.founded && label.mandatory ? 0 : word.length * 50
                     returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
                     returnScore += score
                     if maxLength < word.length {
@@ -1012,8 +1017,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
             }
         }
-            returnWords = returnWords.sorted(by:{$0.length > $1.length ||
-                                                ($0.length == $1.length && ($0.counter > $1.counter || $0.word < $1.word))
+        returnWords = returnWords.sorted(by:{$0.length > $1.length ||
+                                            ($0.length == $1.length && (/*$0.counter > $1.counter || */$0.word < $1.word))
         })
         return (returnWords, maxLength, returnScore)
     }
@@ -1022,7 +1027,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     private func getMyWordsCount()->Int {
         var returnValue = 0
         for label in myLabels {
-            returnValue += label.isHidden ? 1 : 0
+            returnValue += label.founded ? 1 : 0
         }
         return returnValue
     }
@@ -1109,6 +1114,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                         counter += 1
                         if !myLabels.filter({!$0.mandatory}).contains(where: {$0.usedWord! == usedWord}) {
                             let myWord = MyFoundedWord(usedWord: usedWord, mandatory: false, prefixValue: counter + 1)
+                            myWord.founded = true
                             myWord.plPosSize = setPLPos(counter: counter)
                             myWord.setActPosSize()
                             gameLayer.addChild(myWord)
@@ -1188,6 +1194,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
                 if equalLettersCount == item.word.count {
                     returnValue = false
+                }
+            }
+        }
+        if !returnValue {
+            if mandatoryWords.contains(where: {$0 == choosedWord}) {
+                if myLabels.contains(where: {$0.usedWord!.word == choosedWord.word && !$0.founded}) {
+                    returnValue = true
                 }
             }
         }

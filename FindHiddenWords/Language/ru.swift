@@ -44,7 +44,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcFinishGameMessage:       "Ты закончил игру. Новая игра начинается.",
     .tcOK:                      "OK",
     .tcScore:                   "Мои очки:%, лучшие очки:%",
-    .tcShowMyWords:             "Покажи мои слова (%)",
+    .tcShowMyWords:             "Покажи слова (%)",
     .tcWord:                    "Слово",
     .tcCount:                   "Штк.",
     .tcLength:                  "Дл.",

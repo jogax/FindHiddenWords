@@ -165,6 +165,9 @@
 		D012501E25A8AEEA000BCF89 /* BlueOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueOctagon.png; sourceTree = "<group>"; };
 		D012501F25A8AEEA000BCF89 /* GrayOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GrayOctagon.png; sourceTree = "<group>"; };
 		D012502025A8AEEB000BCF89 /* GreenSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite.png; sourceTree = "<group>"; };
+		D07C772225AF25300087851B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		D07C772425AF25720087851B /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Main.strings; sourceTree = "<group>"; };
+		D07C772525AF257C0087851B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
 		D0B94E5A25A8B3AB0058F9B8 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		D0B94E5E25A8B3B20058F9B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		D0B94E6125A8B3B80058F9B8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
@@ -397,6 +400,9 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				hu,
+				ru,
 			);
 			mainGroup = D0E64EA125A899D7006BACC6;
 			productRefGroup = D0E64EAB25A899D7006BACC6 /* Products */;
@@ -536,6 +542,9 @@
 			isa = PBXVariantGroup;
 			children = (
 				D0E64EB825A899D7006BACC6 /* Base */,
+				D07C772225AF25300087851B /* de */,
+				D07C772425AF25720087851B /* hu */,
+				D07C772525AF257C0087851B /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -547,6 +556,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -608,6 +618,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

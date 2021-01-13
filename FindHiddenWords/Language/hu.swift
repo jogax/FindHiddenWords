@@ -44,7 +44,7 @@ let huDictionary: [TextConstants: String] = [
     .tcFinishGameMessage:       "Befejezted a játékot. Új játék indul.",
     .tcOK:                      "OK",
     .tcScore:                   "Saját pontszám:%, Legjobb pontszám:%",
-    .tcShowMyWords:             "Mutasd a szavaimat (%)",
+    .tcShowMyWords:             "Mutasd a szavakat (%)",
     .tcWord:                    "Szó",
     .tcCount:                   "Db.",
     .tcLength:                  "Hossz.",
