@@ -48,9 +48,9 @@ class MyAlertController: SKSpriteNode {
     let titleFontName = "HelveticaNeue-Bold"
     let fontName = "HelveticaNeue-Medium"
     
-    init(title: TextConstants, message: TextConstants = .tcEmpty, size: CGSize, target: AnyObject, type: AlertType) {
-        myTitle = GV.language.getText(title)
-        myMessage = GV.language.getText(message)
+    init(title: String, message: String, size: CGSize, target: AnyObject, type: AlertType) {
+        myTitle = title
+        myMessage = message
         myTarget = target
         switch type {
         case .Gold: myColor = myGoldColor

@@ -525,13 +525,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         case WordIsOK = 0, NoSuchWord, WordIsActiv
     }
     var counter = 0
-    var cellsToAnimate = [GameboardItem]()
-    private func animateLetters(_ usedWord: UsedWord, type: animationType) {
-        cellsToAnimate.removeAll()
+    private func animateLetters(newWord: UsedWord, earlierWord: UsedWord? = nil, type: animationType) {
+        var cellsToAnimate = [GameboardItem]()
+        var oldCellsToAnimate = [GameboardItem]()
         var myActions = [SKAction]()
         switch type {
         case .WordIsOK:
-            for usedLetter in usedWord.usedLetters {
+            for usedLetter in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row].copyMe())
             }
             var newBlockSize = GV.blockSize
@@ -570,8 +570,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 cell.run(sequence)
             }
         case .NoSuchWord:
-            cellsToAnimate.removeAll()
-            for item in choosedWord.usedLetters {
+            for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])
             }
             for cell in cellsToAnimate {
@@ -579,6 +578,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 cell.setStatus(toStatus: .OrigStatus)
 //                myActions.append(SKAction.wait(forDuration: 0.2))
                 for _ in 0...2 {
+                    
                     myActions.append(SKAction.run {
                         cell.setStatus(toStatus: .Error)
                     })
@@ -592,23 +592,46 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 cell.run(sequence)
             }
         case .WordIsActiv:
-            cellsToAnimate.removeAll()
-            for item in choosedWord.usedLetters {
+            for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])
             }
+            if earlierWord != nil {
+                for item in earlierWord!.usedLetters {
+                    oldCellsToAnimate.append(GV.gameArray[item.col][item.row])
+                }
+            }
+            let duration = 0.4
             for cell in cellsToAnimate {
                 myActions.removeAll()
                 cell.setStatus(toStatus: .OrigStatus)
 //                myActions.append(SKAction.wait(forDuration: 0.2))
                 for _ in 0...2 {
                     myActions.append(SKAction.run {
-                        cell.setStatus(toStatus: .GoldStatus)
+                        cell.setStatus(toStatus: .Error)
                     })
-                    myActions.append(SKAction.wait(forDuration: 0.4))
+                    myActions.append(SKAction.wait(forDuration: duration))
                     myActions.append(SKAction.run {
                         cell.setStatus(toStatus: .OrigStatus)
                     })
-                    myActions.append(SKAction.wait(forDuration: 0.2))
+                    myActions.append(SKAction.wait(forDuration: duration))
+                }
+                let sequence = SKAction.sequence(myActions)
+                cell.run(sequence)
+            }
+            let longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
+            for cell in oldCellsToAnimate {
+                myActions.removeAll()
+//                cell.setStatus(toStatus: .OrigStatus)
+                myActions.append(longWaitAction)
+                for _ in 0...2 {
+                    myActions.append(SKAction.run {
+                        cell.setStatus(toStatus: .GoldStatus)
+                    })
+                    myActions.append(SKAction.wait(forDuration: duration))
+                    myActions.append(SKAction.run {
+                        cell.setStatus(toStatus: .WholeWord)
+                    })
+                    myActions.append(SKAction.wait(forDuration: duration))
                 }
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
@@ -618,24 +641,31 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        let touchLocation = touches.first!.location(in: self)
+        for (index, letter) in choosedWord.usedLetters.enumerated() {
+            if index < choosedWord.usedLetters.count - 1 {
+                if abs(letter.col - choosedWord.usedLetters[index + 1].col) > 1 || abs(letter.row - choosedWord.usedLetters[index + 1].row) > 1 {
+                    clearTemporaryCells()
+                    return
+                }
+            }
+        }
         if choosedWord.count > 3 {
             let foundedWords = newWordListRealm.objects(NewWordListModel.self).filter("word = %@", GV.actLanguage + choosedWord.word.lowercased())
             if foundedWords.count == 1 {
                 if saveChoosedWord() {
-                    animateLetters(choosedWord, type: .WordIsOK)
+                    animateLetters(newWord: choosedWord, type: .WordIsOK)
                     mySounds.play(.OKWord)
                     setGameArrayToActualState()
                     let title = GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount()))
                     showMyWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
-                } else {
-                    animateLetters(choosedWord, type: .WordIsActiv)
-                    clearTemporaryCells()
-                    mySounds.play(.NoSuchWord)
+//                } else {
+//                    animateLetters(newWord: choosedWord, type: .WordIsActiv)
+//                    clearTemporaryCells()
+//                    mySounds.play(.NoSuchWord)
                 }
             } else {
                 clearTemporaryCells()
-                animateLetters(choosedWord, type: .NoSuchWord)
+                animateLetters(newWord: choosedWord, type: .NoSuchWord)
                 mySounds.play(.NoSuchWord)
             }
             choosedWord = UsedWord()
@@ -737,8 +767,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         try! playedGamesRealm?.safeWrite {
             playedGame.finished = true
         }
-        let myAlert = MyAlertController(title: .tcCongratulations,
-                                          message: .tcFinishGameMessage,
+        let myAlert = MyAlertController(title: GV.language.getText(.tcCongratulations),
+                                        message: GV.language.getText(.tcFinishGameMessage, values: String(GV.countWords), String(GV.score)),
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
@@ -1184,6 +1214,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     
     private func saveChoosedWord()->Bool {
         var returnValue = true
+        var earlierWord: UsedWord!
         for item in allWords {
             if choosedWord.word == item.word {
                 var equalLettersCount = 0
@@ -1192,8 +1223,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                         equalLettersCount += 1
                     }
                 }
-                if equalLettersCount == item.word.count {
+                if equalLettersCount > 0 { //== item.word.count {
                     returnValue = false
+                    earlierWord = item
+                    break
                 }
             }
         }
@@ -1212,6 +1245,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 playedGame.myWords.append(separator + addString)
                 playedGame.timeStamp = Date() as NSDate
             }
+        } else {
+            animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
         }
         return returnValue
     }
