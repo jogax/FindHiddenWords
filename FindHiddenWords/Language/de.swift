@@ -51,4 +51,5 @@ let deDictionary: [TextConstants: String] = [
     .tcScoreTxt:                "Punkte:",
     .tcCollectedOwnWords:       "Meine Wörter",
     .tcWordsOverLetter:         "Wörter über den Buchstaben: \"%\"",
+    .tcChooseSize:              "Spielgröße",
 ]

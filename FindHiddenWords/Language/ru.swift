@@ -51,4 +51,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcScoreTxt:                "Очки",
     .tcCollectedOwnWords:       "Мои слова",
     .tcWordsOverLetter:         "Слова над буквой: \"%\"",
+    .tcChooseSize:              "Размер игры",
 ]

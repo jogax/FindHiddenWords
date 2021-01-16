@@ -219,7 +219,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
          "09 iPhone 11P"   : CGSize(width: 414, height: 896),
          "10 iPhone 11L"   : CGSize(width: 896, height: 414),
     ]
-    
+/*
     private func generateScreenShotsForAllDevices() {
         for dimension in deviceDimensions.sorted(by: {$0.key < $1.key}) {
             GV.actWidth = dimension.value.width
@@ -245,7 +245,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         GV.minSide = min(GV.actWidth, GV.actHeight)
         GV.maxSide = max(GV.actWidth, GV.actHeight)
     }
-    
+*/
 //    private func setMainMenuSizesAndPositions() {
 //        let heightMpx: CGFloat = GV.onIpad ? 0.04 : 0.06
 //
@@ -292,10 +292,15 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         let mainMenuHeader = MyLabel(text: GV.language.getText(.tcMainTitle), position: mainTitlePosition, fontName: GV.fontName, fontSize: GV.minSide * headerMpx)
         mainMenuHeader.position = isPortrait ? mainTitlePosition.PPos : mainTitlePosition.LPos
 //        mainMenuHeader.position = isPortrait ? CGPoint() : CGPoint()
+        var gameText = GV.language.getText(.tcNewGame)
+        if GV.basicData.gameSize != 0 && GV.basicData.gameNumber != NoGamePlayed {
+            gameText = GV.language.getText(.tcContinueGame)
+        }
         menuLayer!.addChild(mainMenuHeader)
-        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcStartGame), action: #selector(showGameMenu), line: 0)
-        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcChooseLanguage), action: #selector(showLanguageMenu), line: 1)
-        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcDeveloperMenu), action: #selector(showDeveloperMenu), line: 2)
+        addButtonPL(to: menuLayer!, text: gameText, action: #selector(showGameMenu), line: 0)
+        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcChooseSize), action: #selector(showSizeMenu), line: 1)
+        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcChooseLanguage), action: #selector(showLanguageMenu), line: 2)
+        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcDeveloperMenu), action: #selector(showDeveloperMenu), line: 3)
         menuLayer!.setPosAndSizeForAllChildren()
     }
     
@@ -606,24 +611,27 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         grid!.name = gridName
         self.addChild(grid!)
     }
-    
+
     @objc private func showGameMenu() {
-        removeChildrenExceptTypes(from: menuLayer!, types: [.Background])
-        let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.9),
-                                           LPos: CGPoint(x: GV.maxSide * 0.5, y: GV.minSide * 0.9),
-                                           PSize: nil,
-                                           LSize: nil)
-        let gameMenuHeader = MyLabel(text: GV.language.getText(.tcStartGame), position: gameHeaderPosition, fontName: GV.fontName, fontSize: GV.minSide * 0.1)
-        gameMenuHeader.zPosition = self.zPosition + 1
-        menuLayer!.addChild(gameMenuHeader)
-//        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcDuelOfWords), action: #selector(duelWords), line: 0)
-        addButtonPL(to: menuLayer!, text: "5x5", action: #selector(startGame5), line: 0, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: "6x6", action: #selector(startGame6), line: 1, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: "7x7", action: #selector(startGame7), line: 2, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: "8x8", action: #selector(startGame8), line: 3, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: "9x9", action: #selector(startGame9), line: 4, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: "10x10", action: #selector(startGame10), line: 5, buttonWidth: 0.2)
-        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcBack), action: #selector(showMainMenu), line: GoBack, buttonWidth: 0.4)
+        searchWords(size: GV.size)
+    }
+    @objc private func showSizeMenu() {
+            removeChildrenExceptTypes(from: menuLayer!, types: [.Background])
+            let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.9),
+                                               LPos: CGPoint(x: GV.maxSide * 0.5, y: GV.minSide * 0.9),
+                                               PSize: nil,
+                                               LSize: nil)
+            let gameMenuHeader = MyLabel(text: GV.language.getText(.tcStartGame), position: gameHeaderPosition, fontName: GV.fontName, fontSize: GV.minSide * 0.1)
+            gameMenuHeader.zPosition = self.zPosition + 1
+            menuLayer!.addChild(gameMenuHeader)
+    //        addButtonPL(to: menuLayer!, text: GV.language.getText(.tcDuelOfWords), action: #selector(duelWords), line: 0)
+            addButtonPL(to: menuLayer!, text: "5x5", action: #selector(startGame5), line: 0, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: "6x6", action: #selector(startGame6), line: 1, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: "7x7", action: #selector(startGame7), line: 2, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: "8x8", action: #selector(startGame8), line: 3, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: "9x9", action: #selector(startGame9), line: 4, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: "10x10", action: #selector(startGame10), line: 5, buttonWidth: 0.2)
+            addButtonPL(to: menuLayer!, text: GV.language.getText(.tcBack), action: #selector(showMainMenu), line: GoBack, buttonWidth: 0.4)
     }
     
     let GoBack: CGFloat = 1000
@@ -688,7 +696,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         showPopupScene(playSearchingWordsScene!)
         playSearchingWordsScene!.start(delegate: self)
     }
-    
+/*
     @objc private func cubeOfWords() {
         for child in menuLayer!.children {
             if child.myType == .MyButton {
@@ -711,7 +719,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
 //            playWithCubeOfWords!.start()
         }
     }
-    
+*/
     private func fillGameArray(gameArray: [[GameboardItem]], content: String, toGrid: Grid) {
         let size = GV.size
         for (index, letter) in content.enumerated() {

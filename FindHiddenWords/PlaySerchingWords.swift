@@ -375,6 +375,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
 //            }
             GV.gameNumber = actGame.first!.gameNumber
         }
+        try! realm.safeWrite {
+            GV.basicData.gameSize = GV.size
+            GV.basicData.gameNumber = GV.gameNumber
+        }
         playingGame()
     }
     
@@ -768,7 +772,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             playedGame.finished = true
         }
         let myAlert = MyAlertController(title: GV.language.getText(.tcCongratulations),
-                                        message: GV.language.getText(.tcFinishGameMessage, values: String(GV.countWords), String(GV.score)),
+                                        message: GV.language.getText(.tcFinishGameMessage, values: String(playedGame.myCountWords), String(playedGame.myScore)),
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
@@ -1200,6 +1204,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     
     private func createNewPlayedGame(to origGame: Games) {
         try! playedGamesRealm!.safeWrite {
+            playedGame.myScore = 0
             playedGame = PlayedGame()
             playedGame.primary = origGame.primary
             playedGame.language = origGame.language

@@ -51,4 +51,5 @@ let huDictionary: [TextConstants: String] = [
     .tcScoreTxt:                "Pontszám",
     .tcCollectedOwnWords:       "Szavaim",
     .tcWordsOverLetter:         "Szavak a(z) \"%\" betü felett",
+    .tcChooseSize:              "Játékméret",
 ]

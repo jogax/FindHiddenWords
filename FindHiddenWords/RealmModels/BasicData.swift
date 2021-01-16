@@ -13,11 +13,14 @@ enum GCEnabledType: Int {
     case AskForGameCenter = 0, GameCenterEnabled, GameCenterSupressed
 }
 
+let NoGamePlayed = 5000
+
 
 class BasicData: Object {
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
-    @objc dynamic var gameNumber = 0
+    @objc dynamic var gameSize = 0
+    @objc dynamic var gameNumber = NoGamePlayed
     @objc dynamic var creationTime = Date()
     @objc dynamic var playingTime = 0
     @objc dynamic var playingTimeToday = 0
