@@ -68,6 +68,12 @@ class MyAlertController: SKSpriteNode {
         activeLines.append(isActive)
     }
     
+    public func addAction(text: String, action:Selector, isActive: Bool = false) {
+        myTexts.append(text)
+        myActions.append(action)
+        activeLines.append(isActive)
+    }
+    
     public func getPositionForAction(action: Selector)->CGPoint {
         for (index, selector) in myActions.enumerated() {
             if action == selector {
@@ -122,7 +128,7 @@ class MyAlertController: SKSpriteNode {
                 myBackgrounds[index].size = CGSize(width: self.frame.width, height:ownHeight)
             }
             if isNormalLine {
-                createLine(atY: actY + ownHeight * 1.5)
+//                createLine(atY: actY + ownHeight * 1.5)
             }
             self.addChild(label)
         }

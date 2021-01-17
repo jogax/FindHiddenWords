@@ -130,8 +130,8 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         GV.parentScene = self
 //        GV.buttonFontSize = self.frame.width * 0.040
         GV.oldSize = 0
-        GV.size = 0
-        showMainMenu()
+//        showMainMenu()
+        searchWords(size: GV.basicData.gameSize)
     }
     
     private func generateAssets() {
@@ -292,9 +292,9 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
         let mainMenuHeader = MyLabel(text: GV.language.getText(.tcMainTitle), position: mainTitlePosition, fontName: GV.fontName, fontSize: GV.minSide * headerMpx)
         mainMenuHeader.position = isPortrait ? mainTitlePosition.PPos : mainTitlePosition.LPos
 //        mainMenuHeader.position = isPortrait ? CGPoint() : CGPoint()
-        var gameText = GV.language.getText(.tcNewGame)
+        var gameText = GV.language.getText(.tcStartGame)
         if GV.basicData.gameSize != 0 && GV.basicData.gameNumber != NoGamePlayed {
-            gameText = GV.language.getText(.tcContinueGame)
+            gameText = GV.language.getText(.tcStartGame)
         }
         menuLayer!.addChild(mainMenuHeader)
         addButtonPL(to: menuLayer!, text: gameText, action: #selector(showGameMenu), line: 0)
@@ -615,6 +615,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     @objc private func showGameMenu() {
         searchWords(size: GV.size)
     }
+    
     @objc private func showSizeMenu() {
             removeChildrenExceptTypes(from: menuLayer!, types: [.Background])
             let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.9),
@@ -807,6 +808,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
             GV.basicData.deviceType = UIDevice().getModelCode()
             GV.basicData.land = GV.convertLocaleToInt()
             GV.basicData.lastPlayingDay = Date().yearMonthDay
+            GV.basicData.gameSize = 8
 
             try! realm.safeWrite() {
                 realm.add(GV.basicData)

@@ -200,10 +200,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         gameLayer = self
 
     }
-    public func start(delegate: GameMenuScene) {
+    public func start(delegate: GameMenuScene! = nil) {
 //        newWordListRealm = getNewWordList()
         
         oldOrientation = UIDevice.current.orientation.isPortrait
+        GV.language.setLanguage(GV.basicData.actLanguage)
 //        setGlobalSizes()
 //        wordsFontSize = GV.minSide * wordFontSizeMpx
 //        self.addChild(gameLayer)
@@ -215,7 +216,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         self.size = CGSize(width: GV.actWidth, height: GV.actHeight)
         myFont = UIFont(name: myFontName, size: GV.actHeight * 0.03)!
         playedGamesRealm = getRealm(type: .PlayedGameRealm)
-        myDelegate = delegate
+        if delegate != nil {
+            myDelegate = delegate
+        }
 //        showBackground(to: gameLayer)
 //        showGamesMenu()
         startNewGame()
@@ -261,26 +264,26 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
 
     }
     
-    private func addButtonPL(to: SKNode, text: String, action: Selector, line: CGFloat)->MyButton {
-        let button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.minSide * 0.4, height: GV.maxSide * 0.05))
+    private func addButtonPL(to: SKNode, text: String, action: Selector, buttonType: ButtonType)->MyButton {
+        let button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05))
         button.zPosition = self.zPosition + 20
         button.setButtonLabel(title: text, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
-        if line == GoBack {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.25, y: (GV.maxSide * 0.05)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.25, y: (GV.maxSide * 0.03)),
-                                         PSize: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05),
-                                         LSize: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05))
-        } else if line == ShowMyWords {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.70, y: (GV.maxSide * 0.05)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.70, y: (GV.maxSide * 0.03)),
-                                         PSize: CGSize(width: GV.minSide * 0.5, height: GV.maxSide * 0.05),
-                                         LSize: CGSize(width: GV.minSide * 0.5, height: GV.maxSide * 0.05))
-        } else {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: (GV.maxSide * 0.8) - (line * GV.maxSide * 0.06)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.5, y: (GV.minSide * 0.8) - (line * GV.maxSide * 0.06)),
-                                         PSize: CGSize(width: GV.minSide * 0.6, height: GV.maxSide * 0.05),
-                                         LSize: CGSize(width: GV.minSide * 0.6, height: GV.maxSide * 0.05))
+        if buttonType == .SizeButton {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * 0.05)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.03)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .LanguageButton {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: (GV.maxSide * 0.05)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.5, y: (GV.minSide * 0.05)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .WordsButton {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.05)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.03)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         }
         button.myType = .MyButton
         button.setActPosSize()
@@ -314,8 +317,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
 
 
     
-    let GoBack: CGFloat = 1000
-    let ShowMyWords: CGFloat = 1001
+    enum ButtonType: Int {
+        case SizeButton = 0, LanguageButton, WordsButton
+    }
     
     @objc private func goBack() {
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
@@ -910,17 +914,110 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             } else {
                 playedGame = myGame.first!
             }
-            goBackButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcBack), action: #selector(goBackToMainMenu), line: GoBack)
+            goBackButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
             possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             fillMandatoryWords()
             setGameArrayToActualState()
-            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount())), action: #selector(showMyWords), line: ShowMyWords)
-        }
+            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
+            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount())), action: #selector(showMyWords), buttonType: .WordsButton)
+         }
     }
     
+    @objc private func chooseSize() {
+        let myAlert = MyAlertController(title: GV.language.getText(.tcSizeMenuTitle),
+                                        message: "",
+                                          size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
+                                          target: self,
+                                          type: .Green)
+        myAlert.addAction(text: "5 x 5", action: #selector(self.choosed5), isActive: GV.size == 5 ? true : false)
+        myAlert.addAction(text: "6 x 6", action: #selector(self.choosed6), isActive: GV.size == 6 ? true : false)
+        myAlert.addAction(text: "7 x 7", action: #selector(self.choosed7), isActive: GV.size == 7 ? true : false)
+        myAlert.addAction(text: "8 x 8", action: #selector(self.choosed8), isActive: GV.size == 8 ? true : false)
+        myAlert.addAction(text: "9 x 9", action: #selector(self.choosed9), isActive: GV.size == 9 ? true : false)
+        myAlert.addAction(text: "10 x 10", action: #selector(self.choosed10), isActive: GV.size == 10 ? true : false)
+        myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
+        myAlert.presentAlert()
+        self.addChild(myAlert)
+    }
+    
+    @objc private func doNothing() {
+        
+    }
+    
+    private func choosed(size: Int) {
+        try! realm.safeWrite {
+            GV.basicData.gameSize = size
+            GV.size = size
+        }
+        self.start()
+    }
+    
+    @objc private func choosed5() {
+        choosed(size: 5)
+    }
+    
+    @objc private func choosed6() {
+        choosed(size: 6)
+    }
+    
+    @objc private func choosed7() {
+        choosed(size: 7)
+    }
+    
+    @objc private func choosed8() {
+        choosed(size: 8)
+    }
+    
+    @objc private func choosed9() {
+        choosed(size: 9)
+    }
+    
+    @objc private func choosed10() {
+        choosed(size: 10)
+    }
+    
+    @objc private func chooseLanguage() {
+        let myAlert = MyAlertController(title: GV.language.getText(.tcChooseLanguageTitle),
+                                        message: "",
+                                        size: CGSize(width: GV.actWidth * (GV.onIpad ? 0.5 : 0.8), height: GV.actHeight * 0.5),
+                                          target: self,
+                                          type: .Green)
+        myAlert.addAction(text: .tcEnglish, action: #selector(self.setEnglish), isActive: (GV.actLanguage == GV.language.getText(.tcEnglishShort)))
+        myAlert.addAction(text: .tcGerman, action: #selector(self.setGerman), isActive: (GV.actLanguage == GV.language.getText(.tcGermanShort)))
+        myAlert.addAction(text: .tcHungarian, action: #selector(self.setHungarian), isActive: (GV.actLanguage == GV.language.getText(.tcHungarianShort)))
+        myAlert.addAction(text: .tcRussian, action: #selector(self.setRussian), isActive: (GV.actLanguage == GV.language.getText(.tcRussianShort)))
+        myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
+        myAlert.presentAlert()
+        self.addChild(myAlert)
+    }
+    
+    @objc private func setLanguage(language: String) {
+        GV.language.setLanguage(language)
+        try! realm.safeWrite {
+            GV.basicData.actLanguage = language
+        }
+        self.start()
+    }
+    
+    @objc private func setEnglish() {
+        setLanguage(language: GV.language.getText(.tcEnglishShort))
+    }
+    
+    @objc private func setGerman() {
+        setLanguage(language: GV.language.getText(.tcGermanShort))
+    }
+
+    @objc private func setHungarian() {
+        setLanguage(language: GV.language.getText(.tcHungarianShort))
+    }
+
+    @objc private func setRussian() {
+        setLanguage(language: GV.language.getText(.tcRussianShort))
+    }
+
     let wordFont = UIFont(name: GV.headerFontName, size: GV.wordsFontSize)
     var firstWordPositionYP: CGFloat = 0
     var firstWordPositionYL: CGFloat = 0
@@ -1077,13 +1174,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     var myLabels = [MyFoundedWord]()
     var mandatoryWords = [UsedWord]()
     var allWords = [UsedWord]()
-    
-    private func addButton(to: SKNode, text: String, action: Selector, line: CGFloat, name: String? = nil) {
+/*
+    private func addButton(to: SKNode, text: String, action: Selector, buttonType: ButtonType, name: String? = nil) {
         let button = MyButton(fontName: GV.headerFontName, size: CGSize(width: GV.maxSide * 1.1, height: GV.minSide * 0.08))
         button.zPosition = self.zPosition + 20
         button.setButtonLabel(title: text, font: UIFont(name: GV.headerFontName, size: GV.minSide * 0.04)!)
         button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
-        if line == GoBack {
+        if ButtonType == GoBack {
             button.position = CGPoint(x: self.frame.width * 0.5, y: (self.frame.height * 0.2))
         } else {
             button.position = CGPoint(x: self.frame.width * 0.5, y: (self.frame.height * 0.8) - (line * GV.maxSide * 0.06))
@@ -1092,13 +1189,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         button.name = name
         to.addChild(button)
     }
-    
+*/
 
-    @objc private func goBackToMainMenu() {
-        stopShowingTableIfNeeded()
-        goBack()
-    }
-  
+//    @objc private func goBackToMainMenu() {
+//        stopShowingTableIfNeeded()
+//        goBack()
+//    }
+//
     private func setGameArrayToActualState() {
         var counter = 0
         let myWordsInDB = playedGame.myWords.components(separatedBy: GV.outerSeparator)
