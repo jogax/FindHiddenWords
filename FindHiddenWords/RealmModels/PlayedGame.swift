@@ -18,8 +18,8 @@ class PlayedGame: Object {
     @objc dynamic var gameArray = ""
 //    @objc dynamic var words = ""
     @objc dynamic var wordsToFind = ""
-    @objc dynamic var myScore = 0
-    @objc dynamic var myCountWords = 0
+//    @objc dynamic var myScore = 0
+//    @objc dynamic var myCountWords = 0
     @objc dynamic var myWords = ""
     @objc dynamic var finished = false
     @objc dynamic var timeStamp = NSDate()

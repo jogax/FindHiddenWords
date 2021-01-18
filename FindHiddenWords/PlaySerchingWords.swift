@@ -270,18 +270,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         button.setButtonLabel(title: text, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
         if buttonType == .SizeButton {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * 0.05)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.03)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * 0.04)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.04)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         } else if buttonType == .LanguageButton {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: (GV.maxSide * 0.05)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.5, y: (GV.minSide * 0.05)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: (GV.maxSide * 0.04)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.5, y: (GV.maxSide * 0.04)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         } else if buttonType == .WordsButton {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.05)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.03)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.04)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.04)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         }
@@ -430,6 +430,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     var choosedWord = UsedWord()
     var movingLocations = [CGPoint]()
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        clearTemporaryCells()
         stopShowingTableIfNeeded()
         choosedWord = UsedWord()
         let touchLocation = touches.first!.location(in: self)
@@ -701,7 +702,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         }
         var returnWords = [MyFoundedWordsForTable]()
         var maxLength = 0
-        var returnScore = 0
         let letter = choosedWord.usedLetters.first!
         for label in myLabels {
             if !label.mandatory || label.founded {
@@ -718,9 +718,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                             for index in 0..<returnWords.count {
                                 if returnWords[index].word == word {
                                     returnWords[index].counter += 1
-                                    returnScore -= returnWords[index].score
-                                    returnWords[index].score *= 2
-                                    returnScore += returnWords[index].score
+//                                    returnWords[index].score *= 2
                                 }
                             }
                         }
@@ -775,8 +773,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         try! playedGamesRealm?.safeWrite {
             playedGame.finished = true
         }
+        let (_, _, countWords, score) = getMyWordsForShow()
         let myAlert = MyAlertController(title: GV.language.getText(.tcCongratulations),
-                                        message: GV.language.getText(.tcFinishGameMessage, values: String(playedGame.myCountWords), String(playedGame.myScore)),
+                                        message: GV.language.getText(.tcFinishGameMessage, values: String(countWords), String(score)),
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
@@ -1086,7 +1085,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         tableType = .ShowMyWords
         var words: [MyFoundedWordsForTable]
 //        var score = 0
-        (words, globalMaxLength, _) = getMyWordsForShow()
+        (words, globalMaxLength, _, _) = getMyWordsForShow()
         myWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showScore: true)
         let suffix = " (\(myWordsForShow.countWords)/\(myWordsForShow.countAllWords)/\(myWordsForShow.score))"
@@ -1121,10 +1120,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         var score = 0
         var counter = 0
     }
-    private func getMyWordsForShow()->([MyFoundedWordsForTable], Int, Int) {
+    private func getMyWordsForShow()->([MyFoundedWordsForTable], Int, Int, Int) {
         var returnWords = [MyFoundedWordsForTable]()
         var maxLength = 0
         var returnScore = 0
+        var countWords = 0
         for label in myLabels {
             if !label.mandatory || label.founded {
                 let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
@@ -1147,11 +1147,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                     }
                 }
             }
+            countWords += label.mandatory ? 0 : 1
         }
         returnWords = returnWords.sorted(by:{$0.length > $1.length ||
                                             ($0.length == $1.length && (/*$0.counter > $1.counter || */$0.word < $1.word))
         })
-        return (returnWords, maxLength, returnScore)
+        return (returnWords, maxLength, countWords, returnScore)
     }
 
     
@@ -1269,7 +1270,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                     myWord.fontColor = .red
                 }
             }
-            let (_, _, score) = getMyWordsForShow()
+            let (_, _, _, score) = getMyWordsForShow()
             var scoresDecoded = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)
             let actMaxScore: Int! = Int(scoresDecoded[GV.size - 5])
             if score > actMaxScore {
@@ -1301,7 +1302,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     
     private func createNewPlayedGame(to origGame: Games) {
         try! playedGamesRealm!.safeWrite {
-            playedGame.myScore = 0
+//            playedGame.myScore = 0
             playedGame = PlayedGame()
             playedGame.primary = origGame.primary
             playedGame.language = origGame.language
