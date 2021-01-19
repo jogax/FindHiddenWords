@@ -121,6 +121,11 @@ struct GV {
         return value
     }
     
+    static func radian(_ grad: CGFloat)->CGFloat {
+        return grad * CGFloat(Double.pi) / 180
+    }
+
+    
 
     
     static func getTimeIntervalSince20190101(date: Date = Date())->Int {

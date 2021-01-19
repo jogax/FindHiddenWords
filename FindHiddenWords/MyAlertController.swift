@@ -174,12 +174,12 @@ class MyAlertController: SKSpriteNode {
     private func createFragments(text: String, font: UIFont)->[String] {
         var returnArray = [String]()
         let fragments = text.components(separatedBy: " ")
-        let maxLength = myTarget.frame.width * (GV.onIpad ? 0.8 : 0.6)
+        let maxLength = GV.actWidth * (GV.onIpad ? 0.8 : 0.6)
         var newFragment = ""
         for fragment in fragments {
             let adderWidth = fragment.width(font: font)
             let newFragmentWidth = newFragment.width(font: font)
-            if newFragmentWidth + adderWidth < maxLength {
+            if newFragmentWidth + adderWidth < maxLength - GV.actWidth * 0.01 {
                 newFragment += fragment + " "
             } else {
                 if newFragment.count > 0 {

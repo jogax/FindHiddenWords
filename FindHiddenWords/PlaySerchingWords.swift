@@ -540,6 +540,35 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         var myActions = [SKAction]()
         switch type {
         case .WordIsOK:
+            var waiting: Double = 0
+            let center = CGPoint(x: GV.actWidth / 2, y: GV.actHeight / 2)
+            var origPositions = [CGPoint]()
+            for usedLetter in newWord.usedLetters {
+                cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row].copyMe())
+                origPositions.append(GV.gameArray[usedLetter.col][usedLetter.row].position)
+            }
+            for (index, cell) in cellsToAnimate.enumerated() {
+                cell.setStatus(toStatus: .GoldStatus)
+                myActions.removeAll()
+                gameLayer.addChild(cell)
+                let path = UIBezierPath()
+                path.move(to: origPositions[index])
+                path.addLine(to: CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.minY))
+                path.addArc(withCenter: center,
+                            radius: GV.playingGrid!.frame.width / 2, startAngle: GV.radian(0), endAngle: GV.radian(360), clockwise: true)
+                path.addLine(to: origPositions[index])
+                let action = SKAction.follow(path.cgPath, asOffset: true, orientToPath: false, speed: 1000)
+                myActions.append(SKAction.wait(forDuration: waiting))
+                waiting += 1.0
+                myActions.append(action)
+                myActions.append(SKAction.removeFromParent())
+                let sequence = SKAction.sequence(myActions)
+                cell.zPosition = 100
+                cell.run(sequence)
+            }
+
+/*
+        case .WordIsOK:
             for usedLetter in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row].copyMe())
             }
@@ -555,7 +584,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 cell.size = CGSize(width: newBlockSize, height: newBlockSize)
             }
             let firstPositionX = (GV.actWidth - wordSize) * 0.5
-//            let fixPositionY = GV.playingGrid!frame.minY - newBlockSize
             let fixPositionY = GV.playingGrid!.frame.maxY + newBlockSize
 
             for (index, cell) in cellsToAnimate.enumerated() {
@@ -565,9 +593,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 let toPosition = GV.playingGrid!.gridPosition(col: cell.col, row: cell.row) + GV.playingGrid!.position
                 cell.position = toPosition
                 myActions.append(SKAction.move(to: CGPoint(x: firstPositionX + CGFloat(index) * newBlockSize * 1.3, y: fixPositionY), duration: 0.8))
-//                myActions.append(SKAction.resize(toWidth: newBlockSize * 1.2, height: newBlockSize * 1.2, duration: 0.5))
-//                myActions.append(SKAction.resize(toWidth: newBlockSize * 0.8, height: newBlockSize * 0.8, duration: 0.5))
-//                myActions.append(SKAction.resize(toWidth: newBlockSize * 1.2, height: newBlockSize * 1.2, duration: 0.5))
                 myActions.append(SKAction.scale(by: 1.2, duration: 0.5))
                 myActions.append(SKAction.scale(by: 0.8, duration: 0.5))
                 myActions.append(SKAction.scale(by: 1.2, duration: 0.5))
@@ -578,6 +603,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
+*/
         case .NoSuchWord:
             for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])
