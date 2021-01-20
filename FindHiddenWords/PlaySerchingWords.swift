@@ -541,69 +541,29 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         switch type {
         case .WordIsOK:
             var waiting: Double = 0
-            let center = CGPoint(x: GV.actWidth / 2, y: GV.actHeight / 2)
+//            let center = CGPoint(x: GV.actWidth / 2, y: GV.actHeight / 2)
             var origPositions = [CGPoint]()
             for usedLetter in newWord.usedLetters {
-                cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row].copyMe())
+                cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row]/*.copyMe()*/)
                 origPositions.append(GV.gameArray[usedLetter.col][usedLetter.row].position)
             }
-            for (index, cell) in cellsToAnimate.enumerated() {
+            for cell in cellsToAnimate {
                 cell.setStatus(toStatus: .GoldStatus)
                 myActions.removeAll()
-                gameLayer.addChild(cell)
-                let path = UIBezierPath()
-                path.move(to: origPositions[index])
-                path.addLine(to: CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.minY))
-                path.addArc(withCenter: center,
-                            radius: GV.playingGrid!.frame.width / 2, startAngle: GV.radian(0), endAngle: GV.radian(360), clockwise: true)
-                path.addLine(to: origPositions[index])
-                let action = SKAction.follow(path.cgPath, asOffset: true, orientToPath: false, speed: 1000)
                 myActions.append(SKAction.wait(forDuration: waiting))
-                waiting += 1.0
-                myActions.append(action)
-                myActions.append(SKAction.removeFromParent())
-                let sequence = SKAction.sequence(myActions)
-                cell.zPosition = 100
-                cell.run(sequence)
-            }
-
-/*
-        case .WordIsOK:
-            for usedLetter in newWord.usedLetters {
-                cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row].copyMe())
-            }
-            var newBlockSize = GV.blockSize
-            var wordSize = CGFloat(0)
-            repeat {
-                wordSize = CGFloat(cellsToAnimate.count) * newBlockSize * 1.3
-                if wordSize > (GV.actWidth * 0.6) {
-                    newBlockSize *= 0.95
-                }
-            } while wordSize > (GV.actWidth * 0.6)
-            for cell in cellsToAnimate {
-                cell.size = CGSize(width: newBlockSize, height: newBlockSize)
-            }
-            let firstPositionX = (GV.actWidth - wordSize) * 0.5
-            let fixPositionY = GV.playingGrid!.frame.maxY + newBlockSize
-
-            for (index, cell) in cellsToAnimate.enumerated() {
-                myActions.removeAll()
-                gameLayer.addChild(cell)
-                cell.setStatus(toStatus: .WholeWord)
-                let toPosition = GV.playingGrid!.gridPosition(col: cell.col, row: cell.row) + GV.playingGrid!.position
-                cell.position = toPosition
-                myActions.append(SKAction.move(to: CGPoint(x: firstPositionX + CGFloat(index) * newBlockSize * 1.3, y: fixPositionY), duration: 0.8))
-                myActions.append(SKAction.scale(by: 1.2, duration: 0.5))
-                myActions.append(SKAction.scale(by: 0.8, duration: 0.5))
-                myActions.append(SKAction.scale(by: 1.2, duration: 0.5))
-                myActions.append(SKAction.fadeOut(withDuration: 0.2))
-                myActions.append(SKAction.move(to: GV.playingGrid!.gridPosition(col: cell.col, row: cell.row) , duration: 0.2))
-                myActions.append(SKAction.removeFromParent())
-                cell.zPosition = 100
+                waiting += 0.5
+                myActions.append(SKAction.run {
+                    cell.setStatus(toStatus: .Lila)
+                })
+                myActions.append(SKAction.scale(by: 1.25, duration: 0.8))
+                myActions.append(SKAction.scale(by: 0.8, duration: 0.8))
+                myActions.append(SKAction.run {
+                    cell.setStatus(toStatus: .WholeWord)
+                })
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
-*/
+
         case .NoSuchWord:
             for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])

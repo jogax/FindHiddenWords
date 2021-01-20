@@ -10,7 +10,7 @@ import Foundation
 import GameplayKit
 
 enum ItemStatus: Int {
-    case Empty = 0, Temporary, Used, WholeWord, FixUsed, FixWholeWord, FixItem, Error, DarkGreenStatus, GoldStatus, DarkGoldStatus, OrigStatus
+    case Empty = 0, Temporary, Used, WholeWord, FixUsed, FixWholeWord, FixItem, Error, DarkGreenStatus, GoldStatus, DarkGoldStatus, OrigStatus, Lila
     var description: String {
         return String(self.rawValue)
     }
@@ -85,7 +85,8 @@ class GameboardItem: SKSpriteNode {
          StatusType(itemStatus: .GoldStatus, fixItem: false) : "GoldOctagon", //"GoldSprite",
          StatusType(itemStatus: .GoldStatus, fixItem: true) : "GoldOctagon", //"GoldSprite",
          StatusType(itemStatus: .DarkGoldStatus, fixItem: false) : "DarkGoldSprite",
-         StatusType(itemStatus: .DarkGoldStatus, fixItem: true) : "DarkGoldSprite"]
+         StatusType(itemStatus: .DarkGoldStatus, fixItem: true) : "DarkGoldSprite",
+         StatusType(itemStatus: .Lila, fixItem: false): "LilaOctagon"]
 
     public var letter = emptyLetter
     private var fontSize: CGFloat = 0
