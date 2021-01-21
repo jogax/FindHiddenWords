@@ -492,66 +492,37 @@ extension String {
         return self.components(separatedBy: myChar).count - 1
     }
     
-//    func myComponents(separatedBy: String)->[String] {
-//        var parts = [self, "", ""]
-//        let qmIndex = separatedBy.index(of: "?")
-//        if qmIndex == nil {
-//            guard let separatorIndex = self.index(of: separatedBy) else {
-//                return parts
-//            }
-//            parts[0] = self.startingSubString(length: separatorIndex)
-//            parts[1] = separatedBy
-//            parts[2] = self.endingSubString(at: separatorIndex + separatedBy.count)
-//            return parts
-//        } else {
-//            let separatedBy1 = separatedBy.startingSubString(length: qmIndex!)
-//            guard let separatorIndex = self.index(of: separatedBy1) else {
-//                return parts
-//            }
-//            let separatedBy2 = separatedBy.endingSubString(at: qmIndex! + 1)
-//            let separator2Index =  self.index(of:separatedBy2)
-//            if separator2Index == nil {
-//                return parts
-//            }
-//            if separatorIndex + separatedBy1.length + 1 == separator2Index {
-//                parts[0] = self.startingSubString(length: separatorIndex)
-//                parts[1] = separatedBy1 + self.char(at: separatorIndex + separatedBy1.length) + separatedBy2
-//                parts[2] = self.endingSubString(at: separator2Index! + separatedBy2.length)
-//            }
-//            return parts
-//        }
-
-        func myComponents(separatedBy: String)->[String] {
-            var parts = [self, "", ""]
-            let qmIndex = separatedBy.index(of: "?")
-            if qmIndex == nil {
-                guard let separatorIndex = self.index(of: separatedBy) else {
-                    return parts
-                }
-                parts[0] = self.startingSubString(length: separatorIndex)
-                parts[1] = separatedBy
-                parts[2] = self.endingSubString(at: separatorIndex + separatedBy.count)
-                return parts
-            } else {
-                var newSeparator = separatedBy.startingSubString(length: qmIndex!)
-                let indexes = self.indicesOf(string: newSeparator)
-                guard self.index(of: newSeparator) != nil else {
-                    return parts
-                }
-                for index in indexes {
-                    newSeparator += self.char(at: index + newSeparator.length) + separatedBy.endingSubString(at: qmIndex! + 1)
-                    let newSeparatorIndex = self.index(of: newSeparator)
-
-                    if newSeparatorIndex != nil {
-                        parts[0] = self.startingSubString(length: newSeparatorIndex!)
-                        parts[1] = newSeparator
-                        parts[2] = self.endingSubString(at: newSeparatorIndex! + newSeparator.length)
-                        return parts
-                    }
-                    newSeparator = separatedBy.startingSubString(length: qmIndex!)
-                }
+    func myComponents(separatedBy: String)->[String] {
+        var parts = [self, "", ""]
+        let qmIndex = separatedBy.index(of: "?")
+        if qmIndex == nil {
+            guard let separatorIndex = self.index(of: separatedBy) else {
                 return parts
             }
+            parts[0] = self.startingSubString(length: separatorIndex)
+            parts[1] = separatedBy
+            parts[2] = self.endingSubString(at: separatorIndex + separatedBy.count)
+            return parts
+        } else {
+            var newSeparator = separatedBy.startingSubString(length: qmIndex!)
+            let indexes = self.indicesOf(string: newSeparator)
+            guard self.index(of: newSeparator) != nil else {
+                return parts
+            }
+            for index in indexes {
+                newSeparator += self.char(at: index + newSeparator.length) + separatedBy.endingSubString(at: qmIndex! + 1)
+                let newSeparatorIndex = self.index(of: newSeparator)
+
+                if newSeparatorIndex != nil {
+                    parts[0] = self.startingSubString(length: newSeparatorIndex!)
+                    parts[1] = newSeparator
+                    parts[2] = self.endingSubString(at: newSeparatorIndex! + newSeparator.length)
+                    return parts
+                }
+                newSeparator = separatedBy.startingSubString(length: qmIndex!)
+            }
+            return parts
+        }
     }
     
 

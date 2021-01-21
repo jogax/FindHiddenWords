@@ -548,15 +548,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 origPositions.append(GV.gameArray[usedLetter.col][usedLetter.row].position)
             }
             for cell in cellsToAnimate {
-                cell.setStatus(toStatus: .GoldStatus)
+//                cell.setStatus(toStatus: .GoldStatus)
                 myActions.removeAll()
+                waiting += 0.4
                 myActions.append(SKAction.wait(forDuration: waiting))
-                waiting += 0.5
                 myActions.append(SKAction.run {
                     cell.setStatus(toStatus: .Lila)
                 })
                 myActions.append(SKAction.scale(by: 1.25, duration: 0.8))
-                myActions.append(SKAction.scale(by: 0.8, duration: 0.8))
+                myActions.append(SKAction.scale(by: 0.8, duration: 1.0))
                 myActions.append(SKAction.run {
                     cell.setStatus(toStatus: .WholeWord)
                 })
@@ -645,18 +645,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             }
         }
         if choosedWord.count > 3 {
-            let foundedWords = newWordListRealm.objects(NewWordListModel.self).filter("word = %@", GV.actLanguage + choosedWord.word.lowercased())
+            var searchWord = GV.actLanguage + choosedWord.word.lowercased()
+            let foundedWords = newWordListRealm.objects(NewWordListModel.self).filter("word = %@", searchWord)
             if foundedWords.count == 1 {
-                if saveChoosedWord() {
-                    animateLetters(newWord: choosedWord, type: .WordIsOK)
-                    mySounds.play(.OKWord)
-                    setGameArrayToActualState()
-                    let title = GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount()))
-                    showMyWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
-//                } else {
-//                    animateLetters(newWord: choosedWord, type: .WordIsActiv)
-//                    clearTemporaryCells()
-//                    mySounds.play(.NoSuchWord)
+                OKWordFound()
+            } else if GV.actLanguage == GV.language.getText(.tcGermanShort) {
+                if searchWord.indicesOf(string: "ss").count == 1 {
+                    searchWord = searchWord.replace("ss", values: ["ß"])
+                    let foundedWords = newWordListRealm.objects(NewWordListModel.self).filter("word = %@", searchWord)
+                    if foundedWords.count == 1 {
+                        OKWordFound()
+                    }
+                } else {
+                    clearTemporaryCells()
+                    animateLetters(newWord: choosedWord, type: .NoSuchWord)
+                    mySounds.play(.NoSuchWord)
                 }
             } else {
                 clearTemporaryCells()
@@ -677,6 +680,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         }
         if countGreenWords == mandatoryWords.count {
             congratulation()
+        }
+    }
+    
+    private func OKWordFound() {
+        if saveChoosedWord() {
+            animateLetters(newWord: choosedWord, type: .WordIsOK)
+            mySounds.play(.OKWord)
+            setGameArrayToActualState()
+            let title = GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount()))
+            showMyWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         }
     }
     
