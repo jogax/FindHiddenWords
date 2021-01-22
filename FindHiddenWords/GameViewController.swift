@@ -9,8 +9,47 @@
 import UIKit
 import SpriteKit
 import GameplayKit
+import Reachability
+import GameKit
 
-class GameViewController: UIViewController {
+class GameViewController: UIViewController, GCHelperDelegate {
+    
+    var tenMinutesTimer: Timer?
+
+    func matchStarted() {
+        
+    }
+    
+    func match(_ match: GKMatch, didReceive didReceiveData: Data, fromPlayer: String) {
+        
+    }
+    
+    func matchEnded(error: String) {
+        
+    }
+    
+    func localPlayerAuthenticated() {
+        GCHelper.shared.getBestScore(completion: {
+            
+        })
+    }
+    
+    func localPlayerNotAuthenticated() {
+        
+    }
+    
+    func continueTimeCount() {
+        
+    }
+    
+    func firstPlaceFounded() {
+        
+    }
+    
+    func myPlaceFounded() {
+        
+    }
+    
     
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -28,6 +67,7 @@ class GameViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
        super.viewWillAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(deviceRotated), name: UIDevice.orientationDidChangeNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(reachabilityChanged(note:)), name: .reachabilityChanged, object: GV.reachability)
    }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -70,20 +110,10 @@ class GameViewController: UIViewController {
                 view.presentScene(scene)
             
             view.ignoresSiblingOrder = true
-//            GV.actDevice = DeviceType.getActDevice()
-            
-//            view.showsFPS = true
-//            view.showsNodeCount = true
         }
-
     }
     
     @objc func deviceRotated() {
-//        print("in Rotated ------ \(self.view.frame) -------- at: \(Date())")
-//        let localScene = scene
-        
-//        setGlobalSizes()
-//        GV.deviceOrientation = getDeviceOrientation()
         if GV.orientationHandler != nil && GV.target != nil {
             _ = GV.target!.perform(GV.orientationHandler!)
         }
@@ -133,25 +163,38 @@ class GameViewController: UIViewController {
 
     }
     
-
+    var oldConnectedToInternet = false
     
-//    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
-//        super.willTransition(to: newCollection, with: coordinator)
-//
-//        coordinator.animate(alongsideTransition: { (context) in
-//            guard let windowInterfaceOrientation = self.windowInterfaceOrientation else { return }
-//
-//            if windowInterfaceOrientation.isLandscape {
-//                // activate landscape changes
-//            } else {
-//                // activate portrait changes
-//            }
-//        })
-//    }
-//
-//    private var windowInterfaceOrientation: UIInterfaceOrientation? {
-//        return UIApplication.shared.windows.first?.windowScene?.interfaceOrientation
-//    }
+    
+    @objc func reachabilityChanged(note: Notification) {
+        
+        let reachability = note.object as! Reachability
+        
+        switch reachability.connection {
+        case .wifi:
+            GV.connectedToInternet = true
+        case .cellular:
+            GV.connectedToInternet = true
+        case .none:
+            GV.connectedToInternet = false
+        case .unavailable:
+            GV.connectedToInternet = false
+        default:
+            GV.connectedToInternet = false
+        }
+        if oldConnectedToInternet != GV.connectedToInternet {
+            if GV.connectedToInternet {
+                if GV.basicData.actLanguage == "" { // BsiacDataRecord not loaded yet
+                    getBasicData()
+                }
+                GCHelper.shared.authenticateLocalUser(theDelegate: self, presentingViewController: self)
+            } else {
+                
+            }
+            oldConnectedToInternet = GV.connectedToInternet
+        }
+    }
+
 
 
     func printFonts() {

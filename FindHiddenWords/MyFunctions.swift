@@ -12,6 +12,7 @@ import Realm
 import RealmSwift
 import UIKit
 import GameplayKit
+import Reachability
 
 
 func + (left: CGSize, right: CGSize) -> CGSize {
@@ -444,44 +445,59 @@ public func generateNewRealm(oldRealmName: String, newRealmName: String) {
     }
 }
 
-//private func generateAssets() {
-//    let assetSizes = [20, 29, 40, 58, 60, 76, 87, 80, 120, 152, 167, 180, 1024]
-//    for size in assetSizes {
-//        let node = SKSpriteNode(imageNamed: "AppIcon.png")
-////        node.size = CGSize(width: size, height: size)
-//        let toFileName = "AppIcon\(size).png"
-//        saveImage (toFile: toFileName, fromNode: node, size: size)
-//    }
-//}
-//
-//private func saveImage (toFile: String, from: SKScene? = nil, fromNode: SKSpriteNode? = nil, size: Int = 0, deviceSize: CGSize = CGSize(width: 0, height: 0)) {
-////        #if SIMULATOR
-//    var texture: SKTexture?
-//    if from != nil {
-//        texture = SKView().texture(from: from!)!
-//    } else {
-//        texture = SKView().texture(from: fromNode!)!
-//    }
-//    if texture != nil {
-//        let myCGImage = (texture!.cgImage())
-//        let image = UIImage(cgImage: myCGImage)
-//        var resizeFactor: CGFloat = CGFloat(size)
-//        if resizeFactor == 0 && deviceSize != CGSize(width: 0, height: 0) {
-//            resizeFactor = deviceSize.width / image.size.width
-//        }
-//        let newImage = image.resizeImage(newWidth: CGFloat(resizeFactor))
-////            let newImage = image.resizeImageUsingVImage(size: CGSize(width: GV.actWidth, height: GV.actHeight))
-//        if let pngImageData = newImage.pngData() {
-//            let filename = getDocumentsDirectory().appendingPathComponent(toFile)
-//            try? pngImageData.write(to: filename)
-//        }
-//    }
-////        #endif
-//}
-//
-//private func getDocumentsDirectory() -> URL {
-//    let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//    let documentsDirectory = paths[0]
-//    return documentsDirectory
-//}
+public func startReachability() {
+    if GV.reachability == nil {
+        try! GV.reachability = Reachability()
+    }
+    GV.reachability!.whenReachable = { reachability in
+        if reachability.connection == .wifi {
+            print("Reachable via WiFi")
+        } else {
+            print("Reachable via Cellular")
+        }
+    }
+    GV.reachability!.whenUnreachable = { _ in
+        print("Not reachable")
+    }
+    
+    do {
+        try GV.reachability!.startNotifier()
+    } catch {
+        print("Unable to start notifier")
+    }
+
+}
+public func getBasicData() {
+    if realm.objects(BasicData.self).count == 0 {
+        GV.basicData = BasicData()
+        GV.basicData.actLanguage = GV.language.getText(.tcAktLanguage)
+        GV.basicData.creationTime = Date()
+        GV.basicData.deviceType = UIDevice().getModelCode()
+        GV.basicData.land = GV.convertLocaleToInt()
+        GV.basicData.lastPlayingDay = Date().yearMonthDay
+        GV.basicData.gameSize = 8
+
+        try! realm.safeWrite() {
+            realm.add(GV.basicData)
+        }
+    } else {
+        GV.basicData = realm.objects(BasicData.self).first!
+        GV.language.setLanguage(GV.basicData.actLanguage)
+
+        if GV.basicData.deviceType == 0 {
+            try! realm.safeWrite() {
+                GV.basicData.deviceType = UIDevice().getModelCode()
+                GV.basicData.land = GV.convertLocaleToInt()
+           }
+        }
+        if Date().yearMonthDay != GV.basicData.lastPlayingDay {
+            try! realm.safeWrite() {
+                GV.basicData.lastPlayingDay = Date().yearMonthDay
+                GV.basicData.playingTimeToday = 0
+                GV.basicData.countPlaysToday = 0
+            }
+        }
+    }
+
+}
 

@@ -76,29 +76,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
             cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt - 1), color: color)
             cell.addColumn(text: String(wordForShow.length).fixLength(length: lengthOfLength - 1))
-//            cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore + 1), color: color)
-//        case .ShowFoundedWords:
-//            cell.addColumn(text: "  " + listOfFoundedWords[indexPath.row].word.uppercased().fixLength(length: lengthOfWord, leadingBlanks: false), color: myLightBlue)
-//            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].length).fixLength(length: lengthOfLength), color: myLightBlue)
-//            cell.addColumn(text: String(listOfFoundedWords[indexPath.row].score).fixLength(length: lengthOfScore), color: myLightBlue)
-//            let restLength = Int(tableView.frame.width / "A".width(font:myFont)) - lengthOfWord - lengthOfLength - lengthOfScore
-//            let spaces = " "
-//            cell.addColumn(text: spaces.fixLength(length: restLength), color: myLightBlue)
-//        case .ShowHints:
-//            var actColor = UIColor.white
-//            let item = hintsTableForShow[indexPath.row]
-//            switch item.type {
-//            case .WithFixLetter: actColor = UIColor(red: 248/255, green: 209/255, blue: 255/255, alpha: 1.0)
-//            case .WithRedLetter: actColor = UIColor(red: 242/255, green: 170/255, blue: 159/255, alpha: 1.0)
-//            case .WithGreenLetter: actColor = UIColor(red: 153/255, green: 249/255, blue: 114/255, alpha: 1.0)
-//            }
-//            cell.addColumn(text: "   " + item.hint.fixLength(length: lengthOfWord, leadingBlanks: false), color: actColor)
-//            let lengthText = "\(item.hint.count) (\(item.count))"
-//            cell.addColumn(text: lengthText.fixLength(length: lengthOfLength), color: actColor)
-//            cell.addColumn(text: String(item.score).fixLength(length: lengthOfScore), color: actColor)
-//            let restLength = Int(tableView.frame.width / "A".width(font:myFont)) - lengthOfWord - lengthOfLength - lengthOfScore
-//            let spaces = " "
-//            cell.addColumn(text: spaces.fixLength(length: restLength), color: actColor)
         default:
             break
         }
@@ -133,20 +110,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             }
         case .ShowWordsOverPosition:
             text = GV.language.getText(.tcWordsOverLetter, values: choosedWord.usedLetters.first!.letter).fixLength(length: tableHeader.length, center: true)
-//        case .ShowFoundedWords:
-//            let header0 = GV.language.getText(.tcSearchingWord, values: searchingWord)
-//            let header1 = GV.language.getText(.tcShowWordlistHeader, values: String(listOfFoundedWords.count))
-//            (width, length) = calculateTableViewWidth(header0: header0, header1: header1, header2: title)
-//            let optimalLength = Int(tableView.frame.width / "A".width(font: myFont))
-//            length = length < optimalLength ? optimalLength : length
-//            text = header1.fixLength(length: length, center: true)
-//            text0 = header0.fixLength(length: length, center: true)
-//        case .ShowHints:
-//            let length = Int(tableView.frame.width / "W".width(font: myFont))
-//            text = hintHeaderLine.fixLength(length: length + 4, center: true)
-//            if title.length < text.length {
-//                width = text.width(font: myFont)
-//            }
         default:
             break
         }
@@ -169,11 +132,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         label2.text = tableHeader
         label2.textColor = textColor
         view.addSubview(label2)
-//        if tableType == .ShowFoundedWords {
-//            view.backgroundColor = myLightBlue
-//        } else {
-            view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
-//        }
+        view.backgroundColor = UIColor(red:240/255, green: 240/255, blue: 240/255, alpha: 1.0)
         return view
     }
 
@@ -1290,7 +1249,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             GV.gameArray[col][row].showConnections()
         })
     }
-    
+        
     private func iterateGameArray(doing: (_ col: Int, _ row: Int)->()) {
         for col in 0..<GV.size {
             for row in 0..<GV.size {
@@ -1347,12 +1306,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 playedGame.myWords.append(separator + addString)
                 playedGame.timeStamp = Date() as NSDate
             }
+            let bestScore = Int(GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5])
+            GCHelper.shared.sendScoreToGameCenter(score: bestScore, gameSize: GV.size, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
         }
         return returnValue
     }
     
+    @objc private func modifyScoreLabel() {
+        let (_, _, _, score) = getMyWordsForShow()
+        let bestScore = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
+        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
+    }
+
 //    var myFoundedWords = [UsedWord]()
     
     

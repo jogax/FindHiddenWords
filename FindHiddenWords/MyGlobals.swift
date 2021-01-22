@@ -12,6 +12,7 @@ import AVFoundation
 import UIKit
 import RealmSwift
 import GameKit
+import Reachability
 
 //let actVersion = "0.991" // Build 23, Version 1.23
 //let actVersion = "1.0" // Build 25, Version 1.25
@@ -39,6 +40,22 @@ public enum GradientDirection {
     case UpRight
 }
 
+// for GameCenter GlobalData
+struct PlayerData {
+    var alias = ""
+    var isOnline = false
+    var allTime = 0
+    var lastDay = 0
+    var lastTime = 0
+    var device = ""
+    var version = ""
+    var land = ""
+    var easyBestScore: Int64 = 0
+    var mediumBestScore: Int64 = 0
+    var easyActScore = ""
+    var mediumActScore = ""
+    var countPlays = ""
+}
 
 struct GV {
     static var actLanguage: String {
@@ -55,7 +72,9 @@ struct GV {
 //            }
         }
     }
+    static var reachability: Reachability!
     static var playingGrid: Grid?
+    static var globalInfoTable = [PlayerData]()
     static var gameArray3D = [[[GameboardItem]]]()
     static var mainView: UIViewController?
     static let language = Language()
@@ -86,7 +105,8 @@ struct GV {
     static var touchParam1: Set<UITouch>!
     static var touchParam2: UIEvent?
     static var touchType: TouchType?
-
+    static var connectedToInternet = false
+    static let TimeModifier: Int64 = 10000000000
 
 
     static var orientationHandler: Selector?

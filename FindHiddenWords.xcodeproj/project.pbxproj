@@ -79,6 +79,7 @@
 		D012504725A8AEEB000BCF89 /* BlueOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501E25A8AEEA000BCF89 /* BlueOctagon.png */; };
 		D012504825A8AEEB000BCF89 /* GrayOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501F25A8AEEA000BCF89 /* GrayOctagon.png */; };
 		D012504925A8AEEB000BCF89 /* GreenSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = D012502025A8AEEB000BCF89 /* GreenSprite.png */; };
+		D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */; };
 		D0954F6225B9CE19004980F6 /* gelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D0954F6125B9CE19004980F6 /* gelbOctagon.png */; };
 		D09E5F4125B87E86001291D9 /* LilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D09E5F4025B87E86001291D9 /* LilaOctagon.png */; };
 		D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */; };
@@ -167,6 +168,7 @@
 		D012501E25A8AEEA000BCF89 /* BlueOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueOctagon.png; sourceTree = "<group>"; };
 		D012501F25A8AEEA000BCF89 /* GrayOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GrayOctagon.png; sourceTree = "<group>"; };
 		D012502025A8AEEB000BCF89 /* GreenSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite.png; sourceTree = "<group>"; };
+		D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
 		D07C772225AF25300087851B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772425AF25720087851B /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772525AF257C0087851B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 				D0124F9E25A8A0B0000BCF89 /* GradientNode.swift */,
 				D0124FA125A8A0E8000BCF89 /* GameMenuScene.swift */,
 				D0124FA425A8A10C000BCF89 /* GameViewController.swift */,
+				D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */,
 				D0124FA725A8A138000BCF89 /* GenerateGameArray.swift */,
 				D0124FAA25A8A154000BCF89 /* Grid.swift */,
 				D0124FBD25A8A23D000BCF89 /* MyAlertController.swift */,
@@ -528,6 +531,7 @@
 				D0124FCE25A8A325000BCF89 /* MyLabel.swift in Sources */,
 				D0124FA525A8A10C000BCF89 /* GameViewController.swift in Sources */,
 				D0E64EB425A899D7006BACC6 /* GameScene.swift in Sources */,
+				D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */,
 				D0124FBB25A8A217000BCF89 /* ru.swift in Sources */,
 				D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */,
 				D0124FE925A8A44A000BCF89 /* NewWorldListModel.swift in Sources */,

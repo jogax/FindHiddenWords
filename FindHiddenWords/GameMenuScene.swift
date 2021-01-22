@@ -800,39 +800,39 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     }
 
     
-    private func getBasicData() {
-        if realm.objects(BasicData.self).count == 0 {
-            GV.basicData = BasicData()
-            GV.basicData.actLanguage = GV.language.getText(.tcAktLanguage)
-            GV.basicData.creationTime = Date()
-            GV.basicData.deviceType = UIDevice().getModelCode()
-            GV.basicData.land = GV.convertLocaleToInt()
-            GV.basicData.lastPlayingDay = Date().yearMonthDay
-            GV.basicData.gameSize = 8
-
-            try! realm.safeWrite() {
-                realm.add(GV.basicData)
-            }
-        } else {
-            GV.basicData = realm.objects(BasicData.self).first!
-            GV.language.setLanguage(GV.basicData.actLanguage)
-
-            if GV.basicData.deviceType == 0 {
-                try! realm.safeWrite() {
-                    GV.basicData.deviceType = UIDevice().getModelCode()
-                    GV.basicData.land = GV.convertLocaleToInt()
-               }
-            }
-            if Date().yearMonthDay != GV.basicData.lastPlayingDay {
-                try! realm.safeWrite() {
-                    GV.basicData.lastPlayingDay = Date().yearMonthDay
-                    GV.basicData.playingTimeToday = 0
-                    GV.basicData.countPlaysToday = 0
-                }
-            }
-        }
-
-    }
+//    private func getBasicData() {
+//        if realm.objects(BasicData.self).count == 0 {
+//            GV.basicData = BasicData()
+//            GV.basicData.actLanguage = GV.language.getText(.tcAktLanguage)
+//            GV.basicData.creationTime = Date()
+//            GV.basicData.deviceType = UIDevice().getModelCode()
+//            GV.basicData.land = GV.convertLocaleToInt()
+//            GV.basicData.lastPlayingDay = Date().yearMonthDay
+//            GV.basicData.gameSize = 8
+//
+//            try! realm.safeWrite() {
+//                realm.add(GV.basicData)
+//            }
+//        } else {
+//            GV.basicData = realm.objects(BasicData.self).first!
+//            GV.language.setLanguage(GV.basicData.actLanguage)
+//
+//            if GV.basicData.deviceType == 0 {
+//                try! realm.safeWrite() {
+//                    GV.basicData.deviceType = UIDevice().getModelCode()
+//                    GV.basicData.land = GV.convertLocaleToInt()
+//               }
+//            }
+//            if Date().yearMonthDay != GV.basicData.lastPlayingDay {
+//                try! realm.safeWrite() {
+//                    GV.basicData.lastPlayingDay = Date().yearMonthDay
+//                    GV.basicData.playingTimeToday = 0
+//                    GV.basicData.countPlaysToday = 0
+//                }
+//            }
+//        }
+//
+//    }
     
     
     
