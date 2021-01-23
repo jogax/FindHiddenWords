@@ -1088,7 +1088,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
                 let length = label.usedWord!.word.count
                 if !returnWords.contains(where: {$0.word == word}) {
-                    let score = label.founded && label.mandatory ? 0 : word.length * 50
+                    let score = word.length * 50
                     returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
                     returnScore += score
                     if maxLength < word.length {
@@ -1229,8 +1229,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
             }
             let (_, _, _, score) = getMyWordsForShow()
-            var scoresDecoded = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)
-            let actMaxScore: Int! = Int(scoresDecoded[GV.size - 5])
+            var scoresDecoded = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)
+            let actMaxScore: Int! = Int(scoresDecoded[GV.basicData.gameSize - 5])
             if score > actMaxScore {
                 scoresDecoded[GV.size - 5] = String(score)
                 var scoreString = ""
@@ -1239,10 +1239,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
                 scoreString.removeLast()
                 try! realm.safeWrite {
-                    GV.basicData.maxScores = scoreString
+                    GV.basicData.localMaxScores = scoreString
                 }
             }
-            let bestScore = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
+            let bestScore = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
             scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
@@ -1291,6 +1291,29 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
             }
         }
+        if returnValue {
+            for (itemIndex, item) in mandatoryWords.enumerated() {
+                if choosedWord.word == item.word {
+                    var mandatoryWordOK = true
+                    for index in 0..<choosedWord.usedLetters.count {
+                        if choosedWord.usedLetters[index] != item.usedLetters[index] {
+                            mandatoryWordOK = false
+                            break
+                        }
+                    }
+                    if !mandatoryWordOK {
+                        mandatoryWords[itemIndex] = choosedWord
+                        for (labelIndex, labelItem) in myLabels.enumerated() {
+                            if labelItem.usedWord?.word == choosedWord.word {
+                                myLabels[labelIndex].usedWord = choosedWord
+                                break
+                            }
+                        }
+                        break
+                    }
+                }
+            }
+        }
         if !returnValue {
             if mandatoryWords.contains(where: {$0 == choosedWord}) {
                 if myLabels.contains(where: {$0.usedWord!.word == choosedWord.word && !$0.founded}) {
@@ -1306,7 +1329,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 playedGame.myWords.append(separator + addString)
                 playedGame.timeStamp = Date() as NSDate
             }
-            let bestScore = Int(GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5])
+            let bestScore = Int(GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5])
             GCHelper.shared.sendScoreToGameCenter(score: bestScore, gameSize: GV.size, completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
 
@@ -1318,7 +1341,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     
     @objc private func modifyScoreLabel() {
         let (_, _, _, score) = getMyWordsForShow()
-        let bestScore = GV.basicData.maxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
+        let bestScore = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
         scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
     }
 

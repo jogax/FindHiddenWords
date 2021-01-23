@@ -33,6 +33,7 @@ public enum TouchType: Int {
     case Began = 0, Moved, Ended
 }
 
+
 public enum GradientDirection {
     case Up
     case Left
@@ -56,6 +57,62 @@ struct PlayerData {
     var mediumActScore = ""
     var countPlays = ""
 }
+enum ScoreType: Int {
+    case X5 = 0, X6, X7, X8, X9, X10, WordCount
+}
+enum TimeScope: Int {
+    case All = 0, Week, Today
+}
+
+
+struct ScoreForShow {
+    var scoreType: ScoreType = ScoreType.WordCount
+    var timeScope: TimeScope = TimeScope.Today
+    var place = 0
+    var player = ""
+    var score = 0
+    var me = false
+    init (scoreType: ScoreType, timeScope: TimeScope, place: Int, player: String, score: Int, me: Bool) {
+        self.scoreType = scoreType
+        self.timeScope = timeScope
+        self.place = place
+        self.player = player
+        self.score = score
+        self.me = me
+    }
+}
+
+
+func == (left: MyDate, right: MyDate) -> Bool {
+    return left.year == right.year &&
+        left.month == right.month &&
+        left.day == right.day &&
+        left.hour == right.hour &&
+        abs(left.minute - right.minute) < 11
+}
+
+struct MyDate {
+    let year: Int
+    let month: Int
+    let day: Int
+    let hour: Int
+    let minute: Int
+    let second: Int
+    init(date: Date) {
+        let calendar = Calendar.current
+        let actComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute, .second], from: date)
+        year = actComponents.year!
+        month = actComponents.month!
+        day = actComponents.day!
+        hour = actComponents.hour!
+        minute = actComponents.minute!
+        second = actComponents.second!
+    }
+    func datum()->Int {
+        return year * 10000 + month * 100 + day
+    }
+}
+
 
 struct GV {
     static var actLanguage: String {
@@ -76,6 +133,8 @@ struct GV {
     static var playingGrid: Grid?
     static var globalInfoTable = [PlayerData]()
     static var gameArray3D = [[[GameboardItem]]]()
+    static var scoreForShowTable = [ScoreForShow]()
+    static var scoreTable = [Int]()
     static var mainView: UIViewController?
     static let language = Language()
     static var basicData = BasicData()
@@ -126,7 +185,38 @@ struct GV {
         }
     }
 
+    static func convertIntToLocale(value: Int)->String {
+        let landInt = value / 10000
+        let languageInt = value % 10000
+        let returnValue =
+            codeTableToString[landInt / 100]! +
+            codeTableToString[landInt % 100]! +
+            "/" +
+            codeTableToString[languageInt / 100]!.lowercased() +
+            codeTableToString[languageInt % 100]!.lowercased()
+        return returnValue
+    }
     
+    static func convertNowToMyDate()->MyDate {
+        let returnValue = MyDate(date: Date())
+        return returnValue
+    }
+    
+    static func getTimeIntervalSince20190101(date: Date = Date())->Int {
+        var dateComponents = DateComponents()
+        dateComponents.year = 2019
+        dateComponents.month = 1
+        dateComponents.day = 1
+        //        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
+        let userCalendar = Calendar.current // user calendar
+        let someDateTime = userCalendar.date(from: dateComponents)
+        let now = date
+        let returnValue = now.timeIntervalSince(someDateTime!)
+        return Int(returnValue)
+    }
+    
+
+
     static func convertLocaleToInt()->Int {
         var actLocale = "EN"
         if Locale.current.regionCode != nil {
@@ -145,23 +235,18 @@ struct GV {
         return grad * CGFloat(Double.pi) / 180
     }
 
-    
-
-    
-    static func getTimeIntervalSince20190101(date: Date = Date())->Int {
+    static func getDateFromInterval(interval: Int)->MyDate {
         var dateComponents = DateComponents()
         dateComponents.year = 2019
         dateComponents.month = 1
         dateComponents.day = 1
-        //        dateComponents.timeZone = TimeZone(abbreviation: "JST") // Japan Standard Time
         let userCalendar = Calendar.current // user calendar
-        let someDateTime = userCalendar.date(from: dateComponents)
-        let now = date
-        let returnValue = now.timeIntervalSince(someDateTime!)
-        return Int(returnValue)
+        let referenceDate = userCalendar.date(from: dateComponents)
+        let date = Date(timeInterval: Double(interval), since: referenceDate!)
+        let returnValue = MyDate(date: date)
+        return returnValue
     }
     
-
     static var screenWidth: CGFloat {
         if UIWindow.isLandscape {
             return UIScreen.main.bounds.size.height
