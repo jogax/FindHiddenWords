@@ -445,14 +445,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
         if OK {
             var lastIndex = colRowTable.count - 1
-            if colRowTable[lastIndex].col == col && colRowTable[lastIndex].row == row {
+            if lastIndex >= 0 && colRowTable[lastIndex].col == col && colRowTable[lastIndex].row == row  {
                 colRowTable[lastIndex].count += 1
             } else {
                 colRowTable.append(ColRow(col: col, row: row, count: 1))
                 lastIndex += 1
             }
             if colRowTable[lastIndex].count == 1 {
-                if colRowTable[lastIndex - 1].count < 3 {
+                if lastIndex > 0 && colRowTable[lastIndex - 1].count < 3 {
                     GV.gameArray[colRowTable[lastIndex - 1].col][colRowTable[lastIndex - 1].row].setStatus(toStatus: .OrigStatus)
                     colRowTable.remove(at: lastIndex - 1)
                     choosedWord.word = choosedWord.word.startingSubString(length: choosedWord.count - 1)
@@ -828,7 +828,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     public func playingGame() {
         let sizeMultiplierIPhone: [CGFloat] = [0, 0, 0, 0, 0, 0.13, 0.11, 0.095, 0.09, 0.085, 0.08]
-        let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.1, 0.1, 0.10, 0.09, 0.08, 0.07]
+        let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.1, 0.095, 0.09, 0.08, 0.075, 0.07]
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
         let sizeMultiplier = GV.onIpad ? sizeMultiplierIPad : sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[GV.size]
@@ -1185,6 +1185,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         if myWordsInDB.count > 0 {
             for item in myWordsInDB {
                 if item != "" {
+//                    if item.begins(with: "ОКОРОК") {
+//                        continue
+//                    }
                     let usedWord = UsedWord(from: item)
                     if !allWords.contains(where: {$0 == usedWord}){
                         allWords.append(usedWord)
@@ -1306,6 +1309,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                         for (labelIndex, labelItem) in myLabels.enumerated() {
                             if labelItem.usedWord?.word == choosedWord.word {
                                 myLabels[labelIndex].usedWord = choosedWord
+                                myLabels[labelIndex].founded = true
                                 break
                             }
                         }

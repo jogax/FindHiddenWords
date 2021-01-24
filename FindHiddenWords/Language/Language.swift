@@ -53,7 +53,12 @@ enum TextConstants: Int {
     tcScoreTxt,
     tcCollectedOwnWords,
     tcWordsOverLetter,
-    tcChooseSize
+    tcChooseSize,
+    tcBlank,
+    tcPlayer,
+    tcDevice,
+    tcVersion,
+    tcLand
 }
 
     let LanguageEN = "en" // index 0

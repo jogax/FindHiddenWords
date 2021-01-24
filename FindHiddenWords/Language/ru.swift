@@ -52,4 +52,9 @@ let ruDictionary: [TextConstants: String] = [
     .tcCollectedOwnWords:       "Мои слова",
     .tcWordsOverLetter:         "Слова над буквой: \"%\"",
     .tcChooseSize:              "Размер игры",
+    .tcBlank:                   " ",
+    .tcPlayer:                  "Игрок",
+    .tcDevice:                  "Устройство",
+    .tcVersion:                 "Версия",
+    .tcLand:                    " Страна",
 ]

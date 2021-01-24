@@ -52,4 +52,9 @@ let huDictionary: [TextConstants: String] = [
     .tcCollectedOwnWords:       "Szavaim",
     .tcWordsOverLetter:         "Szavak a(z) \"%\" betü felett",
     .tcChooseSize:              "Játékméret",
+    .tcBlank:                   " ",
+    .tcPlayer:                  "Játékos",
+    .tcDevice:                  "Készülék",
+    .tcVersion:                 "Verzió",
+    .tcLand:                    " Ország",
 ]

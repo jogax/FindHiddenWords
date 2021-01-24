@@ -54,4 +54,9 @@ let enDictionary: [TextConstants: String] = [
     .tcCollectedOwnWords:       "My Words",
     .tcWordsOverLetter:         "Words over the letter: \"%\"",
     .tcChooseSize:              "Gamesize",
+    .tcBlank:                   " ",
+    .tcPlayer:                  "Player",
+    .tcDevice:                  "Device",
+    .tcVersion:                 "Version",
+    .tcLand:                    " Land",
 ]

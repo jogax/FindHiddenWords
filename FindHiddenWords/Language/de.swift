@@ -52,4 +52,8 @@ let deDictionary: [TextConstants: String] = [
     .tcCollectedOwnWords:       "Meine Wörter",
     .tcWordsOverLetter:         "Wörter über den Buchstaben: \"%\"",
     .tcChooseSize:              "Spielgröße",
-]
+    .tcBlank:                   " ",
+    .tcPlayer:                  "Spieler",
+    .tcDevice:                  "Gerät",
+    .tcVersion:                 "Version",
+    .tcLand:                    " Land",]

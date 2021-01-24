@@ -149,7 +149,7 @@ class GenerateGameArray {
                 grid!.addChild(GV.gameArray[col][row])
                 setCountConnections(col: col, row: row)
                 let dummy = SKSpriteNode()
-                let value = 0.6 * GV.blockSize
+                let value = 0.5 * GV.blockSize
                 dummy.size = CGSize(width: value, height: value)
                 dummy.position = grid!.gridPosition(col: col, row: row)
                 dummy.name = "GBD/\(col)/\(row)"
