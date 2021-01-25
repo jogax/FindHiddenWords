@@ -41,7 +41,7 @@ let deDictionary: [TextConstants: String] = [
     .tcFinishedGame:            "Fertige Spiele",
     .tcAlphabet:                "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",
     .tcCongratulations:         "Herzliche Glückwünsche!",
-    .tcFinishGameMessage:       "Du hast das Spiel beendet. Du hast % neue Wörter gefunden und % Punkte bekommen! Ein neues Spiel beginnt.",
+    .tcFinishGameMessage:       "Du hast das Spiel beendet. ° Du hast % neue Wörter gefunden ° und % Punkte bekommen! ° Ein neues Spiel beginnt.",
     .tcOK:                      "OK",
     .tcScore:                   "Meine Punkte:%, Beste Punkte:%",
     .tcShowMyWords:             "Wörter (%)",

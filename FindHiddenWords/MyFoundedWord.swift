@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 
 class MyFoundedWord: MyLabel {
-    var usedWord: UsedWord?
+    var usedWord: UsedWord!
     var mandatory: Bool = false
     var founded: Bool = false
     init(usedWord: UsedWord, mandatory: Bool, prefixValue: Int) {

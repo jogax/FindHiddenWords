@@ -637,7 +637,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         for myLabel in myLabels {
             countGreenWords +=  myLabel.founded && myLabel.mandatory ? 1 : 0
         }
-        if countGreenWords == mandatoryWords.count {
+        if countGreenWords == mandatoryWords.count/* || countGreenWords == 0*/ {
             congratulation()
         }
     }
@@ -1279,6 +1279,45 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     private func saveChoosedWord()->Bool {
         var returnValue = true
         var earlierWord: UsedWord!
+        for (itemIndex, item) in myLabels.enumerated() {
+            if item.mandatory && !item.founded && choosedWord.word == item.usedWord!.word {
+                var mandatoryWordOK = false
+                for choosedItem in choosedWord.usedLetters {
+                    if item.usedWord.usedLetters.contains(where: {$0 == choosedItem}) {
+                        mandatoryWordOK = true
+                        break
+                    }
+                }
+                if mandatoryWordOK {
+                    myLabels[itemIndex].founded = true
+                    myLabels[itemIndex].usedWord = choosedWord
+                    for (mandatoryIndex, mandatoryItem) in mandatoryWords.enumerated() {
+                        if mandatoryItem.word == choosedWord.word {
+                            mandatoryWords[mandatoryIndex] = choosedWord
+//                            ---------------
+                            var wordsToFind = ""
+                            for item in mandatoryWords {
+                                wordsToFind += UsedWord(word: item.word, usedLetters: item.usedLetters).toString() + GV.outerSeparator
+                            }
+                            wordsToFind.removeLast()
+                            try! playedGamesRealm!.safeWrite {
+                                playedGame.wordsToFind = wordsToFind
+                            }
+//                            let mandatoryWordsInDB = playedGame.wordsToFind.components(separatedBy: GV.outerSeparator)
+//                            for wordString in mandatoryWordsInDB {
+//                                mandatoryWords.append(UsedWord(from: wordString))
+//                            }
+//                            mandatoryWords = mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count == $1.word.count && $0.word < $1.word)})
+// ----------------
+                            break
+                        }
+                    }
+                    returnValue = true
+                    break
+                }
+            }
+        }
+
         for item in allWords {
             if choosedWord.word == item.word {
                 var equalLettersCount = 0
@@ -1294,38 +1333,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
                 }
             }
         }
-        if returnValue {
-            for (itemIndex, item) in mandatoryWords.enumerated() {
-                if choosedWord.word == item.word {
-                    var mandatoryWordOK = true
-                    for index in 0..<choosedWord.usedLetters.count {
-                        if choosedWord.usedLetters[index] != item.usedLetters[index] {
-                            mandatoryWordOK = false
-                            break
-                        }
-                    }
-                    if !mandatoryWordOK {
-                        mandatoryWords[itemIndex] = choosedWord
-                        for (labelIndex, labelItem) in myLabels.enumerated() {
-                            if labelItem.usedWord?.word == choosedWord.word {
-                                myLabels[labelIndex].usedWord = choosedWord
-                                myLabels[labelIndex].founded = true
-                                break
-                            }
-                        }
-                        break
-                    }
-                }
-            }
-        }
-        if !returnValue {
-            if mandatoryWords.contains(where: {$0 == choosedWord}) {
-                if myLabels.contains(where: {$0.usedWord!.word == choosedWord.word && !$0.founded}) {
-                    returnValue = true
-                }
-            }
-        }
-//        returnValue = !allWords.contains(where: {$0 == choosedWord})//checkChoosedWordInFoundedWordsMyWords()
         if returnValue {
             let addString = choosedWord.toString()
             let separator = playedGame.myWords.count == 0 ? "" : GV.outerSeparator

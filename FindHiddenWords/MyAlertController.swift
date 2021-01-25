@@ -177,16 +177,21 @@ class MyAlertController: SKSpriteNode {
         let maxLength = GV.actWidth * (GV.onIpad ? 0.8 : 0.6)
         var newFragment = ""
         for fragment in fragments {
-            let adderWidth = fragment.width(font: font)
-            let newFragmentWidth = newFragment.width(font: font)
-            if newFragmentWidth + adderWidth < maxLength - GV.actWidth * 0.01 {
-                newFragment += fragment + " "
+            if fragment == GV.innerSeparator {
+               returnArray.append(newFragment)
+                newFragment = ""
             } else {
-                if newFragment.count > 0 {
-                    newFragment.removeLast()
+                let adderWidth = fragment.width(font: font)
+                let newFragmentWidth = newFragment.width(font: font)
+                if newFragmentWidth + adderWidth < maxLength - GV.actWidth * 0.01 {
+                    newFragment += fragment + " "
+                } else {
+                    if newFragment.count > 0 {
+                        newFragment.removeLast()
+                    }
+                    returnArray.append(newFragment)
+                    newFragment = fragment + " "
                 }
-                returnArray.append(newFragment)
-                newFragment = fragment + " "
             }
         }
         newFragment.removeLast()
