@@ -58,7 +58,9 @@ enum TextConstants: Int {
     tcPlayer,
     tcDevice,
     tcVersion,
-    tcLand
+    tcLand,
+    tcDeveloper,
+    tcShowGameCenter
 }
 
     let LanguageEN = "en" // index 0

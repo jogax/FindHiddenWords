@@ -29,6 +29,11 @@ class GameViewController: UIViewController, GCHelperDelegate {
     }
     
     func localPlayerAuthenticated() {
+        #if DEBUG
+        if GCHelper.shared.getName() == GV.myGCName {
+            GV.playSearchingWordsScene!.generateDebugButton()
+        }
+        #endif
         GCHelper.shared.getBestScore(completion: {
             
         })

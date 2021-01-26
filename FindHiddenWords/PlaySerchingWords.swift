@@ -27,7 +27,11 @@ class ObjectSP {
     }
 }
 
-class PlaySearchingWords: SKScene, TableViewDelegate {
+class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControllerDelegate {
+    func backFromShowGameCenterViewController() {
+        self.isHidden = false
+    }
+    
     func getNumberOfSections() -> Int {
         return 1
     }
@@ -48,6 +52,37 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     }
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
 
+    public func generateDebugButton() {
+        showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+    }
+    
+    @objc private func developerMenu() {
+        let myAlert = MyAlertController(title: GV.language.getText(.tcDeveloperMenuTitle),
+                                        message: "",
+                                          size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
+                                          target: self,
+                                          type: .Green)
+        myAlert.addAction(text: .tcShowGameCenter, action: #selector(self.showGameCenter))
+        myAlert.addAction(text: .tcGenerateGameArray, action: #selector(self.generateGameArray))
+        myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
+        myAlert.presentAlert()
+        self.addChild(myAlert)
+    }
+    
+    @objc private func generateGameArray() {
+        
+    }
+    
+    @objc private func showGameCenter() {
+        let gameCenterViewController = ShowGameCenterViewController()
+        gameCenterViewController.myDelegate = self
+        gameCenterViewController.modalPresentationStyle = .overFullScreen
+//        gameCenterViewController.setDataSource(dataSource: dataSource)
+        let currentViewController:UIViewController=UIApplication.shared.keyWindow!.rootViewController!
+        self.isHidden = true
+        currentViewController.present(gameCenterViewController, animated: true, completion: nil)
+    }
+    
     public func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         cell.setFont(font: myTableFont)
@@ -202,27 +237,27 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     var headerMpx: CGFloat = 0
 
     
-    private func addShortButtonPL(to: SKScene, text: String, action: Selector, col: CGFloat, headerNode: SKNode, countCols: CGFloat) {
-        let button = MyButton(fontName: GV.fontName, size: CGSize(width: 100, height: 100))
-        button.zPosition = self.zPosition + 20
-        button.setButtonLabel(title: text, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
-        button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
-        let buttonPlace = GV.minSide / (countCols + 1)
-        let buttonWidth = buttonPlace * 0.8
-        let adderP = (GV.minSide * col * 0.15)
-        let adderL = (GV.maxSide * col * 0.15)
-        let headerNodeHeight = headerNode.frame.height
-        button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.10 + adderP, y: (headerNode.plPosSize?.PPos.y)! - headerNodeHeight),
-                                     LPos: CGPoint(x: GV.maxSide * 0.10 + adderL, y: (headerNode.plPosSize?.LPos.y)! - headerNodeHeight),
-                                     PSize: CGSize(width: buttonWidth, height: GV.maxSide * 0.04),
-                                     LSize: CGSize(width: buttonWidth, height: GV.maxSide * 0.04))
-        button.myType = .MyButton
-        button.setActPosSize()
-        button.name = name
-        to.addChild(button)
-
-    }
-    
+//    private func addShortButtonPL(to: SKScene, text: String, action: Selector, col: CGFloat, headerNode: SKNode, countCols: CGFloat) {
+//        let button = MyButton(fontName: GV.fontName, size: CGSize(width: 100, height: 100))
+//        button.zPosition = self.zPosition + 20
+//        button.setButtonLabel(title: text, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
+//        button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
+//        let buttonPlace = GV.minSide / (countCols + 1)
+//        let buttonWidth = buttonPlace * 0.8
+//        let adderP = (GV.minSide * col * 0.15)
+//        let adderL = (GV.maxSide * col * 0.15)
+//        let headerNodeHeight = headerNode.frame.height
+//        button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.10 + adderP, y: (headerNode.plPosSize?.PPos.y)! - headerNodeHeight),
+//                                     LPos: CGPoint(x: GV.maxSide * 0.10 + adderL, y: (headerNode.plPosSize?.LPos.y)! - headerNodeHeight),
+//                                     PSize: CGSize(width: buttonWidth, height: GV.maxSide * 0.04),
+//                                     LSize: CGSize(width: buttonWidth, height: GV.maxSide * 0.04))
+//        button.myType = .MyButton
+//        button.setActPosSize()
+//        button.name = name
+//        to.addChild(button)
+//
+//    }
+//
     private func addButtonPL(to: SKNode, text: String, action: Selector, buttonType: ButtonType)->MyButton {
         let button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05))
         button.zPosition = self.zPosition + 20
@@ -241,6 +276,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
         } else if buttonType == .WordsButton {
             button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.04)),
                                          LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.04)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .DeveloperButton {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.10)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.10)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         }
@@ -277,7 +317,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
 
     
     enum ButtonType: Int {
-        case SizeButton = 0, LanguageButton, WordsButton
+        case SizeButton = 0, LanguageButton, WordsButton, DeveloperButton
     }
     
     @objc private func goBack() {
@@ -824,6 +864,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
     var fixWordsHeader: MyLabel!
     var goBackButton: MyButton!
     var showMyWordsButton: MyButton!
+    var showChooseLanguageButton: MyButton!
+    var showDeveloperButton: MyButton!
+
     var scoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     public func playingGame() {
@@ -878,8 +921,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate {
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             fillMandatoryWords()
             setGameArrayToActualState()
-            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
+            showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
             showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount())), action: #selector(showMyWords), buttonType: .WordsButton)
+            #if DEBUG
+            if GCHelper.shared.getName() == GV.myGCName {
+                showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+            }
+            #endif
          }
     }
     

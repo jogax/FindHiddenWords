@@ -166,6 +166,8 @@ struct GV {
     static var touchType: TouchType?
     static var connectedToInternet = false
     static let TimeModifier: Int64 = 10000000000
+    static let myGCName = "RJogax"
+    static var playSearchingWordsScene: PlaySearchingWords?
 
 
     static var orientationHandler: Selector?

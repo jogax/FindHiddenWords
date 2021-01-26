@@ -57,4 +57,6 @@ let huDictionary: [TextConstants: String] = [
     .tcDevice:                  "Készülék",
     .tcVersion:                 "Verzió",
     .tcLand:                    " Ország",
+    .tcDeveloper:               "Fejlesztő",
+    .tcShowGameCenter:          "Mutasd a GameCenter-t",
 ]

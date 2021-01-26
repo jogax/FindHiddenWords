@@ -84,9 +84,9 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
 //        return returnValue
 //    }
     
-    public func setDataSource(dataSource: DataSource) {
-        self.dataSource = dataSource
-    }
+//    public func setDataSource(dataSource: DataSource) {
+//        self.dataSource = dataSource
+//    }
     
     func getTableViewCell(tableView: UITableView, indexPath: IndexPath) -> UITableViewCell {
 //        let actColor = (indexPath.row % 2 == 0 ? UIColor.white : color)

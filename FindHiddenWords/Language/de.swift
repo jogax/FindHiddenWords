@@ -29,7 +29,7 @@ let deDictionary: [TextConstants: String] = [
     .tcBack:                    "Zurück",
     .tcDeveloperMenu:           "Developer Optionen",
     .tcGenerateGameArray:       "Game Array generieren",
-    .tcDeveloperMenuTitle:      "Wähle, was zu tun",
+    .tcDeveloperMenuTitle:      "Wähle eine Aktion",
     .tcGeneratingSize:          "Größe des Game Arrays: %",
     .tcSizeMenuTitle:           "Wähle eine Größe",
 //    .tcSearchingWords:          "Wörter suchen",
@@ -56,4 +56,7 @@ let deDictionary: [TextConstants: String] = [
     .tcPlayer:                  "Spieler",
     .tcDevice:                  "Gerät",
     .tcVersion:                 "Version",
-    .tcLand:                    " Land",]
+    .tcLand:                    " Land",
+    .tcDeveloper:               "Entwickler",
+    .tcShowGameCenter:          "Zeige GameCenter",
+]

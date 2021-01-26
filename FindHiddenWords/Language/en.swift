@@ -31,7 +31,7 @@ let enDictionary: [TextConstants: String] = [
     .tcBack:                    "Return",
     .tcDeveloperMenu:           "Developer Options",
     .tcGenerateGameArray:       "Generate Game Array",
-    .tcDeveloperMenuTitle:      "Choose what to do",
+    .tcDeveloperMenuTitle:      "Choose an action",
     .tcGeneratingSize:          "Size of Game Array: %",
     .tcSizeMenuTitle:           "Choose a size",
 //    .tcSearchingWords:          "Searching Words",
@@ -59,4 +59,6 @@ let enDictionary: [TextConstants: String] = [
     .tcDevice:                  "Device",
     .tcVersion:                 "Version",
     .tcLand:                    " Land",
+    .tcDeveloper:               "Developer",
+    .tcShowGameCenter:          "Show GameCenter",
 ]

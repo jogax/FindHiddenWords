@@ -83,6 +83,9 @@
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
 		D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D925BDC66400185EF6 /* GelbOctagon.png */; };
 		D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */; };
+		D08B5B8E25C06A6C007C04D5 /* hook.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B8D25C06A6C007C04D5 /* hook.png */; };
+		D08B5B9125C06AF7007C04D5 /* LeftSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9025C06AF7007C04D5 /* LeftSimple.png */; };
+		D08B5B9425C06B05007C04D5 /* RightSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9325C06B05007C04D5 /* RightSimple.png */; };
 		D09E5F4125B87E86001291D9 /* LilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D09E5F4025B87E86001291D9 /* LilaOctagon.png */; };
 		D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */; };
 		D0E64EB025A899D7006BACC6 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EAF25A899D7006BACC6 /* GameScene.sks */; };
@@ -177,6 +180,9 @@
 		D07C772225AF25300087851B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772425AF25720087851B /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772525AF257C0087851B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		D08B5B8D25C06A6C007C04D5 /* hook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hook.png; sourceTree = "<group>"; };
+		D08B5B9025C06AF7007C04D5 /* LeftSimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LeftSimple.png; sourceTree = "<group>"; };
+		D08B5B9325C06B05007C04D5 /* RightSimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RightSimple.png; sourceTree = "<group>"; };
 		D09E5F4025B87E86001291D9 /* LilaOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LilaOctagon.png; sourceTree = "<group>"; };
 		D0B94E5A25A8B3AB0058F9B8 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		D0B94E5E25A8B3B20058F9B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
@@ -254,6 +260,7 @@
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
 			isa = PBXGroup;
 			children = (
+				D08B5B8D25C06A6C007C04D5 /* hook.png */,
 				D020C8D925BDC66400185EF6 /* GelbOctagon.png */,
 				D020C8D525BDC06100185EF6 /* LightRedOctagon.png */,
 				D012500E25A8AEEA000BCF89 /* AppIcon.png */,
@@ -287,6 +294,8 @@
 				D012500225A8AEEA000BCF89 /* IMG_0498.png */,
 				D012500625A8AEEA000BCF89 /* IMG_0500.png */,
 				D012500725A8AEEA000BCF89 /* LandscapeBG.png */,
+				D08B5B9025C06AF7007C04D5 /* LeftSimple.png */,
+				D08B5B9325C06B05007C04D5 /* RightSimple.png */,
 				D012500D25A8AEEA000BCF89 /* LightBlueSprite.png */,
 				D012501025A8AEEA000BCF89 /* LightGraySprite.png */,
 				D012501A25A8AEEA000BCF89 /* LightRedSprite.png */,
@@ -360,6 +369,7 @@
 				D0124FD625A8A36E000BCF89 /* TableView.swift */,
 				D0124FD925A8A3A0000BCF89 /* PlaySerchingWords.swift */,
 				D0124FDC25A8A3D4000BCF89 /* Projector.swift */,
+				D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */,
 				D0E64EAF25A899D7006BACC6 /* GameScene.sks */,
 				D0E64EB125A899D7006BACC6 /* Actions.sks */,
 				D0E64EB325A899D7006BACC6 /* GameScene.swift */,
@@ -368,7 +378,6 @@
 				D0124FF625A8AE65000BCF89 /* Sounds */,
 				D0124FF125A8AE22000BCF89 /* RealmModels */,
 				D0124FF025A8ADFF000BCF89 /* ReadOnlyDB */,
-				D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */,
 			);
 			path = FindHiddenWords;
 			sourceTree = "<group>";
@@ -468,6 +477,7 @@
 				D0E64EB025A899D7006BACC6 /* GameScene.sks in Resources */,
 				D0E64EBB25A899D7006BACC6 /* Assets.xcassets in Resources */,
 				D012503625A8AEEB000BCF89 /* LightBlueSprite.png in Resources */,
+				D08B5B9125C06AF7007C04D5 /* LeftSimple.png in Resources */,
 				D012502D25A8AEEB000BCF89 /* Connection1101.png in Resources */,
 				D012504725A8AEEB000BCF89 /* BlueOctagon.png in Resources */,
 				D012503725A8AEEB000BCF89 /* AppIcon.png in Resources */,
@@ -477,6 +487,7 @@
 				D012504425A8AEEB000BCF89 /* LilaSprite.png in Resources */,
 				D012503025A8AEEB000BCF89 /* LandscapeBG.png in Resources */,
 				D0EFE8C225AA2C3B00AF0882 /* Games.realm in Resources */,
+				D08B5B9425C06B05007C04D5 /* RightSimple.png in Resources */,
 				D012503A25A8AEEB000BCF89 /* Red Button.png in Resources */,
 				D012502425A8AEEB000BCF89 /* GreenOctagon.png in Resources */,
 				D012503925A8AEEB000BCF89 /* LightGraySprite.png in Resources */,
@@ -485,6 +496,7 @@
 				D0EFE8C325AA2C3B00AF0882 /* NewWordList.realm in Resources */,
 				D012502325A8AEEB000BCF89 /* Rosa Button.png in Resources */,
 				D0E64EB225A899D7006BACC6 /* Actions.sks in Resources */,
+				D08B5B8E25C06A6C007C04D5 /* hook.png in Resources */,
 				D012503225A8AEEB000BCF89 /* Connection0011x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

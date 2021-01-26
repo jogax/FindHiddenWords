@@ -16,7 +16,7 @@ var grid: Grid?
 var playedGamesRealm: Realm?
 var wordLabels = [SKLabelNode]()
 var errorLabel = SKLabelNode(fontNamed: GV.actFont)
-var playSearchingWordsScene: PlaySearchingWords?
+
 //var playWithCubeOfWords: PlayWithCubeOfWords?
 
 
@@ -693,34 +693,11 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
                 (child as! MyButton).disableUserInteraction()
             }
         }
-        playSearchingWordsScene = PlaySearchingWords(/*fileNamed: "NewGameScene"*/)
-        showPopupScene(playSearchingWordsScene!)
-        playSearchingWordsScene!.start(delegate: self)
+        GV.playSearchingWordsScene = PlaySearchingWords(/*fileNamed: "NewGameScene"*/)
+        showPopupScene(GV.playSearchingWordsScene!)
+        GV.playSearchingWordsScene!.start(delegate: self)
     }
-/*
-    @objc private func cubeOfWords() {
-        for child in menuLayer!.children {
-            if child.myType == .MyButton {
-                (child as! MyButton).disableUserInteraction()
-            }
-        }
-        GV.gameNumber = 0
-        GV.size = 5
-        
-        
-        
-        let primary: String = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.size)
-        let game = gamesRealm.objects(Games.self).filter("primary = %@", primary)
-        if game.count > 0 {
-            GV.gameArray = createNewGameArray()
-            let grid = Grid(blockSize: 50, rows: GV.size, cols: GV.size)
-            fillGameArray(gameArray: GV.gameArray, content: game.first!.gameArray, toGrid: grid!)
-//            playWithCubeOfWords = PlayWithCubeOfWords()
-//            showPopupScene(playWithCubeOfWords!)
-//            playWithCubeOfWords!.start()
-        }
-    }
-*/
+
     private func fillGameArray(gameArray: [[GameboardItem]], content: String, toGrid: Grid) {
         let size = GV.size
         for (index, letter) in content.enumerated() {
