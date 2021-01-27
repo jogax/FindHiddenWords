@@ -346,10 +346,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             (scores, error) in
             if scores != nil {
                 if leaderBoard.localPlayerScore != nil {
-                    let usedTimeInGC = Int(leaderBoard.localPlayerScore!.value) % GV.TimeModifier
-                    if usedTimeInGC > GV.basicDataRecord.playingTime {
+                    let usedTimeInGC = Int64(leaderBoard.localPlayerScore!.value) % GV.TimeModifier
+                    if usedTimeInGC > GV.basicData.playingTime {
                         try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTime = usedTimeInGC
+                            GV.basicData.playingTime = Int(usedTimeInGC)
                         }
                     }
                 }
@@ -364,10 +364,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             (scores, error) in
             if scores != nil {
                 if leaderBoardforplayingTimeToday.localPlayerScore != nil {
-                    let playingTimeTodayInGC = Int(leaderBoardforplayingTimeToday.localPlayerScore!.value) % GV.TimeModifier
-                    if playingTimeTodayInGC > GV.basicDataRecord.playingTimeToday {
+                    let playingTimeTodayInGC = Int64(leaderBoardforplayingTimeToday.localPlayerScore!.value) % GV.TimeModifier
+                    if playingTimeTodayInGC > GV.basicData.playingTimeToday {
                         try! realm.safeWrite() {
-                            GV.basicDataRecord.playingTimeToday = playingTimeTodayInGC
+                            GV.basicData.playingTimeToday = Int(playingTimeTodayInGC)
                         }
                     }
                 }
@@ -407,7 +407,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
 
-    @objc private func sendGlobalInfosTOGC(timerX: Timer) {
+    @objc public func sendGlobalInfosTOGC(timerX: Timer) {
         var infoArray = [GCInfo]()
 //        print("sendGlobalInfosTOGC actTime: \(Date())")
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
@@ -427,7 +427,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             sendInfoToGC(infos: infoArray)
         }
         // send infos to GC each 10 minutes
-        globalInfosTimer = Timer.scheduledTimer(timeInterval: 600, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
+        if globalInfosTimer != nil {
+            globalInfosTimer!.invalidate()
+        }
+        globalInfosTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
     }
     
     /**

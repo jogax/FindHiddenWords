@@ -116,7 +116,24 @@ class GameViewController: UIViewController, GCHelperDelegate {
             
             view.ignoresSiblingOrder = true
         }
+        oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
     }
+    
+    var oneMinutesTimer: Timer?
+
+    
+    @objc private func oneMinutesTimer(timerX: Timer) {
+//        print("oneMinutesTimer actTime: \(Date())")
+        try! realm.safeWrite() {
+            GV.basicData.playingTime += 1
+            GV.basicData.playingTimeToday += 1
+        }
+        if oneMinutesTimer != nil {
+            oneMinutesTimer!.invalidate()
+        }
+        oneMinutesTimer = Timer.scheduledTimer(timeInterval: 60.0, target: self, selector: #selector(oneMinutesTimer(timerX: )), userInfo: nil, repeats: false)
+    }
+    
     
     @objc func deviceRotated() {
         if GV.orientationHandler != nil && GV.target != nil {

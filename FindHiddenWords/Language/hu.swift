@@ -59,4 +59,7 @@ let huDictionary: [TextConstants: String] = [
     .tcLand:                    " Ország",
     .tcDeveloper:               "Fejlesztő",
     .tcShowGameCenter:          "Mutasd a GameCenter-t",
+    .tcOnlineTime:              "Online",
+    .tcLastOnline:              "Utoljára",
+    .tcLastOnlineTime:          "Időtartam",
 ]

@@ -428,6 +428,25 @@ public extension Float {
 
 
 extension String {
+    var containsSpecialCharacter: Bool {
+       let regex = ".*[^A-Za-z0-9].*"
+       let testString = NSPredicate(format:"SELF MATCHES %@", regex)
+       return testString.evaluate(with: self)
+    }
+     
+    func convertSpecialCharsToUnderScore()->String {
+        var returnValue = ""
+        for char in self {
+            if String(char).containsSpecialCharacter {
+                returnValue.append("_")
+            } else {
+                returnValue.append(String(char))
+            }
+        }
+        return returnValue
+    }
+        
+
         
     func contains(strings: [String])->Bool {
         for string in strings {

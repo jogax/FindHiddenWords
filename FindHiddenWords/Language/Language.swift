@@ -60,9 +60,11 @@ enum TextConstants: Int {
     tcVersion,
     tcLand,
     tcDeveloper,
-    tcShowGameCenter
+    tcShowGameCenter,
+    tcOnlineTime,
+    tcLastOnline,
+    tcLastOnlineTime
 }
-
     let LanguageEN = "en" // index 0
     let LanguageDE = "de" // index 1
     let LanguageHU = "hu" // index 2

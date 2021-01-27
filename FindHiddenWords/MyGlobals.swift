@@ -14,9 +14,7 @@ import RealmSwift
 import GameKit
 import Reachability
 
-//let actVersion = "0.991" // Build 23, Version 1.23
-//let actVersion = "1.0" // Build 25, Version 1.25
-let actVersion = "0.1" // Build 1, Version 1
+let actVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
 
 private var codeTableToString: [Int: String]  = [65: "A", 66: "B", 67: "C", 68: "D", 69: "E", 70: "F", 71: "G", 72: "H", 73: "I", 74: "J",
                                          75: "K", 76: "L", 77: "M", 78: "N", 79: "O", 80: "P", 81: "Q", 82: "R", 83: "S", 84: "T",

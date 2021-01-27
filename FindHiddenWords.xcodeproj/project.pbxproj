@@ -30,7 +30,7 @@
 		D0124FD125A8A340000BCF89 /* MyRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FD025A8A340000BCF89 /* MyRandom.swift */; };
 		D0124FD425A8A358000BCF89 /* MySounds.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FD325A8A358000BCF89 /* MySounds.swift */; };
 		D0124FD725A8A36E000BCF89 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FD625A8A36E000BCF89 /* TableView.swift */; };
-		D0124FDA25A8A3A0000BCF89 /* PlaySerchingWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FD925A8A3A0000BCF89 /* PlaySerchingWords.swift */; };
+		D0124FDA25A8A3A0000BCF89 /* PlaySearchingWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FD925A8A3A0000BCF89 /* PlaySearchingWords.swift */; };
 		D0124FDD25A8A3D4000BCF89 /* Projector.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FDC25A8A3D4000BCF89 /* Projector.swift */; };
 		D0124FE025A8A3FB000BCF89 /* PlayedGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FDF25A8A3FB000BCF89 /* PlayedGame.swift */; };
 		D0124FE325A8A414000BCF89 /* BasicData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0124FE225A8A414000BCF89 /* BasicData.swift */; };
@@ -82,6 +82,8 @@
 		D020C8D325BDB7C700185EF6 /* ShowGameCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */; };
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
 		D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D925BDC66400185EF6 /* GelbOctagon.png */; };
+		D04190E325C1991C00621D08 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E125C1991C00621D08 /* offline.png */; };
+		D04190E425C1991C00621D08 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E225C1991C00621D08 /* online.png */; };
 		D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */; };
 		D08B5B8E25C06A6C007C04D5 /* hook.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B8D25C06A6C007C04D5 /* hook.png */; };
 		D08B5B9125C06AF7007C04D5 /* LeftSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9025C06AF7007C04D5 /* LeftSimple.png */; };
@@ -124,7 +126,7 @@
 		D0124FD025A8A340000BCF89 /* MyRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyRandom.swift; sourceTree = "<group>"; };
 		D0124FD325A8A358000BCF89 /* MySounds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MySounds.swift; sourceTree = "<group>"; };
 		D0124FD625A8A36E000BCF89 /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
-		D0124FD925A8A3A0000BCF89 /* PlaySerchingWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaySerchingWords.swift; sourceTree = "<group>"; };
+		D0124FD925A8A3A0000BCF89 /* PlaySearchingWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaySearchingWords.swift; sourceTree = "<group>"; };
 		D0124FDC25A8A3D4000BCF89 /* Projector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Projector.swift; sourceTree = "<group>"; };
 		D0124FDF25A8A3FB000BCF89 /* PlayedGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayedGame.swift; sourceTree = "<group>"; };
 		D0124FE225A8A414000BCF89 /* BasicData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicData.swift; sourceTree = "<group>"; };
@@ -176,6 +178,8 @@
 		D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGameCenterViewController.swift; sourceTree = "<group>"; };
 		D020C8D525BDC06100185EF6 /* LightRedOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedOctagon.png; sourceTree = "<group>"; };
 		D020C8D925BDC66400185EF6 /* GelbOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GelbOctagon.png; sourceTree = "<group>"; };
+		D04190E125C1991C00621D08 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
+		D04190E225C1991C00621D08 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
 		D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
 		D07C772225AF25300087851B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772425AF25720087851B /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Main.strings; sourceTree = "<group>"; };
@@ -301,6 +305,8 @@
 				D012501A25A8AEEA000BCF89 /* LightRedSprite.png */,
 				D012501B25A8AEEA000BCF89 /* LilaSprite.png */,
 				D09E5F4025B87E86001291D9 /* LilaOctagon.png */,
+				D04190E125C1991C00621D08 /* offline.png */,
+				D04190E225C1991C00621D08 /* online.png */,
 				D012501925A8AEEA000BCF89 /* PortraitBG.png */,
 				D012501125A8AEEA000BCF89 /* Red Button.png */,
 				D012500025A8AEEA000BCF89 /* RedOctagon.png */,
@@ -367,7 +373,7 @@
 				D0124FD025A8A340000BCF89 /* MyRandom.swift */,
 				D0124FD325A8A358000BCF89 /* MySounds.swift */,
 				D0124FD625A8A36E000BCF89 /* TableView.swift */,
-				D0124FD925A8A3A0000BCF89 /* PlaySerchingWords.swift */,
+				D0124FD925A8A3A0000BCF89 /* PlaySearchingWords.swift */,
 				D0124FDC25A8A3D4000BCF89 /* Projector.swift */,
 				D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */,
 				D0E64EAF25A899D7006BACC6 /* GameScene.sks */,
@@ -452,6 +458,7 @@
 				D012502825A8AEEB000BCF89 /* Connection1010.png in Resources */,
 				D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */,
 				D012504225A8AEEB000BCF89 /* PortraitBG.png in Resources */,
+				D04190E325C1991C00621D08 /* offline.png in Resources */,
 				D012503825A8AEEB000BCF89 /* Connection0001x.png in Resources */,
 				D012502725A8AEEB000BCF89 /* Connection1111.png in Resources */,
 				D012502E25A8AEEB000BCF89 /* blueBackground.png in Resources */,
@@ -471,6 +478,7 @@
 				D012504325A8AEEB000BCF89 /* LightRedSprite.png in Resources */,
 				D012502F25A8AEEB000BCF89 /* IMG_0500.png in Resources */,
 				D012503325A8AEEB000BCF89 /* Connection1001.png in Resources */,
+				D04190E425C1991C00621D08 /* online.png in Resources */,
 				D012504925A8AEEB000BCF89 /* GreenSprite.png in Resources */,
 				D012502B25A8AEEB000BCF89 /* IMG_0498.png in Resources */,
 				D012503425A8AEEB000BCF89 /* Connection1110.png in Resources */,
@@ -554,7 +562,7 @@
 				D0124FBB25A8A217000BCF89 /* ru.swift in Sources */,
 				D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */,
 				D0124FE925A8A44A000BCF89 /* NewWorldListModel.swift in Sources */,
-				D0124FDA25A8A3A0000BCF89 /* PlaySerchingWords.swift in Sources */,
+				D0124FDA25A8A3A0000BCF89 /* PlaySearchingWords.swift in Sources */,
 				D020C8D325BDB7C700185EF6 /* ShowGameCenterViewController.swift in Sources */,
 				D0124FE325A8A414000BCF89 /* BasicData.swift in Sources */,
 				D0124FC525A8A2BE000BCF89 /* MyFoundedWord.swift in Sources */,

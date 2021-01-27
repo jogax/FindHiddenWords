@@ -1001,6 +1001,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func setLanguage(language: String) {
         GV.language.setLanguage(language)
+        GV.basicData.land = GV.convertLocaleToInt()
         try! realm.safeWrite {
             GV.basicData.actLanguage = language
         }

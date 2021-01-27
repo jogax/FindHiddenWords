@@ -102,7 +102,7 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
         let image = origImage.resizeImage(newWidth: cellHeight * 0.6)
         let index = indexOfAlias
         cell.addButton(image: image, xPos: cellHeight * 0.5, callBack: buttonTapped)
-        let alias = ""//GV.globalInfoTable[indexPath.row].alias.convertSpecialCharsToUnderScore()
+        let alias = GV.globalInfoTable[indexPath.row].alias.convertSpecialCharsToUnderScore()
         cell.addColumn(text: " " + (alias.fixLength(length: lengths[index], leadingBlanks: false).startingSubString(length: lengths[index])), /*color: actColor,*/ xPos: cellHeight * 1.0) // WordColumn
         switch showingModus {
         case .Left:
@@ -113,8 +113,8 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
             if GV.onIpad {
                 cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 5], leadingBlanks: false)/*, color: actColor*/)
                 cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].lastTime.HourMin).fixLength(length: lengths[index + 6], leadingBlanks: false)/*, color: actColor*/)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
-                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
+//                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyBestScore).fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
+//                cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
             }
         case .Right:
             cell.addColumn(text: GV.globalInfoTable[indexPath.row].lastDay.yearMonthDay().fixLength(length: lengths[index + 2], leadingBlanks: false)/*, color: actColor*/)
@@ -123,8 +123,8 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
             cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].mediumBestScore).fixLength(length: lengths[index + 5], leadingBlanks: false)/*, color: actColor*/)
            if GV.onIpad {
                 cell.addColumn(text: String(GV.globalInfoTable[indexPath.row].easyActScore).fixLength(length: lengths[index + 6], leadingBlanks: false)/*, color: actColor*/)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
-                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
+//                cell.addColumn(text: GV.globalInfoTable[indexPath.row].mediumActScore.fixLength(length: lengths[index + 7], leadingBlanks: false)/*, color: actColor*/)
+//                cell.addColumn(text: GV.globalInfoTable[indexPath.row].countPlays.fixLength(length: lengths[index + 8], leadingBlanks: false)/*, color: actColor*/)
             }
         }
         return cell
@@ -164,8 +164,8 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
     }
     var calculatedWidth: CGFloat = 0
     var lengths = [Int]()
-    let headerTextContantsLeft: [TextConstants] = [.tcBlank, .tcPlayer, .tcDevice, .tcVersion, .tcLand, /*.tcOnlineTime, .tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore*/]
-    let headerTextContantsRight: [TextConstants] = [.tcBlank, .tcPlayer, /*.tcLastOnline, .tcLastOnlineTime, .tcEasyScore, .tcMediumScore, .tcEasyActScore, .tcMediumActScore, .tcCountPlays,*/ .tcBlank]
+    let headerTextContantsLeft: [TextConstants] = [.tcBlank, .tcPlayer, .tcDevice, .tcVersion, .tcLand, .tcOnlineTime, .tcLastOnline, .tcLastOnlineTime,/* .tcEasyScore, .tcMediumScore*/]
+    let headerTextContantsRight: [TextConstants] = [.tcBlank, .tcPlayer, .tcLastOnline, .tcLastOnlineTime, /*.tcEasyScore, .tcMediumScore, .tcEasyActScore, .tcMediumActScore, .tcCountPlays,*/ .tcBlank]
     
     private func calculateColumnWidths() {
         calculatedWidth = 0
@@ -192,8 +192,8 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
                 if GV.onIpad {
                     lengths[index + 5] = item.lastDay.yearMonthDay().length > lengths[index + 5] ? item.lastDay.yearMonthDay().length : lengths[index + 5]
                     lengths[index + 6] = item.lastTime.HourMin.length > lengths[index + 6] ? item.lastTime.HourMin.length : lengths[index + 6]
-                    lengths[index + 7] = String(item.easyBestScore).length > lengths[index + 7] ? String(item.easyBestScore).length : lengths[index + 7]
-                    lengths[index + 8] = String(item.mediumBestScore).length > lengths[index + 8] ? String(item.mediumBestScore).length : lengths[index + 8]
+//                    lengths[index + 7] = String(item.easyBestScore).length > lengths[index + 7] ? String(item.easyBestScore).length : lengths[index + 7]
+//                    lengths[index + 8] = String(item.mediumBestScore).length > lengths[index + 8] ? String(item.mediumBestScore).length : lengths[index + 8]
                 }
             } else  {
                 lengths[index + 1] = item.allTime.HourMin.length > lengths[index + 1] ? item.allTime.HourMin.length : lengths[index + 1]
@@ -203,8 +203,8 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
                 if GV.onIpad {
                     lengths[index + 5] = String(item.mediumBestScore).length > lengths[index + 5] ? String(item.mediumBestScore).length : lengths[index + 5]
                     lengths[index + 6] = item.easyActScore.length > lengths[index + 6] ? item.easyActScore.length : lengths[index + 6]
-                    lengths[index + 7] = item.mediumActScore.length > lengths[index + 7] ? item.mediumActScore.length : lengths[index + 7]
-                    lengths[index + 8] = item.countPlays.length > lengths[index + 8] ? item.countPlays.length : lengths[index + 8]
+//                    lengths[index + 7] = item.mediumActScore.length > lengths[index + 7] ? item.mediumActScore.length : lengths[index + 7]
+//                    lengths[index + 8] = item.countPlays.length > lengths[index + 8] ? item.countPlays.length : lengths[index + 8]
                 }
             }
        }
@@ -240,7 +240,7 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         let myBackgroundImage = UIImageView (frame: UIScreen.main.bounds)
-        myBackgroundImage.image = UIImage(named: "magier")
+        myBackgroundImage.image = UIImage(named: "background")
         myBackgroundImage.contentMode = UIView.ContentMode.scaleAspectFill
         self.view.frame = UIScreen.main.bounds
         self.view.insertSubview(myBackgroundImage, at: 0)
@@ -250,7 +250,7 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
         if dataSource == .GameCenter {
             GCHelper.shared.getAllGlobalInfos(completion: {self.showPlayerActivity()})
         } else {
-            getGlobalInfoFromICloud(completion: {self.showPlayerActivity()})
+//            getGlobalInfoFromICloud(completion: {self.showPlayerActivity()})
         }
         showingModus = .Left
         buttonsCreated = false
@@ -293,50 +293,50 @@ class ShowGameCenterViewController: UIViewController, TableViewDelegate {
     var buttonsCreated = false
     var countWaitings = 0
 
-    private func getGlobalInfoFromICloud(completion: @escaping ()->()) {
-        let predicate = NSPredicate(format: "deviceType != %@", "")
-        let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
-        let container = CKContainer.default()
-        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
-             if results!.count > 0 {
-                self.countWaitings = results!.count
-                GV.globalInfoTable.removeAll()
-                for result in results! {
-                    var playerData = PlayerData()
-                    playerData.device = result.object(forKey: "deviceType") as! String
-                    playerData.land = (result.object(forKey: "land") as! String) + "/" + (result.object(forKey: "language") as! String)
-                    playerData.allTime = result.object(forKey: "playingTime")  as! Int
-                    playerData.lastDay = result.object(forKey: "lastPlayed") as! Int
-                    playerData.lastTime = result.object(forKey: "lastPlayingTime") as! Int
-                    playerData.version = result.object(forKey: "version") as! String
-                    if result.object(forKey: "actScoreEasy") != nil {
-                        playerData.easyActScore = String(result.object(forKey: "actScoreEasy") as! Int64)
-                    }
-                    if result.object(forKey: "actScoreMedium") != nil {
-                        playerData.mediumActScore = String(result.object(forKey: "actScoreMedium") as! Int64)
-                    }
-                    if result.object(forKey: "actScoreEasy") != nil {
-                        playerData.easyBestScore = result.object(forKey: "actScoreEasy") as! Int64
-                    }
-                    if result.object(forKey: "actScoreMedium") != nil {
-                        playerData.mediumBestScore = result.object(forKey: "actScoreMedium") as! Int64
-                    }
-                    let playerID = result.object(forKey: "playerID") as! String
-                    if playerID != "" {
-                        self.loadPlayer(playerID: playerID, saveToIndex: GV.globalInfoTable.count, completion: completion)
-                    } else {
-                        playerData.alias = playerID
-                        self.countWaitings -= 1
-                        if self.countWaitings == 0 {
-                            completion()
-                        }
-                    }
-                    GV.globalInfoTable.append(playerData)
-                }
-            }
-//            self.showPlayerActivity()
-        }
-    }
+//    private func getGlobalInfoFromICloud(completion: @escaping ()->()) {
+//        let predicate = NSPredicate(format: "deviceType != %@", "")
+//        let query = CKQuery(recordType: "DeviceRecord", predicate: predicate)
+//        let container = CKContainer.default()
+//        container.publicCloudDatabase.perform(query, inZoneWith: nil) { results, error in
+//             if results!.count > 0 {
+//                self.countWaitings = results!.count
+//                GV.globalInfoTable.removeAll()
+//                for result in results! {
+//                    var playerData = PlayerData()
+//                    playerData.device = result.object(forKey: "deviceType") as! String
+//                    playerData.land = (result.object(forKey: "land") as! String) + "/" + (result.object(forKey: "language") as! String)
+//                    playerData.allTime = result.object(forKey: "playingTime")  as! Int
+//                    playerData.lastDay = result.object(forKey: "lastPlayed") as! Int
+//                    playerData.lastTime = result.object(forKey: "lastPlayingTime") as! Int
+//                    playerData.version = result.object(forKey: "version") as! String
+//                    if result.object(forKey: "actScoreEasy") != nil {
+//                        playerData.easyActScore = String(result.object(forKey: "actScoreEasy") as! Int64)
+//                    }
+//                    if result.object(forKey: "actScoreMedium") != nil {
+//                        playerData.mediumActScore = String(result.object(forKey: "actScoreMedium") as! Int64)
+//                    }
+//                    if result.object(forKey: "actScoreEasy") != nil {
+//                        playerData.easyBestScore = result.object(forKey: "actScoreEasy") as! Int64
+//                    }
+//                    if result.object(forKey: "actScoreMedium") != nil {
+//                        playerData.mediumBestScore = result.object(forKey: "actScoreMedium") as! Int64
+//                    }
+//                    let playerID = result.object(forKey: "playerID") as! String
+//                    if playerID != "" {
+//                        self.loadPlayer(playerID: playerID, saveToIndex: GV.globalInfoTable.count, completion: completion)
+//                    } else {
+//                        playerData.alias = playerID
+//                        self.countWaitings -= 1
+//                        if self.countWaitings == 0 {
+//                            completion()
+//                        }
+//                    }
+//                    GV.globalInfoTable.append(playerData)
+//                }
+//            }
+////            self.showPlayerActivity()
+//        }
+//    }
     
     private func loadPlayer(playerID: String, saveToIndex: Int, completion: @escaping ()->()) {
         GKPlayer.loadPlayers(forIdentifiers: [playerID], withCompletionHandler: {
