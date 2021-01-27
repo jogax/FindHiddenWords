@@ -12,8 +12,7 @@ import RealmSwift
 import SpriteKit
 import GameplayKit
 import AVFoundation
-
-
+import GameKit
 
 public protocol PlaySearchingWordsDelegate: class {
     func goBack()
@@ -27,7 +26,11 @@ class ObjectSP {
     }
 }
 
-class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControllerDelegate {
+class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControllerDelegate, GKGameCenterControllerDelegate {
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+        print("after gamecenterViewControllerFinished")
+    }
+    
     func backFromShowGameCenterViewController() {
         self.isHidden = false
     }
@@ -63,10 +66,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                           target: self,
                                           type: .Green)
         myAlert.addAction(text: .tcShowGameCenter, action: #selector(self.showGameCenter))
+        myAlert.addAction(text: .tcGameCenter, action: #selector(self.goGCVC))
         myAlert.addAction(text: .tcGenerateGameArray, action: #selector(self.generateGameArray))
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
+    }
+    
+    @objc private func goGCVC() {
+        let gcVC = GKGameCenterViewController()
+        gcVC.gameCenterDelegate = self
+        gcVC.viewState = .leaderboards
+        gcVC.leaderboardIdentifier = "myDevice"
+        let currentViewController:UIViewController=UIApplication.shared.keyWindow!.rootViewController!
+        self.isHidden = true
+        currentViewController.present(gcVC, animated: true, completion: nil)
+
     }
     
     @objc private func generateGameArray() {
@@ -1001,9 +1016,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func setLanguage(language: String) {
         GV.language.setLanguage(language)
-        GV.basicData.land = GV.convertLocaleToInt()
         try! realm.safeWrite {
             GV.basicData.actLanguage = language
+            GV.basicData.land = GV.convertLocaleToInt()
         }
         self.start()
     }

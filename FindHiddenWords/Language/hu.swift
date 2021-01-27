@@ -62,4 +62,5 @@ let huDictionary: [TextConstants: String] = [
     .tcOnlineTime:              "Online",
     .tcLastOnline:              "Utoljára",
     .tcLastOnlineTime:          "Időtartam",
+    .tcGameCenter:              "GameCenter ViewController"
 ]

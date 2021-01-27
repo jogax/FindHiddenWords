@@ -62,4 +62,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcOnlineTime:              "   В сети  ",
     .tcLastOnline:              "Играл",
     .tcLastOnlineTime:          "Время",
+    .tcGameCenter:              "GameCenter ViewController"
 ]
