@@ -400,7 +400,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         // Submit WordCounters to GC leaderboard
         var infoArray = [GCInfo]()
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            let identifier = GV.actLanguage + countWordsName
+            let identifier = countWordsName.changeChars(at: 3, to: GV.actLanguage)
             infoArray.append(GCInfo(identifier: identifier, value: Int64(counter), modifyValue: 0))
             sendInfoToGC(infos: infoArray)
         }
@@ -426,7 +426,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
             }
             sendInfoToGC(infos: infoArray)
         }
-        // send infos to GC each 10 minutes
+        // send infos to GC each 1 minute
         if globalInfosTimer != nil {
             globalInfosTimer!.invalidate()
         }
@@ -795,6 +795,6 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     let myDeviceName = "FHWDevice"
     let myLandName = "FHWLandLanguage"
     let myVersionName = "FHWVersion"
-    let countWordsName = "FHWCountWords"
+    let countWordsName = "FHW°CountWords"
 
 }

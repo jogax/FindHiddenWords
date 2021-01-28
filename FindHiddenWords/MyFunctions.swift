@@ -476,6 +476,9 @@ public func getBasicData() {
         GV.basicData.land = GV.convertLocaleToInt()
         GV.basicData.lastPlayingDay = Date().yearMonthDay
         GV.basicData.gameSize = 8
+        MaxScoresProLanguageAndSize.initiate()
+        GV.basicData.GCMaxScores = MaxScoresProLanguageAndSize.toString()
+        GV.basicData.localMaxScores = MaxScoresProLanguageAndSize.toString()
 
         try! realm.safeWrite() {
             realm.add(GV.basicData)

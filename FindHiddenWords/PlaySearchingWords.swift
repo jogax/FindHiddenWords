@@ -1296,21 +1296,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             let (_, _, _, score) = getMyWordsForShow()
-            var scoresDecoded = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)
-            let actMaxScore: Int! = Int(scoresDecoded[GV.basicData.gameSize - 5])
-            if score > actMaxScore {
-                scoresDecoded[GV.size - 5] = String(score)
-                var scoreString = ""
-                for item in scoresDecoded {
-                    scoreString += String(item) + GV.outerSeparator
-                }
-                scoreString.removeLast()
-                try! realm.safeWrite {
-                    GV.basicData.localMaxScores = scoreString
-                }
+            MaxScoresProLanguageAndSize.initiate(initValue: GV.basicData.localMaxScores)
+            var maxScore = MaxScoresProLanguageAndSize.getValue(language: GV.actLanguage, size: GV.size)
+            if maxScore < score {
+                MaxScoresProLanguageAndSize.addMaxScore(language: GV.actLanguage, size: GV.size, maxValue: score)
+                maxScore = score
             }
-            let bestScore = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
-            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
+
+            try! realm.safeWrite {
+                GV.basicData.localMaxScores = MaxScoresProLanguageAndSize.toString()
+            }
+            GCHelper.shared.sendScoreToGameCenter(score: maxScore, gameSize: GV.size, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(maxScore))
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
@@ -1358,7 +1356,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     for (mandatoryIndex, mandatoryItem) in mandatoryWords.enumerated() {
                         if mandatoryItem.word == choosedWord.word {
                             mandatoryWords[mandatoryIndex] = choosedWord
-//                            ---------------
                             var wordsToFind = ""
                             for item in mandatoryWords {
                                 wordsToFind += UsedWord(word: item.word, usedLetters: item.usedLetters).toString() + GV.outerSeparator
@@ -1367,12 +1364,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             try! playedGamesRealm!.safeWrite {
                                 playedGame.wordsToFind = wordsToFind
                             }
-//                            let mandatoryWordsInDB = playedGame.wordsToFind.components(separatedBy: GV.outerSeparator)
-//                            for wordString in mandatoryWordsInDB {
-//                                mandatoryWords.append(UsedWord(from: wordString))
-//                            }
-//                            mandatoryWords = mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count == $1.word.count && $0.word < $1.word)})
-// ----------------
                             break
                         }
                     }
@@ -1404,9 +1395,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 playedGame.myWords.append(separator + addString)
                 playedGame.timeStamp = Date() as NSDate
             }
-            let bestScore = Int(GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5])
-            GCHelper.shared.sendScoreToGameCenter(score: bestScore, gameSize: GV.size, completion: {[unowned self] in self.modifyScoreLabel()})
-            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
 
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
