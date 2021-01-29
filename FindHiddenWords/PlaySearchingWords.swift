@@ -27,10 +27,6 @@ class ObjectSP {
 }
 
 class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControllerDelegate, GKGameCenterControllerDelegate {
-    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
-        print("after gamecenterViewControllerFinished")
-    }
-    
     func backFromShowGameCenterViewController() {
         self.isHidden = false
     }
@@ -73,15 +69,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         self.addChild(myAlert)
     }
     
+    var gcVC: GKGameCenterViewController!
     @objc private func goGCVC() {
-        let gcVC = GKGameCenterViewController()
+        gcVC = GKGameCenterViewController()
         gcVC.gameCenterDelegate = self
         gcVC.viewState = .leaderboards
         gcVC.leaderboardIdentifier = "myDevice"
         let currentViewController:UIViewController=UIApplication.shared.keyWindow!.rootViewController!
         self.isHidden = true
-        currentViewController.present(gcVC, animated: true, completion: nil)
-
+        currentViewController.present(gcVC, animated: true, completion: {self.isHidden = false})
+    }
+    
+    func gameCenterViewControllerDidFinish(_ gameCenterViewController: GKGameCenterViewController) {
+        self.isHidden = false
+        gcVC.dismiss(animated:true, completion:nil)
     }
     
     @objc private func generateGameArray() {
@@ -228,10 +229,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if delegate != nil {
             myDelegate = delegate
         }
-//        showBackground(to: gameLayer)
-//        showGamesMenu()
         startNewGame()
     }
+    @objc
     
     var oldOrientation = false
     var mySounds = MySounds()
@@ -295,7 +295,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         } else if buttonType == .DeveloperButton {
             button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.10)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.10)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.10)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         }
@@ -1296,17 +1296,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             let (_, _, _, score) = getMyWordsForShow()
-            MaxScoresProLanguageAndSize.initiate(initValue: GV.basicData.localMaxScores)
-            var maxScore = MaxScoresProLanguageAndSize.getValue(language: GV.actLanguage, size: GV.size)
+            var maxScore = GV.maxScoresProLanguageAndSize.getValue(language: GV.actLanguage, size: GV.size)
             if maxScore < score {
-                MaxScoresProLanguageAndSize.addMaxScore(language: GV.actLanguage, size: GV.size, maxValue: score)
+                GV.maxScoresProLanguageAndSize.addMaxScore(language: GV.actLanguage, size: GV.size, maxValue: score)
                 maxScore = score
             }
 
             try! realm.safeWrite {
-                GV.basicData.localMaxScores = MaxScoresProLanguageAndSize.toString()
+                GV.basicData.localMaxScores = GV.maxScoresProLanguageAndSize.toString()
             }
-            GCHelper.shared.sendScoreToGameCenter(score: maxScore, gameSize: GV.size, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.sendScoreToGameCenter(score: maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
             scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(maxScore))
         }
@@ -1341,16 +1340,17 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     private func saveChoosedWord()->Bool {
         var returnValue = true
         var earlierWord: UsedWord!
+        var mandatoryWordFounded = false
         for (itemIndex, item) in myLabels.enumerated() {
             if item.mandatory && !item.founded && choosedWord.word == item.usedWord!.word {
-                var mandatoryWordOK = false
+//                var mandatoryWordOK = false
                 for choosedItem in choosedWord.usedLetters {
                     if item.usedWord.usedLetters.contains(where: {$0 == choosedItem}) {
-                        mandatoryWordOK = true
+                        mandatoryWordFounded = true
                         break
                     }
                 }
-                if mandatoryWordOK {
+                if mandatoryWordFounded {
                     myLabels[itemIndex].founded = true
                     myLabels[itemIndex].usedWord = choosedWord
                     for (mandatoryIndex, mandatoryItem) in mandatoryWords.enumerated() {
@@ -1395,6 +1395,28 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 playedGame.myWords.append(separator + addString)
                 playedGame.timeStamp = Date() as NSDate
             }
+            if !mandatoryWordFounded {
+                try! realm.safeWrite {
+                    switch GV.actLanguage {
+                    case GV.language.getText(.tcEnglishShort):
+                        GV.basicData.countWordsEN += 1
+                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsEN, completion: {})
+                    case GV.language.getText(.tcGermanShort):
+                        GV.basicData.countWordsDE += 1
+                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsDE, completion: {})
+                    case GV.language.getText(.tcHungarianShort):
+                        GV.basicData.countWordsHU += 1
+                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsHU, completion: {})
+                    case GV.language.getText(.tcRussianShort):
+                        GV.basicData.countWordsRU += 1
+                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsRU, completion: {})
+                    default:
+                        break
+                    }
+ 
+                 }
+            }
+
 
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)

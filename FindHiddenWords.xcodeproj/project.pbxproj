@@ -82,6 +82,7 @@
 		D020C8D325BDB7C700185EF6 /* ShowGameCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */; };
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
 		D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D925BDC66400185EF6 /* GelbOctagon.png */; };
+		D02213CD25C448B500BAB3A7 /* LightLilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */; };
 		D04190E325C1991C00621D08 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E125C1991C00621D08 /* offline.png */; };
 		D04190E425C1991C00621D08 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E225C1991C00621D08 /* online.png */; };
 		D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */; };
@@ -178,6 +179,7 @@
 		D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGameCenterViewController.swift; sourceTree = "<group>"; };
 		D020C8D525BDC06100185EF6 /* LightRedOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedOctagon.png; sourceTree = "<group>"; };
 		D020C8D925BDC66400185EF6 /* GelbOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GelbOctagon.png; sourceTree = "<group>"; };
+		D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightLilaOctagon.png; sourceTree = "<group>"; };
 		D04190E125C1991C00621D08 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
 		D04190E225C1991C00621D08 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
 		D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 			isa = PBXGroup;
 			children = (
 				D08B5B8D25C06A6C007C04D5 /* hook.png */,
+				D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */,
 				D020C8D925BDC66400185EF6 /* GelbOctagon.png */,
 				D020C8D525BDC06100185EF6 /* LightRedOctagon.png */,
 				D012500E25A8AEEA000BCF89 /* AppIcon.png */,
@@ -465,6 +468,7 @@
 				D012503F25A8AEEB000BCF89 /* Connection0010x.png in Resources */,
 				D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */,
 				D012503B25A8AEEB000BCF89 /* RedSprite.png in Resources */,
+				D02213CD25C448B500BAB3A7 /* LightLilaOctagon.png in Resources */,
 				D09E5F4125B87E86001291D9 /* LilaOctagon.png in Resources */,
 				D012502A25A8AEEB000BCF89 /* DarkGoldSprite.png in Resources */,
 				D012504525A8AEEB000BCF89 /* Connection1100.png in Resources */,

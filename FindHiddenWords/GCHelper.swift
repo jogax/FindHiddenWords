@@ -137,7 +137,8 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     var globalInfosTimer: Timer?
     let IDPrefix = "FHW"
-    let IDMid = "Score"
+    let ScoreID = "Score"
+    let CounterID = "CountWords"
     
     /// Authenticates the user with their Game Center account if possible
     public func authenticateLocalUser(theDelegate: GCHelperDelegate, presentingViewController: UIViewController) {
@@ -382,7 +383,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         globalInfosTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(sendGlobalInfosTOGC(timerX: )), userInfo: nil, repeats: false)
     }
     
-    public func sendScoreToGameCenter(score: Int?, gameSize: Int, completion: @escaping ()->()) {
+    public func sendScoreToGameCenter(score: Int?, completion: @escaping ()->()) {
         // Submit score to GC leaderboard
         if score == nil {
             return
@@ -390,7 +391,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         var infoArray = [GCInfo]()
  
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            let scoreID = actID
+            let scoreID = actScoreID
             infoArray.append(GCInfo(identifier: scoreID, value: Int64(score!), modifyValue: 0))
             sendInfoToGC(infos: infoArray)
         }
@@ -400,7 +401,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         // Submit WordCounters to GC leaderboard
         var infoArray = [GCInfo]()
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
-            let identifier = countWordsName.changeChars(at: 3, to: GV.actLanguage)
+            let identifier = actWordCounterID
             infoArray.append(GCInfo(identifier: identifier, value: Int64(counter), modifyValue: 0))
             sendInfoToGC(infos: infoArray)
         }
@@ -702,20 +703,26 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     var bestScoreLeaderboard: GKLeaderboard?
     
-    private var actID:String {
+    private var actScoreID:String {
          get {
-            return IDPrefix + GV.actLanguage.uppercased() + IDMid + String(GV.basicData.gameSize)
+            return IDPrefix + GV.actLanguage.uppercased() + ScoreID + String(GV.basicData.gameSize)
         }
     }
     
-    @objc public func getAllScores(rank: Int = 1, length: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
+    private var actWordCounterID:String {
+         get {
+            return IDPrefix + GV.actLanguage.uppercased() + CounterID
+        }
+    }
+    
+   @objc public func getAllScores(rank: Int = 1, length: Int = 100, inRecursion: Bool = false, completion: @escaping ()->()) {
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             if waitingForScores && !inRecursion {
                 return
             }
             waitingForScores = true
             bestScoreLeaderboard = GKLeaderboard()
-            bestScoreLeaderboard!.identifier = actID
+            bestScoreLeaderboard!.identifier = actScoreID
             bestScoreLeaderboard!.playerScope = .global
             bestScoreLeaderboard!.timeScope = .allTime
             bestScoreLeaderboard!.range = NSRange(location: rank, length: length)
@@ -762,7 +769,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     public func getBestScore(completion: @escaping ()->()) {
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             leaderboardForBestScore = GKLeaderboard()
-            let leaderboardID = actID
+            let leaderboardID = actScoreID
             leaderboardForBestScore!.identifier = leaderboardID
             leaderboardForBestScore!.playerScope = .global
             leaderboardForBestScore!.timeScope = .allTime

@@ -476,22 +476,18 @@ public func getBasicData() {
         GV.basicData.land = GV.convertLocaleToInt()
         GV.basicData.lastPlayingDay = Date().yearMonthDay
         GV.basicData.gameSize = 8
-        MaxScoresProLanguageAndSize.initiate()
-        GV.basicData.GCMaxScores = MaxScoresProLanguageAndSize.toString()
-        GV.basicData.localMaxScores = MaxScoresProLanguageAndSize.toString()
+        GV.basicData.localMaxScores = GV.maxScoresProLanguageAndSize.toString()
 
         try! realm.safeWrite() {
             realm.add(GV.basicData)
         }
     } else {
         GV.basicData = realm.objects(BasicData.self).first!
+        GV.maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize.init(initValue: GV.basicData.localMaxScores)
         GV.language.setLanguage(GV.basicData.actLanguage)
-
-        if GV.basicData.deviceType == 0 {
-            try! realm.safeWrite() {
-                GV.basicData.deviceType = UIDevice().getModelCode()
-                GV.basicData.land = GV.convertLocaleToInt()
-           }
+        try! realm.safeWrite() {
+            GV.basicData.deviceType = UIDevice().getModelCode()
+            GV.basicData.land = GV.convertLocaleToInt()
         }
         if Date().yearMonthDay != GV.basicData.lastPlayingDay {
             try! realm.safeWrite() {

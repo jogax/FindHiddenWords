@@ -120,13 +120,7 @@ struct GV {
     }
     static var size: Int = 0
     static var oldSize: Int = 0
-    static var gameArray = [[GameboardItem]]() {
-        willSet {
-//            if newValue[0][0].letter == " " {
-//                print("will set to blank")
-//            }
-        }
-    }
+    static var gameArray = [[GameboardItem]]()
     static var reachability: Reachability!
     static var playingGrid: Grid?
     static var globalInfoTable = [PlayerData]()
@@ -166,6 +160,7 @@ struct GV {
     static let TimeModifier: Int64 = 10000000000
     static let myGCName = "RJogax"
     static var playSearchingWordsScene: PlaySearchingWords?
+    static var maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize()
 
 
     static var orientationHandler: Selector?

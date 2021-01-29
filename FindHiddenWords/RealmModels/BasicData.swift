@@ -14,9 +14,9 @@ enum GCEnabledType: Int {
 }
 
 class MaxScoresProLanguageAndSize {
-    static let languageIndex = ["en": 0, "de": 1, "hu": 2, "ru":3]
-    static var arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
-    static public func toString()->String {
+    let languageIndex = ["en": 0, "de": 1, "hu": 2, "ru":3]
+    var arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
+    public func toString()->String {
         var strValue = ""
         for languageIndex in 0...3 {
             for sizeIndex in 0...5 {
@@ -28,12 +28,12 @@ class MaxScoresProLanguageAndSize {
         strValue.removeLast()
         return strValue
     }
-    static public func addMaxScore(language: String, size: Int, maxValue: Int) {
+    public func addMaxScore(language: String, size: Int, maxValue: Int) {
         if let lIndex = languageIndex[language] {
             arr[lIndex][size - 5] = maxValue
         }
     }
-    static func initiate(initValue: String) {
+    init(initValue: String) {
         arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
         let languages = initValue.components(separatedBy: GV.outerSeparator)
         for (languageIndex, language) in languages.enumerated() {
@@ -43,11 +43,11 @@ class MaxScoresProLanguageAndSize {
             }
         }
     }
-    static func initiate() {
+    init() {
         arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
     }
 
-    static func getValue (language: String, size: Int)->Int {
+    func getValue (language: String, size: Int)->Int {
         var returnValue = 0
         if let lIndex = languageIndex[language] {
             returnValue = arr[lIndex][size - 5]
@@ -74,11 +74,15 @@ class BasicData: Object {
     @objc dynamic var countPlays = 0
     @objc dynamic var musicOn = false
     @objc dynamic var deviceInfoSaved = false
-    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
+//    @objc dynamic var GameCenterEnabled = GCEnabledType.AskForGameCenter.rawValue
     @objc dynamic var deviceRecordInCloudID = ""
     @objc dynamic var showingScoreType = 0 // ScoreType
     @objc dynamic var showingTimeScope = 0 // TimeScope
     @objc dynamic var localMaxScores = ""
+    @objc dynamic var countWordsEN = 0
+    @objc dynamic var countWordsDE = 0
+    @objc dynamic var countWordsHU = 0
+    @objc dynamic var countWordsRU = 0
     @objc dynamic var GCMaxScores = ""
 
     override  class func primaryKey() -> String {

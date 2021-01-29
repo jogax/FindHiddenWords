@@ -86,7 +86,7 @@ class GameboardItem: SKSpriteNode {
          StatusType(itemStatus: .GoldStatus, fixItem: true) : "GoldOctagon", //"GoldSprite",
          StatusType(itemStatus: .DarkGoldStatus, fixItem: false) : "DarkGoldSprite",
          StatusType(itemStatus: .DarkGoldStatus, fixItem: true) : "DarkGoldSprite",
-         StatusType(itemStatus: .Lila, fixItem: false): "LilaOctagon"]
+         StatusType(itemStatus: .Lila, fixItem: false): "LightLilaOctagon"]
 
     public var letter = emptyLetter
     private var fontSize: CGFloat = 0
