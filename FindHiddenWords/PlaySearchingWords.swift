@@ -1397,24 +1397,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             if !mandatoryWordFounded {
                 try! realm.safeWrite {
-                    switch GV.actLanguage {
-                    case GV.language.getText(.tcEnglishShort):
-                        GV.basicData.countWordsEN += 1
-                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsEN, completion: {})
-                    case GV.language.getText(.tcGermanShort):
-                        GV.basicData.countWordsDE += 1
-                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsDE, completion: {})
-                    case GV.language.getText(.tcHungarianShort):
-                        GV.basicData.countWordsHU += 1
-                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsHU, completion: {})
-                    case GV.language.getText(.tcRussianShort):
-                        GV.basicData.countWordsRU += 1
-                        GCHelper.shared.sendCountWordsToGameCenter(counter: GV.basicData.countWordsRU, completion: {})
-                    default:
-                        break
+                    if GV.basicData.allFoundedWords.filter("word == %d", GV.actLanguage + choosedWord.word).count == 0 {
+                        let foundedWord = FoundedWords()
+                        foundedWord.word = GV.actLanguage + choosedWord.word
+                        GV.basicData.allFoundedWords.append(foundedWord)
                     }
- 
                  }
+                let actWordCounter = GV.basicData.allFoundedWords.filter("word beginswith %d", GV.actLanguage).count
+                GCHelper.shared.sendCountWordsToGameCenter(counter: actWordCounter, completion: {})
             }
 
 

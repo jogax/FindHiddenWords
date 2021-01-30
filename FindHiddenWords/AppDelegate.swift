@@ -77,8 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
                 }
         },
-            objectTypes: [BasicData.self/*, GameDataModel.self, RoundDataModel.self, , ScoreInfoForDifficulty.self, MyWords.self, FinishedGames.self, MyReportedWords.self, WordsFromCloud.self*/]
-//            objectTypes: [WordListModel.self]
+            objectTypes: [BasicData.self, FoundedWords.self]
         )
         
         // Tell Realm to use this new configuration object for the default Realm

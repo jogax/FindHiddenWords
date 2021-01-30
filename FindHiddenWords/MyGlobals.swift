@@ -162,7 +162,6 @@ struct GV {
     static var playSearchingWordsScene: PlaySearchingWords?
     static var maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize()
 
-
     static var orientationHandler: Selector?
     #if SIMULATOR
     static var actDevice: DeviceType = .iPhoneSE1

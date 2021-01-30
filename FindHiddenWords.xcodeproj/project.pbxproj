@@ -90,6 +90,7 @@
 		D08B5B9125C06AF7007C04D5 /* LeftSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9025C06AF7007C04D5 /* LeftSimple.png */; };
 		D08B5B9425C06B05007C04D5 /* RightSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9325C06B05007C04D5 /* RightSimple.png */; };
 		D09E5F4125B87E86001291D9 /* LilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D09E5F4025B87E86001291D9 /* LilaOctagon.png */; };
+		D0B3DFF325C5B8FE00A2BD11 /* FoundedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B3DFF225C5B8FE00A2BD11 /* FoundedWords.swift */; };
 		D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */; };
 		D0E64EB025A899D7006BACC6 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EAF25A899D7006BACC6 /* GameScene.sks */; };
 		D0E64EB225A899D7006BACC6 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EB125A899D7006BACC6 /* Actions.sks */; };
@@ -190,6 +191,7 @@
 		D08B5B9025C06AF7007C04D5 /* LeftSimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LeftSimple.png; sourceTree = "<group>"; };
 		D08B5B9325C06B05007C04D5 /* RightSimple.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RightSimple.png; sourceTree = "<group>"; };
 		D09E5F4025B87E86001291D9 /* LilaOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LilaOctagon.png; sourceTree = "<group>"; };
+		D0B3DFF225C5B8FE00A2BD11 /* FoundedWords.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundedWords.swift; sourceTree = "<group>"; };
 		D0B94E5A25A8B3AB0058F9B8 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		D0B94E5E25A8B3B20058F9B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		D0B94E6125A8B3B80058F9B8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 				D0124FE225A8A414000BCF89 /* BasicData.swift */,
 				D0124FE525A8A42A000BCF89 /* Games.swift */,
 				D0124FE825A8A44A000BCF89 /* NewWorldListModel.swift */,
+				D0B3DFF225C5B8FE00A2BD11 /* FoundedWords.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -546,6 +549,7 @@
 				D0124FE025A8A3FB000BCF89 /* PlayedGame.swift in Sources */,
 				D0124F9725A8A052000BCF89 /* CustomTableViewCell.swift in Sources */,
 				D0124FBE25A8A23D000BCF89 /* MyAlertController.swift in Sources */,
+				D0B3DFF325C5B8FE00A2BD11 /* FoundedWords.swift in Sources */,
 				D0124FE625A8A42A000BCF89 /* Games.swift in Sources */,
 				D0124F9F25A8A0B0000BCF89 /* GradientNode.swift in Sources */,
 				D0124FD425A8A358000BCF89 /* MySounds.swift in Sources */,

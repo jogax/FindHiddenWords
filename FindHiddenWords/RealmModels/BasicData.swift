@@ -9,12 +9,13 @@
 import Foundation
 import RealmSwift
 
+let languageIndex = ["en": 0, "de": 1, "hu": 2, "ru":3]
+
 enum GCEnabledType: Int {
     case AskForGameCenter = 0, GameCenterEnabled, GameCenterSupressed
 }
 
 class MaxScoresProLanguageAndSize {
-    let languageIndex = ["en": 0, "de": 1, "hu": 2, "ru":3]
     var arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
     public func toString()->String {
         var strValue = ""
@@ -33,6 +34,13 @@ class MaxScoresProLanguageAndSize {
             arr[lIndex][size - 5] = maxValue
         }
     }
+    public func getValue (language: String, size: Int)->Int {
+        var returnValue = 0
+        if let lIndex = languageIndex[language] {
+            returnValue = arr[lIndex][size - 5]
+        }
+        return returnValue
+    }
     init(initValue: String) {
         arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
         let languages = initValue.components(separatedBy: GV.outerSeparator)
@@ -47,13 +55,6 @@ class MaxScoresProLanguageAndSize {
         arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
     }
 
-    func getValue (language: String, size: Int)->Int {
-        var returnValue = 0
-        if let lIndex = languageIndex[language] {
-            returnValue = arr[lIndex][size - 5]
-        }
-        return returnValue
-    }
 }
 let NoGamePlayed = 50000
 
@@ -79,11 +80,7 @@ class BasicData: Object {
     @objc dynamic var showingScoreType = 0 // ScoreType
     @objc dynamic var showingTimeScope = 0 // TimeScope
     @objc dynamic var localMaxScores = ""
-    @objc dynamic var countWordsEN = 0
-    @objc dynamic var countWordsDE = 0
-    @objc dynamic var countWordsHU = 0
-    @objc dynamic var countWordsRU = 0
-    @objc dynamic var GCMaxScores = ""
+    let  allFoundedWords = List<FoundedWords>()
 
     override  class func primaryKey() -> String {
         return "ID"

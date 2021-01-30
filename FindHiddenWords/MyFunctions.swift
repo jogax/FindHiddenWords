@@ -483,7 +483,7 @@ public func getBasicData() {
         }
     } else {
         GV.basicData = realm.objects(BasicData.self).first!
-        GV.maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize.init(initValue: GV.basicData.localMaxScores)
+        GV.maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize(initValue: GV.basicData.localMaxScores)
         GV.language.setLanguage(GV.basicData.actLanguage)
         try! realm.safeWrite() {
             GV.basicData.deviceType = UIDevice().getModelCode()
