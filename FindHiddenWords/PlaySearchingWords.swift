@@ -379,7 +379,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 newGame.language = GV.actLanguage
                 newGame.gameNumber = origGame.first!.gameNumber
                 newGame.gameArray = origGame.first!.gameArray
-                newGame.wordsToFind = origGame.first!.words
+                newGame.wordsToFind = mandatoryWordsToWordsToFind(words: origGame.first!.words)
                 newGame.finished = false
                 try! playedGamesRealm!.safeWrite {
                     playedGamesRealm!.add(newGame)
@@ -402,6 +402,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func startFinishedGame() {
 
+    }
+    
+    private func mandatoryWordsToWordsToFind(words: String)->List<FoundedWords> {
+        let returnValue = List<FoundedWords>()
+        let allWords = words.components(separatedBy: GV.outerSeparator)
+        for word in allWords {
+            let foundedWord = FoundedWords()
+            let index = word.index(of: GV.innerSeparator)
+            foundedWord.word = GV.actLanguage + word.startingSubString(length: index!)
+            foundedWord.usedLetters = word.endingSubString(at: index! + 1)
+            returnValue.append(foundedWord)
+        }
+        return returnValue
     }
     
     var games: Results<Games>?
@@ -1187,6 +1200,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
 
     private func fillMandatoryWords() {
+        mandatoryWords.removeAll()
+        for item in playedGame.wordsToFind {
+            let word = item.word.endingSubString(at: 2)
+            let 
+            let usedLetters = item.usedLetters
+            let foundeWord = FoundedWords()
+            foundeWord.word = usedWord.word
+            foundeWord.usedLetters = usedWord.usedLetters.toString()
+        }
         let mandatoryWordsInDB = playedGame.wordsToFind.components(separatedBy: GV.outerSeparator)
         for wordString in mandatoryWordsInDB {
             mandatoryWords.append(UsedWord(from: wordString))
@@ -1296,18 +1318,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             let (_, _, _, score) = getMyWordsForShow()
-            var maxScore = GV.maxScoresProLanguageAndSize.getValue(language: GV.actLanguage, size: GV.size)
-            if maxScore < score {
-                GV.maxScoresProLanguageAndSize.addMaxScore(language: GV.actLanguage, size: GV.size, maxValue: score)
-                maxScore = score
-            }
-
             try! realm.safeWrite {
-                GV.basicData.localMaxScores = GV.maxScoresProLanguageAndSize.toString()
+                if GV.basicData.maxScore < score {
+                    GV.basicData.maxScore = score
+                }
             }
-            GCHelper.shared.sendScoreToGameCenter(score: maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
-            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(maxScore))
+            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScore))
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
@@ -1356,13 +1374,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     for (mandatoryIndex, mandatoryItem) in mandatoryWords.enumerated() {
                         if mandatoryItem.word == choosedWord.word {
                             mandatoryWords[mandatoryIndex] = choosedWord
-                            var wordsToFind = ""
-                            for item in mandatoryWords {
-                                wordsToFind += UsedWord(word: item.word, usedLetters: item.usedLetters).toString() + GV.outerSeparator
-                            }
-                            wordsToFind.removeLast()
                             try! playedGamesRealm!.safeWrite {
-                                playedGame.wordsToFind = wordsToFind
+                                let itemToModify = playedGame.wordsToFind.filter("word = %d", GV.actLanguage + choosedWord.word).first
+                                if itemToModify != nil {
+                                    itemToModify!.usedLetters = choosedWord.usedLettersToString()
+                                }
+//                                playedGame.wordsToFind = wordsToFind
                             }
                             break
                         }
@@ -1416,8 +1433,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func modifyScoreLabel() {
         let (_, _, _, score) = getMyWordsForShow()
-        let bestScore = GV.basicData.localMaxScores.components(separatedBy: GV.outerSeparator)[GV.size - 5]
-        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(bestScore))
+        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScore))
     }
 
 //    var myFoundedWords = [UsedWord]()

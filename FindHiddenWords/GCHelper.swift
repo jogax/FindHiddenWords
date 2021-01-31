@@ -705,13 +705,13 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     
     private var actScoreID:String {
          get {
-            return IDPrefix + GV.actLanguage.uppercased() + ScoreID + String(GV.basicData.gameSize)
+            return IDPrefix + ScoreID + String(GV.basicData.gameSize)
         }
     }
     
     private var actWordCounterID:String {
          get {
-            return IDPrefix + GV.actLanguage.uppercased() + CounterID
+            return IDPrefix + CounterID
         }
     }
     

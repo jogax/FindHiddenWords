@@ -160,7 +160,7 @@ struct GV {
     static let TimeModifier: Int64 = 10000000000
     static let myGCName = "RJogax"
     static var playSearchingWordsScene: PlaySearchingWords?
-    static var maxScoresProLanguageAndSize = MaxScoresProLanguageAndSize()
+//    static var maxScore = MaxScoresProLanguageAndSize()
 
     static var orientationHandler: Selector?
     #if SIMULATOR

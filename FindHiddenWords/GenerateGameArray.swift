@@ -21,6 +21,11 @@ public struct UsedLetter {
         self.row = row
         self.letter = letter
     }
+    init(value: String) {
+        self.col = Int(value.char(at: 0))!
+        self.row = Int(value.char(at: 1))!
+        self.letter = value.char(at: 2)
+    }
     func toString()->String {
         return String(col) + String(row) + String(letter)
     }
@@ -86,13 +91,21 @@ public struct UsedWord {
         return lhs.word == rhs.word
     }
     
-    public func toString()->String {
+    public func usedLettersToString()->String {
         var returnValue = ""
-        returnValue += word
         for item in usedLetters {
             returnValue += GV.innerSeparator + item.toString()
         }
         return returnValue
+    }
+    
+    public func toString()->String {
+//        var returnValue = ""
+        return word + GV.innerSeparator + usedLettersToString()
+//        for item in usedLetters {
+//            returnValue += GV.innerSeparator + item.toString()
+//        }
+//        return returnValue
     }
 }
 

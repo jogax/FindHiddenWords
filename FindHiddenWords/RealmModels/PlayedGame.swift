@@ -16,11 +16,11 @@ class PlayedGame: Object {
     @objc dynamic var gameNumber = 0
     @objc dynamic var gameSize = 0
     @objc dynamic var gameArray = ""
-//    @objc dynamic var words = ""
-    @objc dynamic var wordsToFind = ""
-//    @objc dynamic var myScore = 0
-//    @objc dynamic var myCountWords = 0
-    @objc dynamic var myWords = ""
+//    @objc dynamic var wordsToFind = ""
+    var  wordsToFind = List<FoundedWords>()
+
+//    @objc dynamic var myWords = ""
+    var myWords = List<FoundedWords>()
     @objc dynamic var finished = false
     @objc dynamic var timeStamp = NSDate()
     override  class func primaryKey() -> String {
