@@ -408,11 +408,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let returnValue = List<FoundedWords>()
         let allWords = words.components(separatedBy: GV.outerSeparator)
         for word in allWords {
-            let foundedWord = FoundedWords()
-            let index = word.index(of: GV.innerSeparator)
-            foundedWord.word = GV.actLanguage + word.startingSubString(length: index!)
-            foundedWord.usedLetters = word.endingSubString(at: index! + 1)
-            returnValue.append(foundedWord)
+            returnValue.append(FoundedWords(from: word))
         }
         return returnValue
     }
@@ -1202,16 +1198,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     private func fillMandatoryWords() {
         mandatoryWords.removeAll()
         for item in playedGame.wordsToFind {
-            let word = item.word.endingSubString(at: 2)
-            let 
-            let usedLetters = item.usedLetters
-            let foundeWord = FoundedWords()
-            foundeWord.word = usedWord.word
-            foundeWord.usedLetters = usedWord.usedLetters.toString()
-        }
-        let mandatoryWordsInDB = playedGame.wordsToFind.components(separatedBy: GV.outerSeparator)
-        for wordString in mandatoryWordsInDB {
-            mandatoryWords.append(UsedWord(from: wordString))
+            mandatoryWords.append(item.getUsedWord())
         }
         mandatoryWords = mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count == $1.word.count && $0.word < $1.word)})
     }
@@ -1243,7 +1230,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //
     private func setGameArrayToActualState() {
         var counter = 0
-        let myWordsInDB = playedGame.myWords.components(separatedBy: GV.outerSeparator)
+        let myWordsInDB = playedGame.myWords
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].resetCountOccurencesInWords()
         })
@@ -1270,39 +1257,34 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         
         if myWordsInDB.count > 0 {
             for item in myWordsInDB {
-                if item != "" {
-//                    if item.begins(with: "ОКОРОК") {
-//                        continue
-//                    }
-                    let usedWord = UsedWord(from: item)
-                    if !allWords.contains(where: {$0 == usedWord}){
-                        allWords.append(usedWord)
-                    }
-                    for usedLetter in usedWord.usedLetters {
-                        let cell = GV.gameArray[usedLetter.col][usedLetter.row]
-                        if usedLetter.letter == cell.letter {
-                            cell.setStatus(toStatus: .WholeWord)
-                        }
-                    }
-                    let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
-                    for (index, item) in usedWord.usedLetters.enumerated() {
-                        GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
-                    }
- 
-                    if !mandatoryWords.contains(where: {$0 == usedWord}) {
-                        counter += 1
-                        if !myLabels.filter({!$0.mandatory}).contains(where: {$0.usedWord! == usedWord}) {
-                            let myWord = MyFoundedWord(usedWord: usedWord, mandatory: false, prefixValue: counter + 1)
-                            myWord.founded = true
-                            myWord.plPosSize = setPLPos(counter: counter)
-                            myWord.setActPosSize()
-                            gameLayer.addChild(myWord)
-                            myLabels.append(myWord)
-                        } else {
-
-                        }
+                let usedWord = item.getUsedWord()
+                if !allWords.contains(where: {$0 == usedWord}){
+                    allWords.append(usedWord)
+                }
+                for usedLetter in usedWord.usedLetters {
+                    let cell = GV.gameArray[usedLetter.col][usedLetter.row]
+                    if usedLetter.letter == cell.letter {
+                        cell.setStatus(toStatus: .WholeWord)
                     }
                 }
+                let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
+                for (index, item) in usedWord.usedLetters.enumerated() {
+                    GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
+                }
+
+//                if !mandatoryWords.contains(where: {$0 == usedWord}) {
+//                    counter += 1
+//                    if !myLabels.filter({!$0.mandatory}).contains(where: {$0.usedWord! == usedWord}) {
+//                        let myWord = MyFoundedWord(usedWord: usedWord, mandatory: false, prefixValue: counter + 1)
+//                        myWord.founded = true
+//                        myWord.plPosSize = setPLPos(counter: counter)
+//                        myWord.setActPosSize()
+//                        gameLayer.addChild(myWord)
+//                        myLabels.append(myWord)
+//                    } else {
+//
+//                        }
+//                }
             }
 
             for myWord in myLabels {
@@ -1349,7 +1331,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             playedGame.gameNumber = origGame.gameNumber
             playedGame.gameSize = origGame.size
             playedGame.gameArray = origGame.gameArray
-            playedGame.wordsToFind = origGame.words
+            let myWords = origGame.words.components(separatedBy: GV.outerSeparator)
+            for item in myWords {
+                playedGame.wordsToFind.append(FoundedWords(from: item))
+            }
+//            playedGame.wordsToFind = origGame.words
             playedGame.timeStamp = NSDate()
             playedGamesRealm!.add(playedGame)
         }
@@ -1406,17 +1392,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         if returnValue {
-            let addString = choosedWord.toString()
-            let separator = playedGame.myWords.count == 0 ? "" : GV.outerSeparator
+//            let addString = choosedWord.toString()
+//            let separator = playedGame.myWords.count == 0 ? "" : GV.outerSeparator
             try! playedGamesRealm!.safeWrite {
-                playedGame.myWords.append(separator + addString)
+                playedGame.myWords.append(FoundedWords(fromUsedWord: choosedWord))
                 playedGame.timeStamp = Date() as NSDate
             }
             if !mandatoryWordFounded {
                 try! realm.safeWrite {
                     if GV.basicData.allFoundedWords.filter("word == %d", GV.actLanguage + choosedWord.word).count == 0 {
-                        let foundedWord = FoundedWords()
-                        foundedWord.word = GV.actLanguage + choosedWord.word
+                        let foundedWord = FoundedWords(fromUsedWord: choosedWord)
                         GV.basicData.allFoundedWords.append(foundedWord)
                     }
                  }

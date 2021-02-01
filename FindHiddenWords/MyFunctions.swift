@@ -157,7 +157,7 @@ public  func getRealm(type: RealmType)->Realm {
             let oneMB = 10 * 1024 * 1024
             return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
     },
-        objectTypes: [type == .GamesRealm ? Games.self : PlayedGame.self])
+        objectTypes: [(type == .GamesRealm ? Games.self : PlayedGame.self), FoundedWords.self])
     do {
         // Realm is compacted on the first open if the configuration block conditions were met.
         _ = try Realm(configuration: config)

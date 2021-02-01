@@ -94,8 +94,9 @@ public struct UsedWord {
     public func usedLettersToString()->String {
         var returnValue = ""
         for item in usedLetters {
-            returnValue += GV.innerSeparator + item.toString()
+            returnValue += item.toString() + GV.innerSeparator
         }
+        returnValue.removeLast()
         return returnValue
     }
     
