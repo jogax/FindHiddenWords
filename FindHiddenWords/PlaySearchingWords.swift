@@ -406,9 +406,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func mandatoryWordsToWordsToFind(words: String)->List<FoundedWords> {
         let returnValue = List<FoundedWords>()
+        var startID = GV.basicData.allFoundedWords.count + 1
         let allWords = words.components(separatedBy: GV.outerSeparator)
         for word in allWords {
             returnValue.append(FoundedWords(from: word))
+            returnValue.last!.ID = startID
+            startID += 1
         }
         return returnValue
     }
@@ -1156,30 +1159,52 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         var maxLength = 0
         var returnScore = 0
         var countWords = 0
-        for label in myLabels {
-            if !label.mandatory || label.founded {
-                let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
-                let length = label.usedWord!.word.count
-                if !returnWords.contains(where: {$0.word == word}) {
-                    let score = word.length * 50
-                    returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
-                    returnScore += score
-                    if maxLength < word.length {
-                        maxLength = word.length
-                    }
-                } else {
-                    for index in 0..<returnWords.count {
-                        if returnWords[index].word == word {
-                            returnWords[index].counter += 1
-                            returnScore -= returnWords[index].score
-                            returnWords[index].score *= 2
-                            returnScore += returnWords[index].score
-                        }
+        for item in allWords {
+            let word = item.word + (item.mandatory ? "*" : "")
+            let length = item.word.count
+            if !returnWords.contains(where: {$0.word == word}) {
+                let score = word.length * 50
+                returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
+                returnScore += score
+                if maxLength < word.length {
+                    maxLength = word.length
+                }
+            } else {
+                for index in 0..<returnWords.count {
+                    if returnWords[index].word == word {
+                        returnWords[index].counter += 1
+                        returnScore -= returnWords[index].score
+                        returnWords[index].score *= 2
+                        returnScore += returnWords[index].score
                     }
                 }
             }
-            countWords += label.mandatory ? 0 : 1
+            countWords += item.mandatory ? 0 : 1
         }
+//        for label in myLabels {
+//            if !label.mandatory || label.founded {
+//                let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
+//                let length = label.usedWord!.word.count
+//                if !returnWords.contains(where: {$0.word == word}) {
+//                    let score = word.length * 50
+//                    returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
+//                    returnScore += score
+//                    if maxLength < word.length {
+//                        maxLength = word.length
+//                    }
+//                } else {
+//                    for index in 0..<returnWords.count {
+//                        if returnWords[index].word == word {
+//                            returnWords[index].counter += 1
+//                            returnScore -= returnWords[index].score
+//                            returnWords[index].score *= 2
+//                            returnScore += returnWords[index].score
+//                        }
+//                    }
+//                }
+//            }
+//            countWords += label.mandatory ? 0 : 1
+//        }
         returnWords = returnWords.sorted(by:{$0.length > $1.length ||
                                             ($0.length == $1.length && (/*$0.counter > $1.counter || */$0.word < $1.word))
         })
@@ -1189,8 +1214,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func getMyWordsCount()->Int {
         var returnValue = 0
-        for label in myLabels {
-            returnValue += label.founded ? 1 : 0
+        for item in allWords {
+            returnValue += item.mandatory ? 0 : 1
         }
         return returnValue
     }
@@ -1351,6 +1376,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 for choosedItem in choosedWord.usedLetters {
                     if item.usedWord.usedLetters.contains(where: {$0 == choosedItem}) {
                         mandatoryWordFounded = true
+                        choosedWord.mandatory = true
                         break
                     }
                 }
@@ -1405,7 +1431,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         GV.basicData.allFoundedWords.append(foundedWord)
                     }
                  }
-                let actWordCounter = GV.basicData.allFoundedWords.filter("word beginswith %d", GV.actLanguage).count
+                let actWordCounter = GV.basicData.allFoundedWords.filter("language = %d", GV.actLanguage).count
                 GCHelper.shared.sendCountWordsToGameCenter(counter: actWordCounter, completion: {})
             }
 

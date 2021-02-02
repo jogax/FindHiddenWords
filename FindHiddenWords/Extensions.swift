@@ -1014,6 +1014,9 @@ extension Date {
         return "\(hours):\(minutes):\(milliseconds)"
     }
     
+    func toMilliseconds() -> Int64 {
+        Int64(self.timeIntervalSince1970 * 1000)
+    }    
 }
 
 extension UIViewController {

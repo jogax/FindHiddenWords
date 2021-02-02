@@ -40,6 +40,7 @@ public struct UsedLetter {
 
 public struct UsedWord {
     var word = ""
+    var mandatory = false
     var usedLetters = [UsedLetter]()
     static func +(lhs: UsedWord, rhs: UsedWord)->UsedWord {
         return UsedWord(word: lhs.word + rhs.word, usedLetters: lhs.usedLetters + rhs.usedLetters)
