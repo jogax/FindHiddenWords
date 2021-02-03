@@ -347,8 +347,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     @objc private func startNewGame() {
         GV.oldSize = GV.size
         myLabels.removeAll()
-        allWords.removeAll()
-        mandatoryWords.removeAll()
+//        allWords.removeAll()
+//        mandatoryWords.removeAll()
         let maxGameNumber = 99
         let startGameNumber = 0
         var primary = GV.actLanguage + GV.innerSeparator + "*" + GV.innerSeparator + String(GV.size)
@@ -406,7 +406,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func mandatoryWordsToWordsToFind(words: String)->List<FoundedWords> {
         let returnValue = List<FoundedWords>()
-        var startID = GV.basicData.allFoundedWords.count + 1
+        var startID = getNextID.incrementID()
         let allWords = words.components(separatedBy: GV.outerSeparator)
         for word in allWords {
             returnValue.append(FoundedWords(from: word))
@@ -704,7 +704,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         for myLabel in myLabels {
             countGreenWords +=  myLabel.founded && myLabel.mandatory ? 1 : 0
         }
-        if countGreenWords == mandatoryWords.count/* || countGreenWords == 0*/ {
+        if countGreenWords == playedGame.wordsToFind.count { // mandatoryWords.count/* || countGreenWords == 0*/ {
             congratulation()
         }
     }
@@ -714,7 +714,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             animateLetters(newWord: choosedWord, type: .WordIsOK)
             mySounds.play(.OKWord)
             setGameArrayToActualState()
-            let title = GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount()))
+            let title = GV.language.getText(.tcShowMyWords, values: String(getCountWords()))
             showMyWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         }
     }
@@ -798,7 +798,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         try! playedGamesRealm?.safeWrite {
             playedGame.finished = true
         }
-        let (_, _, countWords, score) = getMyWordsForShow()
+        let score = getScore()
+        let countWords = getCountWords()
         let myAlert = MyAlertController(title: GV.language.getText(.tcCongratulations),
                                         message: GV.language.getText(.tcFinishGameMessage, values: String(countWords), String(score)),
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
@@ -946,10 +947,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
-            fillMandatoryWords()
+//            fillMandatoryWords()
             setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
-            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getMyWordsCount())), action: #selector(showMyWords), buttonType: .WordsButton)
+            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getCountWords())), action: #selector(showMyWords), buttonType: .WordsButton)
             #if DEBUG
             if GCHelper.shared.getName() == GV.myGCName {
                 showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
@@ -1119,7 +1120,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         tableType = .ShowMyWords
         var words: [MyFoundedWordsForTable]
 //        var score = 0
-        (words, globalMaxLength, _, _) = getMyWordsForShow()
+        (words, globalMaxLength) = getMyWordsForShow()
         myWordsForShow = WordsForShow(words: words)
         calculateColumnWidths(showScore: true)
         let suffix = " (\(myWordsForShow.countWords)/\(myWordsForShow.countAllWords)/\(myWordsForShow.score))"
@@ -1154,18 +1155,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         var score = 0
         var counter = 0
     }
-    private func getMyWordsForShow()->([MyFoundedWordsForTable], Int, Int, Int) {
+    private func getMyWordsForShow()->([MyFoundedWordsForTable], Int) {
         var returnWords = [MyFoundedWordsForTable]()
         var maxLength = 0
-        var returnScore = 0
-        var countWords = 0
-        for item in allWords {
+        for item in playedGame.myWords {
             let word = item.word + (item.mandatory ? "*" : "")
             let length = item.word.count
-            if !returnWords.contains(where: {$0.word == word}) {
-                let score = word.length * 50
-                returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
-                returnScore += score
+            if !returnWords.contains(where: {$0.word == item.word}) {
+                returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: item.score, counter: 1))
                 if maxLength < word.length {
                     maxLength = word.length
                 }
@@ -1173,89 +1170,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 for index in 0..<returnWords.count {
                     if returnWords[index].word == word {
                         returnWords[index].counter += 1
-                        returnScore -= returnWords[index].score
-                        returnWords[index].score *= 2
-                        returnScore += returnWords[index].score
+                        returnWords[index].score += item.score
+                        break
                     }
                 }
             }
-            countWords += item.mandatory ? 0 : 1
         }
-//        for label in myLabels {
-//            if !label.mandatory || label.founded {
-//                let word = label.usedWord!.word  + (label.founded && label.mandatory ? "*" : "")
-//                let length = label.usedWord!.word.count
-//                if !returnWords.contains(where: {$0.word == word}) {
-//                    let score = word.length * 50
-//                    returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: score, counter: 1))
-//                    returnScore += score
-//                    if maxLength < word.length {
-//                        maxLength = word.length
-//                    }
-//                } else {
-//                    for index in 0..<returnWords.count {
-//                        if returnWords[index].word == word {
-//                            returnWords[index].counter += 1
-//                            returnScore -= returnWords[index].score
-//                            returnWords[index].score *= 2
-//                            returnScore += returnWords[index].score
-//                        }
-//                    }
-//                }
-//            }
-//            countWords += label.mandatory ? 0 : 1
-//        }
         returnWords = returnWords.sorted(by:{$0.length > $1.length ||
                                             ($0.length == $1.length && (/*$0.counter > $1.counter || */$0.word < $1.word))
         })
-        return (returnWords, maxLength, countWords, returnScore)
+        return (returnWords, maxLength)
     }
 
-    
-    private func getMyWordsCount()->Int {
-        var returnValue = 0
-        for item in allWords {
-            returnValue += item.mandatory ? 0 : 1
-        }
-        return returnValue
-    }
-
-    private func fillMandatoryWords() {
-        mandatoryWords.removeAll()
-        for item in playedGame.wordsToFind {
-            mandatoryWords.append(item.getUsedWord())
-        }
-        mandatoryWords = mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count == $1.word.count && $0.word < $1.word)})
-    }
     
     var myLabels = [MyFoundedWord]()
-    var mandatoryWords = [UsedWord]()
-    var allWords = [UsedWord]()
-/*
-    private func addButton(to: SKNode, text: String, action: Selector, buttonType: ButtonType, name: String? = nil) {
-        let button = MyButton(fontName: GV.headerFontName, size: CGSize(width: GV.maxSide * 1.1, height: GV.minSide * 0.08))
-        button.zPosition = self.zPosition + 20
-        button.setButtonLabel(title: text, font: UIFont(name: GV.headerFontName, size: GV.minSide * 0.04)!)
-        button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
-        if ButtonType == GoBack {
-            button.position = CGPoint(x: self.frame.width * 0.5, y: (self.frame.height * 0.2))
-        } else {
-            button.position = CGPoint(x: self.frame.width * 0.5, y: (self.frame.height * 0.8) - (line * GV.maxSide * 0.06))
-        }
-        button.size = CGSize(width: GV.minSide * 0.6, height: GV.maxSide * 0.05)
-        button.name = name
-        to.addChild(button)
-    }
-*/
-
-//    @objc private func goBackToMainMenu() {
-//        stopShowingTableIfNeeded()
-//        goBack()
-//    }
-//
     private func setGameArrayToActualState() {
         var counter = 0
-        let myWordsInDB = playedGame.myWords
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].resetCountOccurencesInWords()
         })
@@ -1269,9 +1199,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidth), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
                              LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidth), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
         }
-        for item in mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
-            if !myLabels.contains(where: {$0.usedWord! == item}) {
-                let myWord = MyFoundedWord(usedWord: item, mandatory: true, prefixValue: counter + 1)
+//        for item in mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
+        for item in playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
+            if !myLabels.contains(where: {$0.usedWord! == item.getUsedWord()}) {
+                let myWord = MyFoundedWord(usedWord: item.getUsedWord(), mandatory: true, prefixValue: counter + 1)
                 myWord.plPosSize = setPLPos(counter: counter)
                 myWord.setActPosSize()
                 gameLayer.addChild(myWord)
@@ -1280,12 +1211,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             counter += 1
         }
         
-        if myWordsInDB.count > 0 {
-            for item in myWordsInDB {
+        if playedGame.myWords.count > 0 {
+            for item in playedGame.myWords {
                 let usedWord = item.getUsedWord()
-                if !allWords.contains(where: {$0 == usedWord}){
-                    allWords.append(usedWord)
-                }
                 for usedLetter in usedWord.usedLetters {
                     let cell = GV.gameArray[usedLetter.col][usedLetter.row]
                     if usedLetter.letter == cell.letter {
@@ -1296,26 +1224,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 for (index, item) in usedWord.usedLetters.enumerated() {
                     GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
                 }
-
-//                if !mandatoryWords.contains(where: {$0 == usedWord}) {
-//                    counter += 1
-//                    if !myLabels.filter({!$0.mandatory}).contains(where: {$0.usedWord! == usedWord}) {
-//                        let myWord = MyFoundedWord(usedWord: usedWord, mandatory: false, prefixValue: counter + 1)
-//                        myWord.founded = true
-//                        myWord.plPosSize = setPLPos(counter: counter)
-//                        myWord.setActPosSize()
-//                        gameLayer.addChild(myWord)
-//                        myLabels.append(myWord)
-//                    } else {
-//
-//                        }
-//                }
             }
 
             for myWord in myLabels {
                 if myWord.mandatory {
                     myWord.setQuestionMarks()
-                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
+                    if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
+//                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
                         myWord.fontColor = GV.darkGreen
                         myWord.founded = true
                      }
@@ -1324,7 +1239,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     myWord.fontColor = .red
                 }
             }
-            let (_, _, _, score) = getMyWordsForShow()
+            let score = getScore()
             try! realm.safeWrite {
                 if GV.basicData.maxScore < score {
                     GV.basicData.maxScore = score
@@ -1383,17 +1298,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 if mandatoryWordFounded {
                     myLabels[itemIndex].founded = true
                     myLabels[itemIndex].usedWord = choosedWord
-                    for (mandatoryIndex, mandatoryItem) in mandatoryWords.enumerated() {
-                        if mandatoryItem.word == choosedWord.word {
-                            mandatoryWords[mandatoryIndex] = choosedWord
-                            try! playedGamesRealm!.safeWrite {
-                                let itemToModify = playedGame.wordsToFind.filter("word = %d", GV.actLanguage + choosedWord.word).first
-                                if itemToModify != nil {
-                                    itemToModify!.usedLetters = choosedWord.usedLettersToString()
-                                }
-//                                playedGame.wordsToFind = wordsToFind
-                            }
-                            break
+                    let foundedMandatoryWords = playedGame.wordsToFind.filter("word = %d", choosedWord.word)
+                    if foundedMandatoryWords.count == 1 {
+                        try! playedGamesRealm!.safeWrite {
+                            foundedMandatoryWords[0].usedLetters = choosedWord.usedLettersToString()
                         }
                     }
                     returnValue = true
@@ -1402,18 +1310,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
 
-        for item in allWords {
-            if choosedWord.word == item.word {
-                var equalLettersCount = 0
-                for letter in item.usedLetters {
-                    if choosedWord.usedLetters.contains(where: {$0 == letter}) {
-                        equalLettersCount += 1
+        let actWords = playedGame.myWords.filter("word = %d", choosedWord.word)
+        if actWords.count > 0 {
+            for item in actWords {
+                if choosedWord.word == item.word {
+                    var equalLettersCount = 0
+                    let usedWord = item.getUsedWord()
+                    for letter in usedWord.usedLetters {
+                        if choosedWord.usedLetters.contains(where: {$0 == letter}) {
+                            equalLettersCount += 1
+                        }
                     }
-                }
-                if equalLettersCount > 0 { //== item.word.count {
-                    returnValue = false
-                    earlierWord = item
-                    break
+                    if equalLettersCount > 0 { //== item.word.count {
+                        returnValue = false
+                        earlierWord = item.getUsedWord()
+                        break
+                    }
                 }
             }
         }
@@ -1443,8 +1355,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func modifyScoreLabel() {
-        let (_, _, _, score) = getMyWordsForShow()
+        let score = getScore()
         scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScore))
+    }
+    
+    private func getScore()->Int {
+        return playedGame.myWords.sum(ofProperty: "score")
+    }
+    
+    private func getCountWords()->Int {
+        return playedGame.myWords.count
     }
 
 //    var myFoundedWords = [UsedWord]()

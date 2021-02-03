@@ -13,6 +13,7 @@ class FoundedWords: Object {
     @objc dynamic var ID = 0
     @objc dynamic var language = ""
     @objc dynamic var mandatory = false
+    @objc dynamic var score = 0
     @objc dynamic var word = ""
     @objc dynamic var usedLetters = ""
     override  class func primaryKey() -> String {
@@ -36,6 +37,7 @@ class FoundedWords: Object {
         self.language = GV.actLanguage
         self.word = from.startingSubString(length: firstSeparatorIndex)
         self.usedLetters = from.endingSubString(at: firstSeparatorIndex + 1)
+        self.score = calculateScore()
     }
     
     init(fromUsedWord: UsedWord) {
@@ -45,6 +47,7 @@ class FoundedWords: Object {
         self.mandatory = fromUsedWord.mandatory
         self.word = fromUsedWord.word
         self.usedLetters = fromUsedWord.usedLettersToString()
+        self.score = calculateScore()
     }
     override init() {
         super.init()
@@ -52,6 +55,19 @@ class FoundedWords: Object {
         self.language = GV.actLanguage
         self.word = ""
         self.usedLetters = ""
+    }
+    
+    private func calculateScore()->Int {
+        let positions = self.usedLetters.components(separatedBy: GV.innerSeparator)
+        var countLetters = 1
+        for index in 0...positions.count - 2 {
+            let col1 = Int(positions[index].char(at: 0))!
+            let row1 = Int(positions[index].char(at: 1))!
+            let col2 = Int(positions[index + 1].char(at: 0))!
+            let row2 = Int(positions[index + 1].char(at: 1))!
+            countLetters += abs(col1 - col2) + abs(row1 - row2)
+        }
+        return countLetters * 50
     }
     
     func getNewID()->Int {
@@ -63,8 +79,11 @@ class FoundedWords: Object {
 
 class getNextID {
     static func incrementID() -> Int {
-//        let playedGamesRealm = getRealm(type: .PlayedGameRealm)
-        return playedGamesRealm!.objects(FoundedWords.self).count + 1
+        let records = playedGamesRealm!.objects(FoundedWords.self)
+        if let maxID = records.max(ofProperty: "ID") as Int? {
+            return maxID + 1
+        }
+        return 1
     }
 }
 
