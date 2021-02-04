@@ -79,11 +79,24 @@ class BasicData: Object {
     @objc dynamic var deviceRecordInCloudID = ""
     @objc dynamic var showingScoreType = 0 // ScoreType
     @objc dynamic var showingTimeScope = 0 // TimeScope
-    @objc dynamic var maxScore = 0
-    let  allFoundedWords = List<FoundedWords>()
+    let maxScores = List<MaxScores>()
+    let allFoundedWords = List<FoundedWords>()
 
     override  class func primaryKey() -> String {
         return "ID"
     }
-    
+}
+
+class MaxScores: Object {
+    @objc dynamic var size = 0
+    @objc dynamic var maxScore = 0
+    override  class func primaryKey() -> String {
+        return "size"
+    }
+    init(newSize: Int) {
+        size = newSize
+    }
+    override init() {
+        
+    }
 }

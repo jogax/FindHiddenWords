@@ -127,6 +127,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             cell.addColumn(text: "  " + wordForShow.word.fixLength(length: lengthOfWord + 2, leadingBlanks: false)) // WordColumn
             cell.addColumn(text: String(wordForShow.counter).fixLength(length: lengthOfCnt - 1), color: color)
             cell.addColumn(text: String(wordForShow.length).fixLength(length: lengthOfLength - 1))
+            cell.addColumn(text: String(wordForShow.score).fixLength(length: lengthOfScore), color: color) // Score column
         default:
             break
         }
@@ -719,43 +720,28 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     
-    private func getWordsOverPosition()->([MyFoundedWordsForTable], Int) {
+    private func getWordsOverPosition()->([MyFoundedWordsForTable]) {
         func setGoldLetters(usedLetters: [UsedLetter]) {
             for letter in usedLetters {
                 GV.gameArray[letter.col][letter.row].setStatus(toStatus: .GoldStatus)
             }
         }
         var returnWords = [MyFoundedWordsForTable]()
-        var maxLength = 0
+//        var maxLength = 0
         let letter = choosedWord.usedLetters.first!
-        for label in myLabels {
-            if !label.mandatory || label.founded {
-                let word = label.usedWord!.word + (label.founded && label.mandatory ? "*" : "")
-                for actLetter in label.usedWord!.usedLetters {
-                    if actLetter == letter {
-                        if !returnWords.contains(where: {$0.word == word}) {
-                            if maxLength < word.length {
-                                maxLength = word.length
-                            }
-                            let length = label.usedWord!.word.count
-                            returnWords.append(MyFoundedWordsForTable(word: word, length: length, score: 0, counter: 1))
-                        } else {
-                            for index in 0..<returnWords.count {
-                                if returnWords[index].word == word {
-                                    returnWords[index].counter += 1
-//                                    returnWords[index].score *= 2
-                                }
-                            }
-                        }
-                        setGoldLetters(usedLetters: label.usedWord!.usedLetters)
-                    }
-                }
-            }
+        let words = playedGame.myWords.filter("usedLetters contains %d", letter.toString())
+        for item in words {
+            let word = item.word + (item.mandatory ? "*" : "")
+            let length = item.word.length
+//            maxLength = maxLength > length ? maxLength : length
+            let wordToShow = MyFoundedWordsForTable(word: word, length: length, score: item.score, counter: 1)
+            returnWords.append(wordToShow)
+            setGoldLetters(usedLetters: item.getUsedWord().usedLetters)
         }
         returnWords = returnWords.sorted(by: {$0.word.length > $1.word.length ||
                                               $0.word.length == $1.word.length && $0.counter > $1.counter
         })
-        return (returnWords, maxLength)
+        return (returnWords)
 
     }
     
@@ -763,9 +749,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         showWordsOverPositionTableView = TableView()
 
         tableType = .ShowWordsOverPosition
-        let (words, _) = getWordsOverPosition()
+        let words = getWordsOverPosition()
+        if words.count == 0 {
+            return
+        }
         wordList = WordsForShow(words: words)
-        calculateColumnWidths(showScore: false)
+        calculateColumnWidths()
         let suffix = " (\(wordList.countWords))"
         let headerText = (GV.language.getText(.tcWordsOverLetter, values: choosedWord.usedLetters.first!.letter) + suffix)
         let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.2
@@ -926,8 +915,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                                LPos: CGPoint(x: GV.maxSide * 0.18, y: gameHeaderPosition.LPos.y))
         fixWordsHeader = MyLabel(text: GV.language.getText(.tcFixWords), position: fixWordsHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(fixWordsHeader)
-
-        scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(0)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+        let score = getScore()
+        let maxScore = GV.basicData.maxScores[GV.size].maxScore
+        scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(score), String(maxScore)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(scoreLabel!) // index 0
 
 
@@ -948,6 +938,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
 //            fillMandatoryWords()
+            generateLabels()
             setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
             showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getCountWords())), action: #selector(showMyWords), buttonType: .WordsButton)
@@ -1090,21 +1081,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     private var lengthOfScore = 0
     private let myTableFont  = UIFont(name: "CourierNewPS-BoldMT", size: GV.onIpad ? 18 : 18)!
     
-    private func calculateColumnWidths(showScore: Bool) {
+    private func calculateColumnWidths() {
         tableHeader = ""
         let fixlength = GV.onIpad ? 15 : 10
         lengthOfWord = globalMaxLength < fixlength ? fixlength : globalMaxLength
         let text1 = " \(GV.language.getText(.tcWord).fixLength(length: lengthOfWord, center: true))     "
         let text2 = "\(GV.language.getText(.tcCount)) "
         let text3 = "\(GV.language.getText(.tcLength)) "
-        let text4 = showScore ? "\(GV.language.getText(.tcScoreTxt)) " : ""
+        let text4 = "\(GV.language.getText(.tcScoreTxt)) "
         tableHeader += text1
         tableHeader += text2
         tableHeader += text3
         tableHeader += text4
         lengthOfCnt = text2.length
         lengthOfLength = text3.length
-        lengthOfScore = text4.length + (showScore ? 0 : 4)
+        lengthOfScore = text4.length
     }
 
     private var globalMaxLength = 0
@@ -1122,7 +1113,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        var score = 0
         (words, globalMaxLength) = getMyWordsForShow()
         myWordsForShow = WordsForShow(words: words)
-        calculateColumnWidths(showScore: true)
+        calculateColumnWidths()
         let suffix = " (\(myWordsForShow.countWords)/\(myWordsForShow.countAllWords)/\(myWordsForShow.score))"
         let headerText = (GV.language.getText(.tcCollectedOwnWords) + suffix)
         let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.2
@@ -1181,14 +1172,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         })
         return (returnWords, maxLength)
     }
-
     
-    var myLabels = [MyFoundedWord]()
-    private func setGameArrayToActualState() {
+    private func generateLabels() {
         var counter = 0
-        iterateGameArray(doing: {(col: Int, row: Int) in
-            GV.gameArray[col][row].resetCountOccurencesInWords()
-        })
         func setPLPos(counter: Int)->PLPosSize {
             let colP = counter / Int(possibleLineCountP)
             let colL = counter / Int(possibleLineCountL)
@@ -1210,22 +1196,49 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
+
+    }
+
+    
+    var myLabels = [MyFoundedWord]()
+    private func setGameArrayToActualState() {
+//        var counter = 0
+//        iterateGameArray(doing: {(col: Int, row: Int) in
+//            GV.gameArray[col][row].resetCountOccurencesInWords()
+//        })
         
-        if playedGame.myWords.count > 0 {
-            for item in playedGame.myWords {
-                let usedWord = item.getUsedWord()
-                for usedLetter in usedWord.usedLetters {
-                    let cell = GV.gameArray[usedLetter.col][usedLetter.row]
-                    if usedLetter.letter == cell.letter {
-                        cell.setStatus(toStatus: .WholeWord)
-                    }
-                }
-                let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
-                for (index, item) in usedWord.usedLetters.enumerated() {
-                    GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
+        func setWordStatus(usedWord: UsedWord) {
+            for usedLetter in usedWord.usedLetters {
+                let cell = GV.gameArray[usedLetter.col][usedLetter.row]
+                if usedLetter.letter == cell.letter {
+                    cell.setStatus(toStatus: .WholeWord)
                 }
             }
-
+            let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
+            for (index, item) in usedWord.usedLetters.enumerated() {
+                GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
+            }
+        }
+        if playedGame.myWords.count > 0 {
+            if choosedWord.word.count > 0 {
+                setWordStatus(usedWord: choosedWord)
+            } else {
+                for item in playedGame.myWords {
+                    let usedWord = item.getUsedWord()
+                    setWordStatus(usedWord: usedWord)
+                    
+//                    for usedLetter in usedWord.usedLetters {
+//                        let cell = GV.gameArray[usedLetter.col][usedLetter.row]
+//                        if usedLetter.letter == cell.letter {
+//                            cell.setStatus(toStatus: .WholeWord)
+//                        }
+//                    }
+//                    let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
+//                    for (index, item) in usedWord.usedLetters.enumerated() {
+//                        GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
+//                    }
+                }
+            }
             for myWord in myLabels {
                 if myWord.mandatory {
                     myWord.setQuestionMarks()
@@ -1241,13 +1254,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             let score = getScore()
             try! realm.safeWrite {
-                if GV.basicData.maxScore < score {
-                    GV.basicData.maxScore = score
+                if GV.basicData.maxScores[GV.size].maxScore < score {
+                    GV.basicData.maxScores[GV.size].maxScore = score
                 }
             }
-            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScores[GV.size].maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
-            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScore))
+            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.size].maxScore))
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
@@ -1356,7 +1369,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func modifyScoreLabel() {
         let score = getScore()
-        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScore))
+        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.size].maxScore))
     }
     
     private func getScore()->Int {
