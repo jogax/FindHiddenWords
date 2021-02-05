@@ -247,7 +247,7 @@ class GenerateGameArray {
         saveGame()
         printGameArray()
         clearGameArray(neighborToo: true)
-        GV.size = 0
+        GV.basicData.gameSize = 0
     }
     
     private func saveGame() {

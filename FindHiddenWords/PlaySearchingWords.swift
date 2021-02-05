@@ -342,41 +342,67 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func createNewGame() {
-        startNewGame()
+        animateOldGame()
+    }
+    
+    @objc private func animateOldGame() {
+        var col = 0
+        var row = 0
+        let targetPoint = CGPoint(x: GV.actWidth * 0.5, y: GV.actHeight * 0.05)
+
+        var myActions = [SKAction]()
+        let sequence = SKAction.sequence(myActions)
+        for colCount in 0..<GV.basicData.gameSize {
+            for rowCount in 0..<GV.basicData.gameSize {
+                myActions.removeAll()
+                col = colCount
+                row = rowCount
+                let cell = GV.gameArray[col][row]
+                myActions.append(SKAction.move(to: targetPoint, duration: 1.0))
+                myActions.append(SKAction.run {
+                    if col == GV.basicData.gameSize - 1 && row == GV.basicData.gameSize - 1 {
+                        self.startNewGame()
+                    }
+                })
+                myActions.append(SKAction.wait(forDuration: 1.0))
+                myActions.append(SKAction.removeFromParent())
+                cell.run(sequence)
+            }
+        }
     }
     
     @objc private func startNewGame() {
-        GV.oldSize = GV.size
+        GV.oldSize = GV.basicData.gameSize
         myLabels.removeAll()
 //        allWords.removeAll()
 //        mandatoryWords.removeAll()
         let maxGameNumber = 99
         let startGameNumber = 0
-        var primary = GV.actLanguage + GV.innerSeparator + "*" + GV.innerSeparator + String(GV.size)
+        var primary = GV.actLanguage + GV.innerSeparator + "*" + GV.innerSeparator + String(GV.basicData.gameSize)
         playedGamesRealm = getRealm(type: .PlayedGameRealm)
         let actGame = playedGamesRealm!.objects(PlayedGame.self).filter("finished = %d AND primary like %@", false, primary).sorted(byKeyPath: "timeStamp", ascending: true)
         if actGame.count == 0 {
             let finishedGames = playedGamesRealm!.objects(PlayedGame.self).filter("primary like %@ AND finished = true",
                                                                                   primary).sorted(byKeyPath: "gameNumber", ascending: false)
             if finishedGames.count == 0 {
-//                GV.size = 8
+//                GV.basicData.gameSize = 8
                 GV.gameNumber = startGameNumber
-                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.size)
+                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
             } else {
                 let lastPlayed = finishedGames.first!
                 GV.gameNumber = lastPlayed.gameNumber + 1
-//                GV.size = lastPlayed.gameSize
+//                GV.basicData.gameSize = lastPlayed.gameSize
                 if GV.gameNumber > maxGameNumber {
-//                    GV.size += 1
+//                    GV.basicData.gameSize += 1
                     GV.gameNumber = 1
                 }
-                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.size)
+                primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
             }
             let origGame = gamesRealm.objects(Games.self).filter("primary = %@", primary)
             if origGame.count > 0 {
                 let newGame = PlayedGame()
                 newGame.primary = primary
-                newGame.gameSize = GV.size
+                newGame.gameSize = GV.basicData.gameSize
                 newGame.language = GV.actLanguage
                 newGame.gameNumber = origGame.first!.gameNumber
                 newGame.gameArray = origGame.first!.gameArray
@@ -395,7 +421,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             GV.gameNumber = actGame.first!.gameNumber
         }
         try! realm.safeWrite {
-            GV.basicData.gameSize = GV.size
+            GV.basicData.gameSize = GV.basicData.gameSize
             GV.basicData.gameNumber = GV.gameNumber
         }
         playingGame()
@@ -425,7 +451,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         for i in 0..<size {
             gameArray.append( [GameboardItem]() )
             
-            for j in 0..<GV.size {
+            for j in 0..<GV.basicData.gameSize {
                 gameArray[i].append( GameboardItem() )
                 gameArray[i][j].letter = emptyLetter
             }
@@ -701,11 +727,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
 //        var countGreenCells = 0
-        var countGreenWords = 0
-        for myLabel in myLabels {
-            countGreenWords +=  myLabel.founded && myLabel.mandatory ? 1 : 0
-        }
-        if countGreenWords == playedGame.wordsToFind.count { // mandatoryWords.count/* || countGreenWords == 0*/ {
+        let countGreenWords = playedGame.myWords.filter("mandatory = true").count
+        
+        if countGreenWords == playedGame.wordsToFind.count || countGreenWords == 1 {
             congratulation()
         }
     }
@@ -794,7 +818,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
-        myAlert.addAction(text: .tcOK, action: #selector(self.createNewGame))
+        myAlert.addAction(text: .tcOK, action: #selector(self.animateOldGame))
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
@@ -891,11 +915,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.1, 0.095, 0.09, 0.08, 0.075, 0.07]
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
         let sizeMultiplier = GV.onIpad ? sizeMultiplierIPad : sizeMultiplierIPhone
-        let blockSize = GV.minSide * sizeMultiplier[GV.size]
+        let blockSize = GV.minSide * sizeMultiplier[GV.basicData.gameSize]
         GV.blockSize = blockSize
-        GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: GV.size, cols: GV.size)
+        GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: GV.basicData.gameSize, cols: GV.basicData.gameSize)
         let gridLposX = GV.maxSide - GV.playingGrid!.size.width * 0.65
-        GV.gameArray = createNewGameArray(size: GV.size)
+        GV.gameArray = createNewGameArray(size: GV.basicData.gameSize)
         let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.92),
                                            LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.94))
         let scoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: gameHeaderPosition.PPos.y - GV.maxSide * 0.02),
@@ -904,7 +928,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                      LPos: CGPoint(x: gridLposX, y: GV.minSide * 0.89 - GV.playingGrid!.size.height * 0.52),
                                      PSize: GV.playingGrid!.size,
                                      LSize: GV.playingGrid!.size)
-        let gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(GV.size)x\(GV.size)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
+        let gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(GV.basicData.gameSize)x\(GV.basicData.gameSize)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(gameHeader) // index 0
         GV.playingGrid!.plPosSize = gridPosition
         GV.playingGrid!.setActPosSize()
@@ -915,13 +939,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                                LPos: CGPoint(x: GV.maxSide * 0.18, y: gameHeaderPosition.LPos.y))
         fixWordsHeader = MyLabel(text: GV.language.getText(.tcFixWords), position: fixWordsHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(fixWordsHeader)
-        let score = getScore()
-        let maxScore = GV.basicData.maxScores[GV.size].maxScore
-        scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(score), String(maxScore)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
-        gameLayer.addChild(scoreLabel!) // index 0
 
 
-        let primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.size)
+        let primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
         let origGames = gamesRealm.objects(Games.self).filter("primary = %@", primary)
         if origGames.count > 0 {
             let origGame = origGames.first!
@@ -947,6 +967,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
             }
             #endif
+            let score = getScore()
+            let maxScore = GV.basicData.maxScores[GV.basicData.gameSize].maxScore
+            scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(score), String(maxScore)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+            gameLayer.addChild(scoreLabel!) // index 0
          }
     }
     
@@ -956,12 +980,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
-        myAlert.addAction(text: "5 x 5", action: #selector(self.choosed5), isActive: GV.size == 5 ? true : false)
-        myAlert.addAction(text: "6 x 6", action: #selector(self.choosed6), isActive: GV.size == 6 ? true : false)
-        myAlert.addAction(text: "7 x 7", action: #selector(self.choosed7), isActive: GV.size == 7 ? true : false)
-        myAlert.addAction(text: "8 x 8", action: #selector(self.choosed8), isActive: GV.size == 8 ? true : false)
-        myAlert.addAction(text: "9 x 9", action: #selector(self.choosed9), isActive: GV.size == 9 ? true : false)
-        myAlert.addAction(text: "10 x 10", action: #selector(self.choosed10), isActive: GV.size == 10 ? true : false)
+        myAlert.addAction(text: "5 x 5", action: #selector(self.choosed5), isActive: GV.basicData.gameSize == 5 ? true : false)
+        myAlert.addAction(text: "6 x 6", action: #selector(self.choosed6), isActive: GV.basicData.gameSize == 6 ? true : false)
+        myAlert.addAction(text: "7 x 7", action: #selector(self.choosed7), isActive: GV.basicData.gameSize == 7 ? true : false)
+        myAlert.addAction(text: "8 x 8", action: #selector(self.choosed8), isActive: GV.basicData.gameSize == 8 ? true : false)
+        myAlert.addAction(text: "9 x 9", action: #selector(self.choosed9), isActive: GV.basicData.gameSize == 9 ? true : false)
+        myAlert.addAction(text: "10 x 10", action: #selector(self.choosed10), isActive: GV.basicData.gameSize == 10 ? true : false)
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
@@ -974,7 +998,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     private func choosed(size: Int) {
         try! realm.safeWrite {
             GV.basicData.gameSize = size
-            GV.size = size
+            GV.basicData.gameSize = size
         }
         self.start()
     }
@@ -1226,17 +1250,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 for item in playedGame.myWords {
                     let usedWord = item.getUsedWord()
                     setWordStatus(usedWord: usedWord)
-                    
-//                    for usedLetter in usedWord.usedLetters {
-//                        let cell = GV.gameArray[usedLetter.col][usedLetter.row]
-//                        if usedLetter.letter == cell.letter {
-//                            cell.setStatus(toStatus: .WholeWord)
-//                        }
-//                    }
-//                    let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
-//                    for (index, item) in usedWord.usedLetters.enumerated() {
-//                        GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
-//                    }
                 }
             }
             for myWord in myLabels {
@@ -1254,13 +1267,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             let score = getScore()
             try! realm.safeWrite {
-                if GV.basicData.maxScores[GV.size].maxScore < score {
-                    GV.basicData.maxScores[GV.size].maxScore = score
+                if GV.basicData.maxScores[GV.basicData.gameSize].maxScore < score {
+                    GV.basicData.maxScores[GV.basicData.gameSize].maxScore = score
                 }
             }
-            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScores[GV.size].maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScores[GV.basicData.gameSize].maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
-            scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.size].maxScore))
+            if scoreLabel != nil {
+                scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.basicData.gameSize].maxScore))
+            }
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
@@ -1268,8 +1283,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
         
     private func iterateGameArray(doing: (_ col: Int, _ row: Int)->()) {
-        for col in 0..<GV.size {
-            for row in 0..<GV.size {
+        for col in 0..<GV.basicData.gameSize {
+            for row in 0..<GV.basicData.gameSize {
                 doing(col, row)
             }
         }
@@ -1369,7 +1384,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func modifyScoreLabel() {
         let score = getScore()
-        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.size].maxScore))
+        let maxScore = GV.basicData.maxScores[GV.basicData.gameSize].maxScore
+        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(maxScore))
     }
     
     private func getScore()->Int {

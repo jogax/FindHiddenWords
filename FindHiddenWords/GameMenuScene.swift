@@ -487,7 +487,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
                     while record.count == 0 || !OKRecord && countRepeats < 50 {
                         GV.language.setLanguage(languages[languageIndex])
                         GV.gameNumber = gameNumber
-                        GV.size = size
+                        GV.basicData.gameSize = size
                         callGenerating(OKRecord: OKRecord, languageIndex: languageIndex)
                         let record = myRealm.objects(Games.self).filter("primary = %@", primary).first!
                         OKRecord = checkRecord(record: record)
@@ -527,15 +527,15 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
             repeats = 0
             repeat {
                 repeats += 1
-            } while GV.size != GV.oldSize
+            } while GV.basicData.gameSize != GV.oldSize
         }
         waiting()
 
         if let child = self.childNode(withName: self.gridName) as? SKSpriteNode {
             child.removeFromParent()
         }
-        self.createBackgroundShape(size: GV.size)
-        let generateGameArray = GenerateGameArray(size: GV.size)
+        self.createBackgroundShape(size: GV.basicData.gameSize)
+        let generateGameArray = GenerateGameArray(size: GV.basicData.gameSize)
         generateGameArray.start(new: OKRecord)
         waiting()
 
@@ -613,7 +613,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     }
 
     @objc private func showGameMenu() {
-        searchWords(size: GV.size)
+        searchWords(size: GV.basicData.gameSize)
     }
     
     @objc private func showSizeMenu() {
@@ -687,7 +687,9 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     
 
     @objc private func searchWords(size: Int) {
-        GV.size = size
+        try! realm.safeWrite {
+            GV.basicData.gameSize = size
+        }
         for child in menuLayer!.children {
             if child.myType == .MyButton {
                 (child as! MyButton).disableUserInteraction()
@@ -699,7 +701,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     }
 
     private func fillGameArray(gameArray: [[GameboardItem]], content: String, toGrid: Grid) {
-        let size = GV.size
+        let size = GV.basicData.gameSize
         for (index, letter) in content.enumerated() {
             let col = index / size
             let row = index % size
@@ -746,8 +748,8 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
 
 
     override func update(_ currentTime: TimeInterval) {
-        if GV.size != GV.oldSize {
-            if GV.size > 0 {
+        if GV.basicData.gameSize != GV.oldSize {
+            if GV.basicData.gameSize > 0 {
                 GV.gameArray = createNewGameArray()
             } else {
                 if let child = childNode(withName: gridName) {
@@ -757,7 +759,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
                 }
 
             }
-            GV.oldSize = GV.size
+            GV.oldSize = GV.basicData.gameSize
         }
         // Called before each frame is rendered
     }
@@ -765,10 +767,10 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     private func createNewGameArray() -> [[GameboardItem]] {
         var gameArray: [[GameboardItem]] = []
         
-        for i in 0..<GV.size {
+        for i in 0..<GV.basicData.gameSize {
             gameArray.append( [GameboardItem]() )
             
-            for j in 0..<GV.size {
+            for j in 0..<GV.basicData.gameSize {
                 gameArray[i].append( GameboardItem() )
                 gameArray[i][j].letter = emptyLetter
             }

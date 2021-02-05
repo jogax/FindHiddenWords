@@ -118,7 +118,7 @@ struct GV {
             return GV.language.getText(.tcAktLanguage)
         }
     }
-    static var size: Int = 0
+//    static var size: Int = 0
     static var oldSize: Int = 0
     static var gameArray = [[GameboardItem]]()
     static var reachability: Reachability!

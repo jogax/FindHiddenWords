@@ -71,9 +71,9 @@ public func printFontNames() {
 
 public func printGameArray() {
     let line = "____________________________________________"
-    for row in 0..<GV.size {
+    for row in 0..<GV.basicData.gameSize {
         var infoLine = "|"
-        for col in 0..<GV.size {
+        for col in 0..<GV.basicData.gameSize {
             let char = GV.gameArray[col][row].letter
             infoLine += " " + (char == "" ? " " : char) + " " + "|"
         }
@@ -86,9 +86,9 @@ public func printGameArray3D() {
     for gameIndex in 0..<6 {
         print("-------- cube side: \(gameIndex + 1) ------- ")
         print()
-        for row in 0..<GV.size {
+        for row in 0..<GV.basicData.gameSize {
             var infoLine = "|"
-            for col in 0..<GV.size {
+            for col in 0..<GV.basicData.gameSize {
                 let char = GV.gameArray3D[gameIndex][col][row].letter
                 infoLine += " " + (char == "" ? " " : char) + " " + "|"
             }
@@ -103,9 +103,9 @@ public func printGameArray3D() {
 public func printConnectios() {
     let line = "____________________________________________"
     print(line)
-    for row in 0..<GV.size {
+    for row in 0..<GV.basicData.gameSize {
         var infoLine = "|"
-        for col in 0..<GV.size {
+        for col in 0..<GV.basicData.gameSize {
             let char = String(GV.gameArray[col][row].countFreeConnections)
             infoLine += " " + (char == "" ? " " : char) + " " + "|"
         }
@@ -117,9 +117,9 @@ public func printConnectios() {
 public func printChecked() {
     let line = "____________________________________________"
     print(line)
-    for row in 0..<GV.size {
+    for row in 0..<GV.basicData.gameSize {
         var infoLine = "|"
-        for col in 0..<GV.size {
+        for col in 0..<GV.basicData.gameSize {
             let char = String(GV.gameArray[col][row].checked ? "#" : " ")
             infoLine += " " + (char == "" ? " " : char) + " " + "|"
         }
