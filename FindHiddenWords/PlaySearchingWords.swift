@@ -346,28 +346,35 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func animateOldGame() {
-        var col = 0
-        var row = 0
-        let targetPoint = CGPoint(x: GV.actWidth * 0.5, y: GV.actHeight * 0.05)
-
+        var cellsToAnimate = [GameboardItem]()
+        var duration = 0.1
         var myActions = [SKAction]()
-        let sequence = SKAction.sequence(myActions)
-        for colCount in 0..<GV.basicData.gameSize {
-            for rowCount in 0..<GV.basicData.gameSize {
-                myActions.removeAll()
-                col = colCount
-                row = rowCount
-                let cell = GV.gameArray[col][row]
-                myActions.append(SKAction.move(to: targetPoint, duration: 1.0))
-                myActions.append(SKAction.run {
-                    if col == GV.basicData.gameSize - 1 && row == GV.basicData.gameSize - 1 {
-                        self.startNewGame()
-                    }
-                })
-                myActions.append(SKAction.wait(forDuration: 1.0))
-                myActions.append(SKAction.removeFromParent())
-                cell.run(sequence)
+        var childNode: SKNode?
+        repeat {
+            childNode = GV.playingGrid!.childNode(withName: ConnectionName)
+            if childNode != nil {
+                childNode?.removeFromParent()
             }
+        } while childNode != nil
+        for row in 0..<GV.basicData.gameSize {
+            for col in 0..<GV.basicData.gameSize {
+                cellsToAnimate.append(GV.gameArray[col][GV.basicData.gameSize - 1 - row])
+            }
+        }
+        for cell in cellsToAnimate {
+            cell.zPosition += 100
+            myActions.removeAll()
+            let targetPoint = CGPoint(x: cell.position.x, y: -GV.playingGrid!.position.y)
+            duration += 0.05
+            myActions.append(SKAction.move(to: targetPoint, duration: duration))
+            myActions.append(SKAction.run {
+                if cell.col == GV.basicData.gameSize - 1 && cell.row == 0 {
+                    self.startNewGame()
+                }
+            })
+            myActions.append(SKAction.removeFromParent())
+            let sequence = SKAction.sequence(myActions)
+            cell.run(sequence)
         }
     }
     
@@ -729,7 +736,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        var countGreenCells = 0
         let countGreenWords = playedGame.myWords.filter("mandatory = true").count
         
-        if countGreenWords == playedGame.wordsToFind.count || countGreenWords == 1 {
+        if countGreenWords == playedGame.wordsToFind.count || countGreenWords >= 0 {
             congratulation()
         }
     }

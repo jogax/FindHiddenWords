@@ -469,12 +469,12 @@ class GameboardItem: SKSpriteNode {
         let child = SKSpriteNode(texture: connectedSprite) // imageNamed: connectionName)
 //        child.size = self.size * 1.1
         child.zPosition = self.zPosition - 10
-        child.name = "Connection"
+        child.name = ConnectionName
 //        let main = self
         child.position = self.position
         GV.playingGrid!.addChild(child)
 //        self.addChild(child)
-        print()
+//        print()
     }
 
     public func toString()->String {
