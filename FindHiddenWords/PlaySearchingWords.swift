@@ -467,17 +467,62 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     private func fillGameArray(gameArray: [[GameboardItem]], content: String, toGrid: Grid) {
+        struct CellsToMove {
+            var toPoint = CGPoint()
+            var cell: GameboardItem!
+        }
+        let p1 = toGrid.gridPosition(col: 0,                            row: 0)                         - CGPoint(x: 2 * GV.blockSize, y: -2 * GV.blockSize)
+        let p2 = toGrid.gridPosition(col: GV.basicData.gameSize - 1,    row: 0)                         + CGPoint(x: 2 * GV.blockSize, y: 2 * GV.blockSize)
+        let p3 = toGrid.gridPosition(col: 0,                            row: GV.basicData.gameSize - 1) - CGPoint(x: 2 * GV.blockSize, y: 4 * GV.blockSize)
+        let p4 = toGrid.gridPosition(col: GV.basicData.gameSize - 1,    row: GV.basicData.gameSize - 1) + CGPoint(x: 2 * GV.blockSize, y: -4 * GV.blockSize)
+        let edges = [p1, p2, p3, p4]
         let size = gameArray.count
+        var cellsToMove = [CellsToMove]()
         for (index, letter) in content.enumerated() {
             let col = index / size
             let row = index % size
-            gameArray[col][row].position = toGrid.gridPosition(col: col, row: row)
-            gameArray[col][row].name = "GBD/\(col)/\(row)"
-            gameArray[col][row].col = col
-            gameArray[col][row].row = row
-            _ = gameArray[col][row].setLetter(letter: String(letter), toStatus: .Used, fontSize: GV.blockSize * 0.6)
-            toGrid.addChild(gameArray[col][row])
+            let cell = gameArray[col][row]
+//            gameArray[col][row].position = toGrid.gridPosition(col: col, row: row)
+            let toPoint = toGrid.gridPosition(col: col, row: row)
+            let midValue = Int(GV.basicData.gameSize / 2) + 1
+            let maxValue = GV.basicData.gameSize
+            var ind = 0
+            switch (col, row) {
+            case (0..<midValue, 0..<midValue):
+                ind = 0
+            case (midValue..<maxValue, 0..<midValue):
+                ind = 1
+            case (0..<midValue, midValue..<maxValue):
+                ind = 2
+            case (midValue..<maxValue, midValue..<maxValue):
+                ind = 3
+            default:
+                continue
+            }
+            cell.position = edges[ind]
+            cell.name = "GBD/\(col)/\(row)"
+            cell.col = col
+            cell.row = row
+            cellsToMove.append(CellsToMove(toPoint: toPoint, cell: cell))
+            _ = cell.setLetter(letter: String(letter), toStatus: .Used, fontSize: GV.blockSize * 0.6)
+            toGrid.addChild(cell)
         }
+        var myActions = [SKAction]()
+        var duration: Double = 0
+        for item in cellsToMove {
+            myActions.removeAll()
+            let targetPoint = item.toPoint
+            duration += 0.02
+            myActions.append(SKAction.move(to: targetPoint, duration: duration))
+            myActions.append(SKAction.run { [self] in
+                if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
+                    setGameArrayToActualState()
+                }
+            })
+            let sequence = SKAction.sequence(myActions)
+            item.cell.run(sequence)
+        }
+
     }
     
     var firstTouchLocation = CGPoint(x: 0, y: 0)
@@ -736,7 +781,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        var countGreenCells = 0
         let countGreenWords = playedGame.myWords.filter("mandatory = true").count
         
-        if countGreenWords == playedGame.wordsToFind.count || countGreenWords >= 0 {
+        if countGreenWords == playedGame.wordsToFind.count  {//|| countGreenWords >= 0 {
             congratulation()
         }
     }
@@ -966,7 +1011,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
 //            fillMandatoryWords()
             generateLabels()
-            setGameArrayToActualState()
+//            setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
             showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getCountWords())), action: #selector(showMyWords), buttonType: .WordsButton)
             #if DEBUG
