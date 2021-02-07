@@ -79,6 +79,7 @@
 		D012504725A8AEEB000BCF89 /* BlueOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501E25A8AEEA000BCF89 /* BlueOctagon.png */; };
 		D012504825A8AEEB000BCF89 /* GrayOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501F25A8AEEA000BCF89 /* GrayOctagon.png */; };
 		D012504925A8AEEB000BCF89 /* GreenSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = D012502025A8AEEB000BCF89 /* GreenSprite.png */; };
+		D01EE31D25D02DA40099C1E9 /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = D01EE31C25D02DA40099C1E9 /* finger.png */; };
 		D020C8D325BDB7C700185EF6 /* ShowGameCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */; };
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
 		D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D925BDC66400185EF6 /* GelbOctagon.png */; };
@@ -177,6 +178,7 @@
 		D012501E25A8AEEA000BCF89 /* BlueOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueOctagon.png; sourceTree = "<group>"; };
 		D012501F25A8AEEA000BCF89 /* GrayOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GrayOctagon.png; sourceTree = "<group>"; };
 		D012502025A8AEEB000BCF89 /* GreenSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite.png; sourceTree = "<group>"; };
+		D01EE31C25D02DA40099C1E9 /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger.png; sourceTree = "<group>"; };
 		D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGameCenterViewController.swift; sourceTree = "<group>"; };
 		D020C8D525BDC06100185EF6 /* LightRedOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedOctagon.png; sourceTree = "<group>"; };
 		D020C8D925BDC66400185EF6 /* GelbOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GelbOctagon.png; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
 			isa = PBXGroup;
 			children = (
+				D01EE31C25D02DA40099C1E9 /* finger.png */,
 				D08B5B8D25C06A6C007C04D5 /* hook.png */,
 				D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */,
 				D020C8D925BDC66400185EF6 /* GelbOctagon.png */,
@@ -458,6 +461,7 @@
 				D012504025A8AEEB000BCF89 /* Connection1011.png in Resources */,
 				D012502C25A8AEEB000BCF89 /* DarkGreenSprite.png in Resources */,
 				D012502225A8AEEB000BCF89 /* Connection0111x.png in Resources */,
+				D01EE31D25D02DA40099C1E9 /* finger.png in Resources */,
 				D012503C25A8AEEB000BCF89 /* Connection1000.png in Resources */,
 				D012502925A8AEEB000BCF89 /* RedOctagon.png in Resources */,
 				D012503D25A8AEEB000BCF89 /* Connection0000x.png in Resources */,

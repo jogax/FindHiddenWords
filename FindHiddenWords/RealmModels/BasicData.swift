@@ -60,6 +60,7 @@ let NoGamePlayed = 50000
 
 
 class BasicData: Object {
+    @objc dynamic var showDemo = true
     @objc dynamic var ID = 0
     @objc dynamic var actLanguage = ""
     @objc dynamic var gameSize = 0

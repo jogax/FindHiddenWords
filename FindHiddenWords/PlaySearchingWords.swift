@@ -420,11 +420,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
         } else {
-//            if !new {
-//                try! playedGamesRealm?.safeWrite {
-//                    actGame.first!.myWords = ""
-//                }
-//            }
             GV.gameNumber = actGame.first!.gameNumber
         }
         try! realm.safeWrite {
@@ -517,6 +512,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             myActions.append(SKAction.run { [self] in
                 if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
                     setGameArrayToActualState()
+                    if GV.justStarted && GV.basicData.showDemo {
+                        showDemo()
+                    }
+
                 }
             })
             let sequence = SKAction.sequence(myActions)
@@ -760,24 +759,25 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let foundedWords = newWordListRealm.objects(NewWordListModel.self).filter("word = %@", searchWord)
                     if foundedWords.count == 1 {
                         OKWordFound()
+                    } else {
+                        animateLetters(newWord: choosedWord, type: .NoSuchWord)
+                        mySounds.play(.NoSuchWord)
                     }
                 } else {
-                    clearTemporaryCells()
                     animateLetters(newWord: choosedWord, type: .NoSuchWord)
                     mySounds.play(.NoSuchWord)
                 }
             } else {
-                clearTemporaryCells()
                 animateLetters(newWord: choosedWord, type: .NoSuchWord)
                 mySounds.play(.NoSuchWord)
             }
             choosedWord = UsedWord()
         } else {
-            clearTemporaryCells()
             if choosedWord.count == 1 {
                 showWordsOverPosition()
             }
         }
+        clearTemporaryCells()
 //        var countGreenCells = 0
         let countGreenWords = playedGame.myWords.filter("mandatory = true").count
         
@@ -1024,6 +1024,47 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(score), String(maxScore)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
             gameLayer.addChild(scoreLabel!) // index 0
          }
+    }
+    
+    struct WordsToAnimate {
+        var word: String = ""
+        var usedLetters = [UsedLetter]()
+        var calculatedDiagonalConnections = 0
+    }
+    var wordsToAnimate = [WordsToAnimate]()
+    private func showDemo() {
+        
+        for item in playedGame.myWords {
+            let usedWord = item.getUsedWord()
+            let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
+            wordsToAnimate.append(wordToAppend)
+        }
+        wordsToAnimate = wordsToAnimate.sorted(by: {
+            ($0.calculatedDiagonalConnections>$1.calculatedDiagonalConnections) ||
+            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
+            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
+        })
+        let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+        fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
+        fingerSprite.zPosition += 100
+        fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
+        gameLayer.addChild(fingerSprite)
+        var myActions = [SKAction]()
+
+        for item in wordsToAnimate {
+            print("word: \(item.word)")
+            var cellsToAnimate = [GameboardItem]()
+            for letter in item.usedLetters {
+                cellsToAnimate.append(GV.gameArray[letter.col][letter.row])
+            }
+            for cell in cellsToAnimate {
+                let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
+                print("Position: \(cell.position)")
+                myActions.append(moveAction)
+            }
+        }
+        let sequence = SKAction.sequence(myActions)
+        fingerSprite.run(sequence)
     }
     
     @objc private func chooseSize() {

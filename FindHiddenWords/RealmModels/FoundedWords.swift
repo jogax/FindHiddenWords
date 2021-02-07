@@ -70,6 +70,13 @@ class FoundedWords: Object {
         return countLetters * 50
     }
     
+    public var calculatedDiagonalConnections: Int {
+        get {
+            let returnValue = (score - (word.count * 50)) / 50
+            return returnValue
+        }
+    }
+    
     func getNewID()->Int {
         return getNextID.incrementID()
 //        FoundedWords.newID += 1
