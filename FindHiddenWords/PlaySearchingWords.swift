@@ -423,7 +423,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             GV.gameNumber = actGame.first!.gameNumber
         }
         try! realm.safeWrite {
-            GV.basicData.gameSize = GV.basicData.gameSize
             GV.basicData.gameNumber = GV.gameNumber
         }
         playingGame()
@@ -514,6 +513,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     setGameArrayToActualState()
                     if GV.justStarted && GV.basicData.showDemo {
                         showDemo()
+//                        xxx
                     }
 
                 }
@@ -534,10 +534,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var choosedWord = UsedWord()
     var movingLocations = [CGPoint]()
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        demoModus = false
+        let touchLocation = touches.first!.location(in: self)
+        myTouchesBegan(touchLocation: touchLocation)
+    }
+    private func myTouchesBegan(touchLocation: CGPoint) {
         clearTemporaryCells()
         stopShowingTableIfNeeded()
         choosedWord = UsedWord()
-        let touchLocation = touches.first!.location(in: self)
         movingLocations.removeAll()
         movingLocations.append(touchLocation)
         let (OK, col, row) = analyzeNodesAtLocation(location: touchLocation)
@@ -581,13 +585,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     var colRowTable = [ColRow]()
-    
+    var demoModus = false
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
+        myTouchesMoved(touchLocation: touchLocation)
+    }
+    private func myTouchesMoved(touchLocation: CGPoint) {
         movingLocations.append(touchLocation)
         let (OK, col, row) = analyzeNodesAtLocation(location: touchLocation)
         let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
+        if demoModus {
+            choosedWord.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
+            GV.gameArray[col][row].setStatus(toStatus: .Temporary)
+            return
+        }
         if OK {
             var lastIndex = colRowTable.count - 1
             if lastIndex >= 0 && colRowTable[lastIndex].col == col && colRowTable[lastIndex].row == row  {
@@ -651,7 +663,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cellsToAnimate.append(GV.gameArray[usedLetter.col][usedLetter.row]/*.copyMe()*/)
                 origPositions.append(GV.gameArray[usedLetter.col][usedLetter.row].position)
             }
-            for cell in cellsToAnimate {
+            for (index, cell) in cellsToAnimate.enumerated() {
 //                cell.setStatus(toStatus: .GoldStatus)
                 myActions.removeAll()
                 waiting += 0.4
@@ -664,6 +676,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myActions.append(SKAction.run {
                     cell.setStatus(toStatus: .WholeWord)
                 })
+                if index == cellsToAnimate.count - 1 {
+                    let finishAction = SKAction.run { [self] in
+                        if demoModus {
+                            if wordsToAnimate.count > 0 {
+                                animateWord()
+                            } else {
+                                demoModus = false
+                            }
+                        }
+                    }
+                    myActions.append(finishAction)
+                }
+                
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
@@ -672,7 +697,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])
             }
-            for cell in cellsToAnimate {
+            for (index, cell) in cellsToAnimate.enumerated() {
                 myActions.removeAll()
                 cell.setStatus(toStatus: .OrigStatus)
 //                myActions.append(SKAction.wait(forDuration: 0.2))
@@ -687,6 +712,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: 0.2))
                 }
+                if index == cellsToAnimate.count - 1 {
+                    let finishAction = SKAction.run { [self] in
+                        if demoModus {
+                            if wordsToAnimate.count > 0 {
+                                animateWord()
+                            } else {
+                                demoModus = false
+                            }
+                        }
+                    }
+                    myActions.append(finishAction)
+                }
+
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
@@ -718,7 +756,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cell.run(sequence)
             }
             let longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
-            for cell in oldCellsToAnimate {
+            for (index, cell) in oldCellsToAnimate.enumerated() {
                 myActions.removeAll()
 //                cell.setStatus(toStatus: .OrigStatus)
                 myActions.append(longWaitAction)
@@ -732,6 +770,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: duration))
                 }
+                if index == cellsToAnimate.count - 1 {
+                    let finishAction = SKAction.run { [self] in
+                        if demoModus {
+                            if wordsToAnimate.count > 0 {
+                                animateWord()
+                            } else {
+                                demoModus = false
+                            }
+                        }
+                    }
+                    myActions.append(finishAction)
+                }
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
@@ -740,6 +790,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        myTouchesEnded()
+    }
+    private func myTouchesEnded() {
         for (index, letter) in choosedWord.usedLetters.enumerated() {
             if index < choosedWord.usedLetters.count - 1 {
                 if abs(letter.col - choosedWord.usedLetters[index + 1].col) > 1 || abs(letter.row - choosedWord.usedLetters[index + 1].row) > 1 {
@@ -778,7 +831,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         clearTemporaryCells()
-//        var countGreenCells = 0
         let countGreenWords = playedGame.myWords.filter("mandatory = true").count
         
         if countGreenWords == playedGame.wordsToFind.count  {//|| countGreenWords >= 0 {
@@ -1044,27 +1096,64 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
         })
+        animateWord()
+//        var myActions = [SKAction]()
+
+//        for item in wordsToAnimate {
+//            var cellsToAnimate = [GameboardItem]()
+//            for letter in item.usedLetters {
+//                cellsToAnimate.append(GV.gameArray[letter.col][letter.row])
+//            }
+//            for cell in cellsToAnimate {
+//                let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
+//                print("Position: \(cell.position)")
+//                myActions.append(moveAction)
+//            }
+//        }
+//        let sequence = SKAction.sequence(myActions)
+//        fingerSprite.run(sequence)
+    }
+    
+    @objc private func animateWord() {
         let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+        demoModus = true
         fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
         fingerSprite.zPosition += 100
         fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
         gameLayer.addChild(fingerSprite)
         var myActions = [SKAction]()
-
-        for item in wordsToAnimate {
-            print("word: \(item.word)")
+        if wordsToAnimate.count > 0 {
+            let item = wordsToAnimate.first!
+            wordsToAnimate.removeFirst()
             var cellsToAnimate = [GameboardItem]()
             for letter in item.usedLetters {
                 cellsToAnimate.append(GV.gameArray[letter.col][letter.row])
             }
-            for cell in cellsToAnimate {
+            for (index, cell) in cellsToAnimate.enumerated() {
                 let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
-                print("Position: \(cell.position)")
                 myActions.append(moveAction)
+                let touchAction = SKAction.run { [self] in
+                    switch index {
+                    case 0:
+                        myTouchesBegan(touchLocation: cell.position + GV.playingGrid!.position)
+                    case 1..<cellsToAnimate.count:
+                        myTouchesMoved(touchLocation: cell.position + GV.playingGrid!.position)
+                        if index == cellsToAnimate.count - 1 {
+                            myTouchesEnded()
+                        }
+                    default:
+                        break
+                    }
+                }
+                myActions.append(touchAction)
+                if index == cellsToAnimate.count - 1 {
+                    myActions.append(SKAction.fadeOut(withDuration: 0.5))
+                    myActions.append(SKAction.removeFromParent())
+                }
             }
+            let sequence = SKAction.sequence(myActions)
+            fingerSprite.run(sequence)
         }
-        let sequence = SKAction.sequence(myActions)
-        fingerSprite.run(sequence)
     }
     
     @objc private func chooseSize() {
