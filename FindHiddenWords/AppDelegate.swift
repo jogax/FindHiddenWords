@@ -102,7 +102,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-//        generateNewDB()
+        generateNewOrigGamesDB()
         window = UIWindow(frame: UIScreen.main.bounds)
 //        let homeViewController = GameViewController3D()
         let homeViewController = GameViewController()
@@ -140,52 +140,72 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-//    private func generateNewDB() {
-//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-//        let gamesURL = documentsURL.appendingPathComponent("NewWordList.realm")
-//        let config = Realm.Configuration(
-//            fileURL: gamesURL,
-//            schemaVersion: 1, // new item words
-//            shouldCompactOnLaunch: { totalBytes, usedBytes in
-//                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-//                // usedBytes refers to the number of bytes used by data in the file
-//
-//                // Compact if the file is over 100MB in size and less than 50% 'used'
-//                let oneMB = 10 * 1024 * 1024
-//                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-//        },
-//            objectTypes: [NewWordListModel.self])
-//        do {
-//            // Realm is compacted on the first open if the configuration block conditions were met.
-//            _ = try Realm(configuration: config)
-//        } catch {
-//            print("error")
-//            // handle error compacting or opening Realm
-//        }
-//        let newWordListRealm = try! Realm(configuration: config)
-//        let newRecords = newWordListRealm.objects(NewWordListModel.self)
-//        try! newWordListRealm.safeWrite() {
-//            newWordListRealm.delete(newRecords)
-//        }
+    private func generateNewOrigGamesDB() {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let gamesURL = documentsURL.appendingPathComponent("OrigGames.realm")
+        let config = Realm.Configuration(
+            fileURL: gamesURL,
+            schemaVersion: 1, // new item words
+            shouldCompactOnLaunch: { totalBytes, usedBytes in
+                // totalBytes refers to the size of the file on disk in bytes (data + free space)
+                // usedBytes refers to the number of bytes used by data in the file
+
+                // Compact if the file is over 100MB in size and less than 50% 'used'
+                let oneMB = 10 * 1024 * 1024
+                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+        },
+            objectTypes: [GameModel.self, FoundedWords.self])
+        do {
+            // Realm is compacted on the first open if the configuration block conditions were met.
+            _ = try Realm(configuration: config)
+        } catch {
+            print("error")
+            // handle error compacting or opening Realm
+        }
+        let origGamesRealm = try! Realm(configuration: config)
+        let newRecords = origGamesRealm.objects(GameModel.self)
+        try! origGamesRealm.safeWrite() {
+            origGamesRealm.delete(newRecords)
+        }
+        let myOrigGames = gamesRealm.objects(Games.self)
 //        let myWordList = realmWordList.objects(WordListModel.self)
-//        let countRecords = myWordList.count
-//        var countGeneratedRecords = 0
+        let countRecords = myOrigGames.count
+        var countGeneratedRecords = 0
 //        let myHints = realmHints.objects(HintModel.self)
-//        for word in myWordList {
-//            let newRecord = NewWordListModel()
-//            newRecord.word = word.word
-//            if myHints.filter("languageWord = %@", word.word).count > 0 {
-//                newRecord.checked = true
-//            }
-//            countGeneratedRecords += 1
-//            if countGeneratedRecords % 1000 == 0 {
-//                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
-//            }
-//            try! newWordListRealm.safeWrite() {
-//                newWordListRealm.add(newRecord)
-//            }
-//        }
-//    }
+        for item in myOrigGames {
+            let newRecord = GameModel()
+            newRecord.primary = item.primary
+            newRecord.language = item.language
+            newRecord.gameNumber = item.gameNumber
+            newRecord.gameSize = item.size
+            newRecord.gameArray = item.gameArray
+            
+//            var wordsToFind = List<FoundedWords>()
+//            var myWords = List<FoundedWords>()
+//            var myDemos = List<FoundedWords>()
+            newRecord.finished = false
+            newRecord.timeStamp = item.timeStamp
+            newRecord.OK = item.OK
+            newRecord.errorCount = item.errorCount
+            let myOrigWords = item.words.components(separatedBy: GV.outerSeparator)
+            for item in myOrigWords {
+                newRecord.wordsToFind.append(FoundedWords(from: item, language: newRecord.language, actRealm: origGamesRealm))
+            }
+
+            countGeneratedRecords += 1
+            if countGeneratedRecords % 100 == 0 {
+                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
+            }
+            try! origGamesRealm.safeWrite() {
+                var startID = newRecord.wordsToFind.first!.ID
+                for (index, record) in newRecord.wordsToFind.enumerated() {
+                    newRecord.wordsToFind[index].ID = startID
+                    startID += 1
+                }
+                origGamesRealm.add(newRecord)
+            }
+        }
+    }
 
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

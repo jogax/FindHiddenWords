@@ -86,6 +86,7 @@
 		D02213CD25C448B500BAB3A7 /* LightLilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */; };
 		D04190E325C1991C00621D08 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E125C1991C00621D08 /* offline.png */; };
 		D04190E425C1991C00621D08 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E225C1991C00621D08 /* online.png */; };
+		D043EBD225D2DA2F008315D7 /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D043EBD125D2DA2F008315D7 /* GameModel.swift */; };
 		D04A2AAD25BB1A8C00404A5F /* GCHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */; };
 		D08B5B8E25C06A6C007C04D5 /* hook.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B8D25C06A6C007C04D5 /* hook.png */; };
 		D08B5B9125C06AF7007C04D5 /* LeftSimple.png in Resources */ = {isa = PBXBuildFile; fileRef = D08B5B9025C06AF7007C04D5 /* LeftSimple.png */; };
@@ -185,6 +186,7 @@
 		D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightLilaOctagon.png; sourceTree = "<group>"; };
 		D04190E125C1991C00621D08 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
 		D04190E225C1991C00621D08 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
+		D043EBD125D2DA2F008315D7 /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
 		D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCHelper.swift; sourceTree = "<group>"; };
 		D07C772225AF25300087851B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		D07C772425AF25720087851B /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Main.strings; sourceTree = "<group>"; };
@@ -255,6 +257,7 @@
 				D0124FE525A8A42A000BCF89 /* Games.swift */,
 				D0124FE825A8A44A000BCF89 /* NewWorldListModel.swift */,
 				D0B3DFF225C5B8FE00A2BD11 /* FoundedWords.swift */,
+				D043EBD125D2DA2F008315D7 /* GameModel.swift */,
 			);
 			path = RealmModels;
 			sourceTree = "<group>";
@@ -555,6 +558,7 @@
 				D0124FBE25A8A23D000BCF89 /* MyAlertController.swift in Sources */,
 				D0B3DFF325C5B8FE00A2BD11 /* FoundedWords.swift in Sources */,
 				D0124FE625A8A42A000BCF89 /* Games.swift in Sources */,
+				D043EBD225D2DA2F008315D7 /* GameModel.swift in Sources */,
 				D0124F9F25A8A0B0000BCF89 /* GradientNode.swift in Sources */,
 				D0124FD425A8A358000BCF89 /* MySounds.swift in Sources */,
 				D0124FDD25A8A3D4000BCF89 /* Projector.swift in Sources */,

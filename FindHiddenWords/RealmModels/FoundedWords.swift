@@ -30,11 +30,15 @@ class FoundedWords: Object {
         returnValue.mandatory = self.mandatory
         return returnValue
     }
-    init(from: String) {
+    init(from: String, language: String? = nil, actRealm: Realm? = nil) {
         let firstSeparatorIndex = from.index(of: GV.innerSeparator)!
         super.init()
-        self.ID = getNewID()
-        self.language = GV.actLanguage
+    self.ID = getNewID(actRealm: actRealm)
+        if language != nil {
+            self.language = language!
+        } else {
+            self.language = GV.actLanguage
+        }
         self.word = from.startingSubString(length: firstSeparatorIndex)
         self.usedLetters = from.endingSubString(at: firstSeparatorIndex + 1)
         self.score = calculateScore()
@@ -77,16 +81,21 @@ class FoundedWords: Object {
         }
     }
     
-    func getNewID()->Int {
-        return getNextID.incrementID()
+    func getNewID(actRealm: Realm? = nil)->Int {
+        return getNextID.incrementID(actRealm: actRealm)
 //        FoundedWords.newID += 1
 //        return FoundedWords.newID
     }
 }
 
 class getNextID {
-    static func incrementID() -> Int {
-        let records = playedGamesRealm!.objects(FoundedWords.self)
+    static func incrementID(actRealm: Realm? = nil) -> Int {
+        var records: Results<FoundedWords>!
+        if actRealm == nil {
+            records = playedGamesRealm!.objects(FoundedWords.self)
+        } else {
+            records = actRealm!.objects(FoundedWords.self)
+        }
         if let maxID = records.max(ofProperty: "ID") as Int? {
             return maxID + 1
         }
