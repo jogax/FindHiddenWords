@@ -1015,10 +1015,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var scoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     public func playingGame() {
-        let sizeMultiplierIPhone: [CGFloat] = [0, 0, 0, 0, 0, 0.13, 0.11, 0.095, 0.09, 0.085, 0.08]
-        let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.1, 0.095, 0.09, 0.08, 0.075, 0.07]
+
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
-        let sizeMultiplier = GV.onIpad ? sizeMultiplierIPad : sizeMultiplierIPhone
+        let sizeMultiplier = GV.onIpad ? GV.sizeMultiplierIPad : GV.sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[GV.basicData.gameSize]
         GV.blockSize = blockSize
         GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: GV.basicData.gameSize, cols: GV.basicData.gameSize)

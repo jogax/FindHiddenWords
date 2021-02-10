@@ -79,6 +79,7 @@
 		D012504725A8AEEB000BCF89 /* BlueOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501E25A8AEEA000BCF89 /* BlueOctagon.png */; };
 		D012504825A8AEEB000BCF89 /* GrayOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D012501F25A8AEEA000BCF89 /* GrayOctagon.png */; };
 		D012504925A8AEEB000BCF89 /* GreenSprite.png in Resources */ = {isa = PBXBuildFile; fileRef = D012502025A8AEEB000BCF89 /* GreenSprite.png */; };
+		D0178E7D25D4213E00996566 /* AddNewWordsToOrigRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0178E7C25D4213E00996566 /* AddNewWordsToOrigRecord.swift */; };
 		D01EE31D25D02DA40099C1E9 /* finger.png in Resources */ = {isa = PBXBuildFile; fileRef = D01EE31C25D02DA40099C1E9 /* finger.png */; };
 		D020C8D325BDB7C700185EF6 /* ShowGameCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */; };
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
@@ -179,6 +180,7 @@
 		D012501E25A8AEEA000BCF89 /* BlueOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = BlueOctagon.png; sourceTree = "<group>"; };
 		D012501F25A8AEEA000BCF89 /* GrayOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GrayOctagon.png; sourceTree = "<group>"; };
 		D012502025A8AEEB000BCF89 /* GreenSprite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GreenSprite.png; sourceTree = "<group>"; };
+		D0178E7C25D4213E00996566 /* AddNewWordsToOrigRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNewWordsToOrigRecord.swift; sourceTree = "<group>"; };
 		D01EE31C25D02DA40099C1E9 /* finger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = finger.png; sourceTree = "<group>"; };
 		D020C8D225BDB7C700185EF6 /* ShowGameCenterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowGameCenterViewController.swift; sourceTree = "<group>"; };
 		D020C8D525BDC06100185EF6 /* LightRedOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedOctagon.png; sourceTree = "<group>"; };
@@ -375,6 +377,7 @@
 				D0124FA425A8A10C000BCF89 /* GameViewController.swift */,
 				D04A2AAC25BB1A8C00404A5F /* GCHelper.swift */,
 				D0124FA725A8A138000BCF89 /* GenerateGameArray.swift */,
+				D0178E7C25D4213E00996566 /* AddNewWordsToOrigRecord.swift */,
 				D0124FAA25A8A154000BCF89 /* Grid.swift */,
 				D0124FBD25A8A23D000BCF89 /* MyAlertController.swift */,
 				D0124FC125A8A282000BCF89 /* MyButton.swift */,
@@ -554,6 +557,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0124FE025A8A3FB000BCF89 /* PlayedGame.swift in Sources */,
+				D0178E7D25D4213E00996566 /* AddNewWordsToOrigRecord.swift in Sources */,
 				D0124F9725A8A052000BCF89 /* CustomTableViewCell.swift in Sources */,
 				D0124FBE25A8A23D000BCF89 /* MyAlertController.swift in Sources */,
 				D0B3DFF325C5B8FE00A2BD11 /* FoundedWords.swift in Sources */,

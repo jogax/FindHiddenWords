@@ -102,7 +102,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-        generateNewOrigGamesDB()
+//        generateNewOrigGamesDB()
+//        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
+//        addNewWordsToOrigRecord.findNewMandatoryWords()
         window = UIWindow(frame: UIScreen.main.bounds)
 //        let homeViewController = GameViewController3D()
         let homeViewController = GameViewController()
@@ -141,28 +143,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     private func generateNewOrigGamesDB() {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let gamesURL = documentsURL.appendingPathComponent("OrigGames.realm")
-        let config = Realm.Configuration(
-            fileURL: gamesURL,
-            schemaVersion: 1, // new item words
-            shouldCompactOnLaunch: { totalBytes, usedBytes in
-                // totalBytes refers to the size of the file on disk in bytes (data + free space)
-                // usedBytes refers to the number of bytes used by data in the file
-
-                // Compact if the file is over 100MB in size and less than 50% 'used'
-                let oneMB = 10 * 1024 * 1024
-                return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-        },
-            objectTypes: [GameModel.self, FoundedWords.self])
-        do {
-            // Realm is compacted on the first open if the configuration block conditions were met.
-            _ = try Realm(configuration: config)
-        } catch {
-            print("error")
-            // handle error compacting or opening Realm
-        }
-        let origGamesRealm = try! Realm(configuration: config)
+        let origGamesRealm = getOrigGamesRealm()
         let newRecords = origGamesRealm.objects(GameModel.self)
         try! origGamesRealm.safeWrite() {
             origGamesRealm.delete(newRecords)
@@ -179,10 +160,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             newRecord.gameNumber = item.gameNumber
             newRecord.gameSize = item.size
             newRecord.gameArray = item.gameArray
-            
-//            var wordsToFind = List<FoundedWords>()
-//            var myWords = List<FoundedWords>()
-//            var myDemos = List<FoundedWords>()
             newRecord.finished = false
             newRecord.timeStamp = item.timeStamp
             newRecord.OK = item.OK
@@ -198,7 +175,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
             try! origGamesRealm.safeWrite() {
                 var startID = newRecord.wordsToFind.first!.ID
-                for (index, record) in newRecord.wordsToFind.enumerated() {
+                for index in 0..<newRecord.wordsToFind.count {
                     newRecord.wordsToFind[index].ID = startID
                     startID += 1
                 }

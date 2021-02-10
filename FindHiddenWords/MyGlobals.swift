@@ -163,6 +163,8 @@ struct GV {
     static let TimeModifier: Int64 = 10000000000
     static let myGCName = "RJogax"
     static var playSearchingWordsScene: PlaySearchingWords?
+    static let sizeMultiplierIPhone: [CGFloat] = [0, 0, 0, 0, 0, 0.13, 0.11, 0.095, 0.09, 0.085, 0.08]
+    static let sizeMultiplierIPad:   [CGFloat] = [0, 0, 0, 0, 0, 0.1, 0.095, 0.09, 0.08, 0.075, 0.07]
 //    static var maxScore = MaxScoresProLanguageAndSize()
 
     static var orientationHandler: Selector?
