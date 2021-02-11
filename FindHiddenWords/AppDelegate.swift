@@ -103,8 +103,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print("Unable to start notifier")
         }
 //        generateNewOrigGamesDB()
-//        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
-//        addNewWordsToOrigRecord.findNewMandatoryWords()
+        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
+        addNewWordsToOrigRecord.findNewMandatoryWords()
         window = UIWindow(frame: UIScreen.main.bounds)
 //        let homeViewController = GameViewController3D()
         let homeViewController = GameViewController()

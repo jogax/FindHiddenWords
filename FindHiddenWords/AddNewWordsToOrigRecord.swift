@@ -10,6 +10,7 @@ import Realm
 import RealmSwift
 import SpriteKit
 import GameplayKit
+import GameKit
 
 public var origGamesRealm: Realm!
 
@@ -40,10 +41,14 @@ public func getOrigGamesRealm()->Realm {
 }
 
 class AddNewWordsToOrigRecord {
+    var gameSize = 0
+    var language = ""
     public func findNewMandatoryWords() {
         origGamesRealm = getOrigGamesRealm()
         for actSize in 5...10 {
+            gameSize = actSize
             for actLanguage in ["ru", "hu", "de", "en"] {
+                language = actLanguage
                 let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d", actLanguage, String(actSize)).sorted(byKeyPath: "gameNumber", ascending: true)
                 for record in origRecords {
                     searchMoreWordsInRecord(record: record)
@@ -52,6 +57,14 @@ class AddNewWordsToOrigRecord {
         }
     }
         
+    var allWordsWithLength5_10 = newWordListRealm.objects(NewWordListModel.self).filter("word like %d or word like %d or word like %d or word like %d or word like %d or word like %d",
+                                                                                        "???????",
+                                                                                        "????????",
+                                                                                        "?????????",
+                                                                                        "??????????",
+                                                                                        "???????????",
+                                                                                        "????????????")
+    
     private func searchMoreWordsInRecord(record: GameModel){
         let sizeMultiplier = GV.onIpad ? GV.sizeMultiplierIPad : GV.sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[record.gameSize]
@@ -64,7 +77,7 @@ class AddNewWordsToOrigRecord {
             cellIndexes.append(ind)
         }
         repeat {
-            let index = Int.random(in: 0..<cellIndexes.count)
+            let index = 0 //Int.random(in: 0..<cellIndexes.count)
             let actIndex = cellIndexes[index]
             let col = actIndex / record.gameSize
             let row = actIndex % record.gameSize
@@ -73,9 +86,69 @@ class AddNewWordsToOrigRecord {
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
     }
-    
+
     private func searchWordForCell(cell:GameboardItem) {
-        print("col: \(cell.col), row: \(cell.row), letter: \(cell.letter)")
+        var foundedWord = UsedWord()
+        foundedWord.append(UsedLetter(col: cell.col, row: cell.row, letter: cell.letter))
+        let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
+        for secondCell in cellsAround {
+            let possibleWords2 = allWordsWithLength5_10.filter("word beginswith %d", (language + cell.letter + secondCell.letter).lowercased())
+            if possibleWords2.count > 0 {
+                foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
+                for myWord in possibleWords2 {
+                    let cellsAroundSecond = getCellsAround(cell: secondCell, exclude: foundedWord.usedLetters)
+                    for thirdCell in cellsAroundSecond {
+                        let possibleWords3 = possibleWords2.filter("word beginswith %d", (language + cell.letter + secondCell.letter + thirdCell.letter).lowercased())
+                        if possibleWords3.count > 0 {
+                            foundedWord.append(UsedLetter(col: thirdCell.col, row: thirdCell.row, letter: thirdCell.letter))
+                            print("word OK: \(foundedWord)")
+                        }
+                    }
+                }
+                if foundedWord.count == 2 {
+                    foundedWord.removeLast()
+                }
+            }
+        }
+    }
+    
+    private func getCellsAround(cell: GameboardItem, exclude: [UsedLetter])->[GameboardItem] {
+        var returnCells = [GameboardItem]()
+        
+        func appendIfPossible(cell: GameboardItem) {
+            for item in exclude {
+                if cell.col == item.col && cell.row == item.row {
+                    return
+                }
+            }
+            returnCells.append(cell)
+        }
+        if cell.col > 0 {
+            appendIfPossible(cell: GV.gameArray[cell.col - 1][cell.row])
+            if cell.row > 0 {
+                appendIfPossible(cell: GV.gameArray[cell.col - 1][cell.row - 1])
+            }
+            if cell.row < gameSize - 1 {
+                appendIfPossible(cell: GV.gameArray[cell.col - 1][cell.row + 1])
+            }
+        }
+        if cell.col < gameSize - 1 {
+            appendIfPossible(cell: GV.gameArray[cell.col + 1][cell.row])
+            if cell.row > 0 {
+                appendIfPossible(cell: GV.gameArray[cell.col + 1][cell.row - 1])
+            }
+            if cell.row < gameSize - 1 {
+                appendIfPossible(cell: GV.gameArray[cell.col + 1][cell.row + 1])
+            }
+        }
+        if cell.row > 0 {
+            appendIfPossible(cell: GV.gameArray[cell.col][cell.row - 1])
+        }
+        if cell.row < gameSize - 1 {
+            appendIfPossible(cell: GV.gameArray[cell.col][cell.row + 1])
+        }
+        
+        return returnCells
     }
     
     private func fillGameArray(gameArray: [[GameboardItem]], content: String, toGrid: Grid) {
