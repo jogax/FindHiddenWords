@@ -31,6 +31,7 @@ enum TextConstants: Int {
     tcBack,
     tcDeveloperMenu,
     tcGenerateGameArray,
+    tcSearchingMoreWords,
     tcDeveloperMenuTitle,
     tcGeneratingSize,
     tcSizeMenuTitle,

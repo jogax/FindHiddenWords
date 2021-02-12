@@ -62,5 +62,6 @@ let deDictionary: [TextConstants: String] = [
     .tcOnlineTime:              "Onlinezeit",
     .tcLastOnline:              "Zuletzt        ",
     .tcLastOnlineTime:          "Dauer",
-    .tcGameCenter:              "GameCenter ViewController"
+    .tcGameCenter:              "GameCenter ViewController",
+    .tcSearchingMoreWords:      "Suche neue Wörter",
 ]

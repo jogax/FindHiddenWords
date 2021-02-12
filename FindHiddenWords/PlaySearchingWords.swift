@@ -63,7 +63,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                           type: .Green)
         myAlert.addAction(text: .tcShowGameCenter, action: #selector(self.showGameCenter))
         myAlert.addAction(text: .tcGameCenter, action: #selector(self.goGCVC))
-        myAlert.addAction(text: .tcGenerateGameArray, action: #selector(self.generateGameArray))
+//        myAlert.addAction(text: .tcGenerateGameArray, action: #selector(self.generateGameArray))
+        myAlert.addAction(text: .tcSearchingMoreWords, action: #selector(self.findMoreWords))
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
@@ -88,6 +89,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     @objc private func generateGameArray() {
         
     }
+    
+    @objc private func findMoreWords() {
+        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
+        addNewWordsToOrigRecord.findNewMandatoryWords()
+    }
+
     
     @objc private func showGameCenter() {
         let gameCenterViewController = ShowGameCenterViewController()

@@ -33,7 +33,7 @@ class FoundedWords: Object {
     init(from: String, language: String? = nil, actRealm: Realm? = nil) {
         let firstSeparatorIndex = from.index(of: GV.innerSeparator)!
         super.init()
-    self.ID = getNewID(actRealm: actRealm)
+        self.ID = getNewID(actRealm: actRealm)
         if language != nil {
             self.language = language!
         } else {
@@ -44,9 +44,9 @@ class FoundedWords: Object {
         self.score = calculateScore()
     }
     
-    init(fromUsedWord: UsedWord) {
+    init(fromUsedWord: UsedWord, actRealm: Realm? = nil) {
         super.init()
-        self.ID = getNewID()
+        self.ID = getNewID(actRealm: actRealm)
         self.language = GV.actLanguage
         self.mandatory = fromUsedWord.mandatory
         self.word = fromUsedWord.word

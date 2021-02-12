@@ -102,9 +102,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-//        generateNewOrigGamesDB()
-        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
-        addNewWordsToOrigRecord.findNewMandatoryWords()
+        generateNewOrigGamesDB()
         window = UIWindow(frame: UIScreen.main.bounds)
 //        let homeViewController = GameViewController3D()
         let homeViewController = GameViewController()
@@ -162,7 +160,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             newRecord.gameArray = item.gameArray
             newRecord.finished = false
             newRecord.timeStamp = item.timeStamp
-            newRecord.OK = item.OK
+            newRecord.OK = false
             newRecord.errorCount = item.errorCount
             let myOrigWords = item.words.components(separatedBy: GV.outerSeparator)
             for item in myOrigWords {

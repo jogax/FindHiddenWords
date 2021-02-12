@@ -49,13 +49,16 @@ class AddNewWordsToOrigRecord {
             gameSize = actSize
             for actLanguage in ["ru", "hu", "de", "en"] {
                 language = actLanguage
-                let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d", actLanguage, String(actSize)).sorted(byKeyPath: "gameNumber", ascending: true)
+                let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(actSize)).sorted(byKeyPath: "gameNumber", ascending: true)
                 for record in origRecords {
-                    searchMoreWordsInRecord(record: record)
+                    workingRecord = record
+                    searchMoreWordsInRecord()
                 }
             }
         }
     }
+    
+    var workingRecord: GameModel!
         
     var allWordsWithLength5_10 = newWordListRealm.objects(NewWordListModel.self).filter("word like %d or word like %d or word like %d or word like %d or word like %d or word like %d",
                                                                                         "???????",
@@ -65,51 +68,53 @@ class AddNewWordsToOrigRecord {
                                                                                         "???????????",
                                                                                         "????????????")
     
-    private func searchMoreWordsInRecord(record: GameModel){
+    private func searchMoreWordsInRecord(){
         let sizeMultiplier = GV.onIpad ? GV.sizeMultiplierIPad : GV.sizeMultiplierIPhone
-        let blockSize = GV.minSide * sizeMultiplier[record.gameSize]
+        let blockSize = GV.minSide * sizeMultiplier[workingRecord.gameSize]
         GV.blockSize = blockSize
-        GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: record.gameSize, cols: record.gameSize)
-        GV.gameArray = createNewGameArray(size: record.gameSize)
-        fillGameArray(gameArray: GV.gameArray, content:  record.gameArray, toGrid: GV.playingGrid!)
+        GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: workingRecord.gameSize, cols: workingRecord.gameSize)
+        GV.gameArray = createNewGameArray(size: workingRecord.gameSize)
+        fillGameArray(gameArray: GV.gameArray, content:  workingRecord.gameArray, toGrid: GV.playingGrid!)
         var cellIndexes = [Int]()
-        for ind in 0..<record.gameSize*record.gameSize {
+        for ind in 0..<workingRecord.gameSize*workingRecord.gameSize {
             cellIndexes.append(ind)
         }
         repeat {
+            foundedWord = UsedWord()
             let index = 0 //Int.random(in: 0..<cellIndexes.count)
             let actIndex = cellIndexes[index]
-            let col = actIndex / record.gameSize
-            let row = actIndex % record.gameSize
+            let col = actIndex / workingRecord.gameSize
+            let row = actIndex % workingRecord.gameSize
             let workingCell = GV.gameArray[col][row]
-            searchWordForCell(cell: workingCell)
+            foundedWord.append(UsedLetter(col: workingCell.col, row: workingCell.row, letter: workingCell.letter))
+            recursionWithCells(cell: workingCell)
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
     }
+    var foundedWord = UsedWord()
 
-    private func searchWordForCell(cell:GameboardItem) {
-        var foundedWord = UsedWord()
-        foundedWord.append(UsedLetter(col: cell.col, row: cell.row, letter: cell.letter))
+    private func recursionWithCells(cell:GameboardItem) {
         let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
         for secondCell in cellsAround {
-            let possibleWords2 = allWordsWithLength5_10.filter("word beginswith %d", (language + cell.letter + secondCell.letter).lowercased())
-            if possibleWords2.count > 0 {
-                foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
-                for myWord in possibleWords2 {
-                    let cellsAroundSecond = getCellsAround(cell: secondCell, exclude: foundedWord.usedLetters)
-                    for thirdCell in cellsAroundSecond {
-                        let possibleWords3 = possibleWords2.filter("word beginswith %d", (language + cell.letter + secondCell.letter + thirdCell.letter).lowercased())
-                        if possibleWords3.count > 0 {
-                            foundedWord.append(UsedLetter(col: thirdCell.col, row: thirdCell.row, letter: thirdCell.letter))
-                            print("word OK: \(foundedWord)")
-                        }
+            foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
+            let possibleWords = allWordsWithLength5_10.filter("word beginswith %d and checked = true", (language + foundedWord.word).lowercased())
+            if possibleWords.count == 1 && possibleWords[0].word.endingSubString(at: 2) == foundedWord.word.lowercased() {
+                if !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) && !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) {
+                    try! origGamesRealm.safeWrite {
+                        workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRealm))
                     }
+                    print ("foundedWord: \(foundedWord)")
                 }
-                if foundedWord.count == 2 {
-                    foundedWord.removeLast()
-                }
+            } else if possibleWords.count > 0 {
+//                print ("recursion with: \(foundedWord.word)")
+                recursionWithCells(cell: secondCell)
+            } else {
+//                print ("no word begins with: \(foundedWord.word)")
+               foundedWord.removeLast()
             }
         }
+        foundedWord.removeLast()
+//        print("go back from recursion with \(foundedWord)")
     }
     
     private func getCellsAround(cell: GameboardItem, exclude: [UsedLetter])->[GameboardItem] {
