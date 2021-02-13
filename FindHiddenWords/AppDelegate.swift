@@ -143,9 +143,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private func generateNewOrigGamesDB() {
         let origGamesRealm = getOrigGamesRealm()
         let newRecords = origGamesRealm.objects(GameModel.self)
-        try! origGamesRealm.safeWrite() {
-            origGamesRealm.delete(newRecords)
+        if newRecords.count == 2400 {
+            return
         }
+//        try! origGamesRealm.safeWrite() {
+//            origGamesRealm.delete(newRecords)
+//        }
         let myOrigGames = gamesRealm.objects(Games.self)
 //        let myWordList = realmWordList.objects(WordListModel.self)
         let countRecords = myOrigGames.count

@@ -46,12 +46,14 @@ class AddNewWordsToOrigRecord {
     public func findNewMandatoryWords() {
         origGamesRealm = getOrigGamesRealm()
         for actSize in 5...10 {
-            gameSize = actSize
+            gameSize = 15 - actSize
             for actLanguage in ["ru", "hu", "de", "en"] {
                 language = actLanguage
-                let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(actSize)).sorted(byKeyPath: "gameNumber", ascending: true)
+                let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
                 for record in origRecords {
                     workingRecord = record
+                    let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+                    print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
                     searchMoreWordsInRecord()
                 }
             }
@@ -60,22 +62,22 @@ class AddNewWordsToOrigRecord {
     
     var workingRecord: GameModel!
         
-    var allWordsWithLength5_10 = newWordListRealm.objects(NewWordListModel.self).filter("word like %d or word like %d or word like %d or word like %d or word like %d or word like %d",
+    var allCheckedWords = newWordListRealm.objects(NewWordListModel.self).filter("checked = true and (word like %d or word like %d or word like %d or word like %d or word like %d or word like %d)",
                                                                                         "???????",
                                                                                         "????????",
                                                                                         "?????????",
                                                                                         "??????????",
                                                                                         "???????????",
                                                                                         "????????????")
-    
+    var cellIndexes = [Int]()
     private func searchMoreWordsInRecord(){
+        let startTime = Date()
         let sizeMultiplier = GV.onIpad ? GV.sizeMultiplierIPad : GV.sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[workingRecord.gameSize]
         GV.blockSize = blockSize
         GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: workingRecord.gameSize, cols: workingRecord.gameSize)
         GV.gameArray = createNewGameArray(size: workingRecord.gameSize)
         fillGameArray(gameArray: GV.gameArray, content:  workingRecord.gameArray, toGrid: GV.playingGrid!)
-        var cellIndexes = [Int]()
         for ind in 0..<workingRecord.gameSize*workingRecord.gameSize {
             cellIndexes.append(ind)
         }
@@ -90,6 +92,11 @@ class AddNewWordsToOrigRecord {
             recursionWithCells(cell: workingCell)
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
+        try! origGamesRealm.safeWrite {
+            let usedTime = Date().timeIntervalSince(startTime)
+            workingRecord.OK = true
+            print("Search ended for game \(workingRecord.gameNumber), found \(workingRecord.myDemos.count) records in \(usedTime) seconds")
+        }
     }
     var foundedWord = UsedWord()
 
@@ -97,24 +104,21 @@ class AddNewWordsToOrigRecord {
         let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
         for secondCell in cellsAround {
             foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
-            let possibleWords = allWordsWithLength5_10.filter("word beginswith %d and checked = true", (language + foundedWord.word).lowercased())
+            let possibleWords = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
             if possibleWords.count == 1 && possibleWords[0].word.endingSubString(at: 2) == foundedWord.word.lowercased() {
                 if !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) && !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) {
                     try! origGamesRealm.safeWrite {
                         workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRealm))
                     }
-                    print ("foundedWord: \(foundedWord)")
+                    print ("foundedWord: \(foundedWord.word), CellIndexes left: \(cellIndexes.count)")
                 }
             } else if possibleWords.count > 0 {
-//                print ("recursion with: \(foundedWord.word)")
                 recursionWithCells(cell: secondCell)
             } else {
-//                print ("no word begins with: \(foundedWord.word)")
                foundedWord.removeLast()
             }
         }
         foundedWord.removeLast()
-//        print("go back from recursion with \(foundedWord)")
     }
     
     private func getCellsAround(cell: GameboardItem, exclude: [UsedLetter])->[GameboardItem] {

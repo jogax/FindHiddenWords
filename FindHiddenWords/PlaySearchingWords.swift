@@ -70,6 +70,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         self.addChild(myAlert)
     }
     
+    override func update(_ currentTime: TimeInterval) {
+//        print("hier in update")
+    }
+    
     var gcVC: GKGameCenterViewController!
     @objc private func goGCVC() {
         gcVC = GKGameCenterViewController()
@@ -91,8 +95,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func findMoreWords() {
-        let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
-        addNewWordsToOrigRecord.findNewMandatoryWords()
+        let globalQueue = DispatchQueue.global()
+//        run AddNewWordsToOrigRecord in Background thread
+        globalQueue.async {
+            let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
+            addNewWordsToOrigRecord.findNewMandatoryWords()
+        }
     }
 
     
@@ -1121,14 +1129,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func animateWord() {
-        let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
-        demoModus = true
-        fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
-        fingerSprite.zPosition += 100
-        fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
-        gameLayer.addChild(fingerSprite)
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
+            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+            demoModus = true
+            fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
+            fingerSprite.zPosition += 100
+            fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
+            gameLayer.addChild(fingerSprite)
             let item = wordsToAnimate.first!
             wordsToAnimate.removeFirst()
             var cellsToAnimate = [GameboardItem]()
