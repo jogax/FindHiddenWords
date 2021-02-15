@@ -69,9 +69,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
-    
+    var lastAddingData = AddingWordData()
+
     override func update(_ currentTime: TimeInterval) {
-//        print("hier in update")
+        if AW.addNewWordsRunning {
+            if lastAddingData.countFoundedWords != AW.addingWordData.countFoundedWords {
+                lastAddingData.countFoundedWords = AW.addingWordData.countFoundedWords
+                print("In Update: countFoundedWords: \(AW.addingWordData.countFoundedWords), lastWord: \(AW.addingWordData.lastWord)")
+            }
+        }
     }
     
     var gcVC: GKGameCenterViewController!
@@ -97,7 +103,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     @objc private func findMoreWords() {
         let globalQueue = DispatchQueue.global()
 //        run AddNewWordsToOrigRecord in Background thread
-        globalQueue.async {
+        globalQueue.async { [self] in
+            fixWordsHeader.isHidden = true
             let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
             addNewWordsToOrigRecord.findNewMandatoryWords()
         }
@@ -527,7 +534,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
                     setGameArrayToActualState()
                     if GV.justStarted && GV.basicData.showDemo {
-                        showDemo()
+//                        showDemo()
 //                        xxx
                     }
 

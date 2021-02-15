@@ -44,6 +44,7 @@ class AddNewWordsToOrigRecord {
     var gameSize = 0
     var language = ""
     public func findNewMandatoryWords() {
+        AW.addNewWordsRunning = true
         origGamesRealm = getOrigGamesRealm()
         for actSize in 5...10 {
             gameSize = 15 - actSize
@@ -53,6 +54,10 @@ class AddNewWordsToOrigRecord {
                 for record in origRecords {
                     workingRecord = record
                     let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+                    AW.addingWordData.countFinishedRecords = finishedRecords.count
+                    AW.addingWordData.gameSize = gameSize
+                    AW.addingWordData.language = actLanguage
+                    AW.addingWordData.gameNumber = record.gameNumber
                     print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
                     searchMoreWordsInRecord()
                 }
@@ -95,6 +100,7 @@ class AddNewWordsToOrigRecord {
         try! origGamesRealm.safeWrite {
             let usedTime = Date().timeIntervalSince(startTime)
             workingRecord.OK = true
+            AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
             print("Search ended for game \(workingRecord.gameNumber), found \(workingRecord.myDemos.count) records in \(usedTime) seconds")
         }
     }
@@ -110,7 +116,10 @@ class AddNewWordsToOrigRecord {
                     try! origGamesRealm.safeWrite {
                         workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRealm))
                     }
-                    print ("foundedWord: \(foundedWord.word), CellIndexes left: \(cellIndexes.count)")
+                    AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
+                    AW.addingWordData.callIndexesLeft = cellIndexes.count
+                    AW.addingWordData.lastWord = foundedWord.word
+//                    print ("foundedWord: \(foundedWord.word), CellIndexes left: \(cellIndexes.count)")
                 }
             } else if possibleWords.count > 0 {
                 recursionWithCells(cell: secondCell)

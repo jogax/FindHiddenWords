@@ -91,6 +91,16 @@ func == (left: MyDate, right: MyDate) -> Bool {
         abs(left.minute - right.minute) < 11
 }
 
+struct AddingWordData {
+    var countFinishedRecords = 0
+    var gameSize = 0
+    var language = ""
+    var gameNumber = 0
+    var countFoundedWords = 0
+    var callIndexesLeft = 0
+    var lastWord = ""
+}
+
 struct MyDate {
     let year: Int
     let month: Int
@@ -111,6 +121,12 @@ struct MyDate {
     func datum()->Int {
         return year * 10000 + month * 100 + day
     }
+}
+
+
+struct AW {
+    static var addNewWordsRunning = false
+    static var addingWordData = AddingWordData()
 }
 
 
