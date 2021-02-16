@@ -46,15 +46,23 @@ class AddNewWordsToOrigRecord {
     public func findNewMandatoryWords() {
         AW.addNewWordsRunning = true
         origGamesRealm = getOrigGamesRealm()
+        checkOrigRecords()
         for actSize in 5...10 {
             gameSize = 15 - actSize
-            for actLanguage in ["ru", "hu", "de", "en"] {
+            for actLanguage in ["hu", "ru", "de", "en"] {
                 language = actLanguage
                 let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
+                AW.addingWordData = AddingWordData()
                 for record in origRecords {
+                    try! origGamesRealm.safeWrite {
+                        origGamesRealm.delete(record.myDemos)
+                    }
                     workingRecord = record
                     let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+                    let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d", language)
                     AW.addingWordData.countFinishedRecords = finishedRecords.count
+                    AW.addingWordData.language = language
+                    AW.addingWordData.finishedProLanguage = finishedProLanguage.count
                     AW.addingWordData.gameSize = gameSize
                     AW.addingWordData.language = actLanguage
                     AW.addingWordData.gameNumber = record.gameNumber
@@ -63,6 +71,30 @@ class AddNewWordsToOrigRecord {
                 }
             }
         }
+    }
+    
+    private func checkOrigRecords() {
+        let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+        for record in finishedRecords {
+            for item in record.myDemos {
+                if !checkFoundedWordOK(foundedWord: item.getUsedWord()) {
+                    print("this record must be deleted: \(item.usedLetters)")
+                }
+            }
+        }
+    }
+    private func checkFoundedWordOK(foundedWord: UsedWord)->Bool {
+        let letters = foundedWord.usedLetters
+        for (index, usedLetter) in letters.enumerated() {
+            if index < letters.count - 1 {
+                for ind in index + 1..<letters.count {
+                    if usedLetter == letters[ind] {
+                        return false
+                    }
+                }
+            }
+        }
+        return true
     }
     
     var workingRecord: GameModel!
@@ -95,6 +127,7 @@ class AddNewWordsToOrigRecord {
             let workingCell = GV.gameArray[col][row]
             foundedWord.append(UsedLetter(col: workingCell.col, row: workingCell.row, letter: workingCell.letter))
             recursionWithCells(cell: workingCell)
+            AW.addingWordData.callIndexesLeft = cellIndexes.count
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
         try! origGamesRealm.safeWrite {
@@ -107,12 +140,18 @@ class AddNewWordsToOrigRecord {
     var foundedWord = UsedWord()
 
     private func recursionWithCells(cell:GameboardItem) {
+        if AW.stopSearching {
+            AW.stopSearching = false
+            AW.addNewWordsRunning = false
+        }
         let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
         for secondCell in cellsAround {
             foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
             let possibleWords = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
             if possibleWords.count == 1 && possibleWords[0].word.endingSubString(at: 2) == foundedWord.word.lowercased() {
-                if !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) && !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) {
+                if  !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) &&
+                    !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) &&
+                    checkFoundedWordOK(foundedWord: foundedWord) {
                     try! origGamesRealm.safeWrite {
                         workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRealm))
                     }

@@ -66,4 +66,5 @@ let enDictionary: [TextConstants: String] = [
     .tcLastOnlineTime:          "Duration",
     .tcGameCenter:              "GameCenter ViewController",
     .tcSearchingMoreWords:      "Search new words",
+    .tcStopSearching:           "Stop searching",
 ]

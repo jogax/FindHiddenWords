@@ -93,6 +93,7 @@ func == (left: MyDate, right: MyDate) -> Bool {
 
 struct AddingWordData {
     var countFinishedRecords = 0
+    var finishedProLanguage = 0
     var gameSize = 0
     var language = ""
     var gameNumber = 0
@@ -126,6 +127,7 @@ struct MyDate {
 
 struct AW {
     static var addNewWordsRunning = false
+    static var stopSearching = false
     static var addingWordData = AddingWordData()
 }
 

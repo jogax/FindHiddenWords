@@ -64,7 +64,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myAlert.addAction(text: .tcShowGameCenter, action: #selector(self.showGameCenter))
         myAlert.addAction(text: .tcGameCenter, action: #selector(self.goGCVC))
 //        myAlert.addAction(text: .tcGenerateGameArray, action: #selector(self.generateGameArray))
-        myAlert.addAction(text: .tcSearchingMoreWords, action: #selector(self.findMoreWords))
+        if AW.addNewWordsRunning {
+            myAlert.addAction(text: .tcStopSearching, action: #selector(self.stopSearching))
+        } else {
+            myAlert.addAction(text: .tcSearchingMoreWords, action: #selector(self.findMoreWords))
+        }
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
@@ -73,9 +77,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     override func update(_ currentTime: TimeInterval) {
         if AW.addNewWordsRunning {
-            if lastAddingData.countFoundedWords != AW.addingWordData.countFoundedWords {
+            if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft && AW.addingWordData.lastWord != ""{
+                fixWordsHeader.horizontalAlignmentMode = .left
+//                fixWordsHeader.plPosSize?.PPos = GV.actWidth * 0.5
+                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language) / \(AW.addingWordData.finishedProLanguage) / "
+                fixWordsHeader.text! += "\(AW.addingWordData.countFoundedWords) / \(AW.addingWordData.lastWord) / \(AW.addingWordData.callIndexesLeft)"
                 lastAddingData.countFoundedWords = AW.addingWordData.countFoundedWords
-                print("In Update: countFoundedWords: \(AW.addingWordData.countFoundedWords), lastWord: \(AW.addingWordData.lastWord)")
+                lastAddingData.callIndexesLeft = AW.addingWordData.callIndexesLeft
+                print("In Update: countFoundedWords: \(AW.addingWordData.countFoundedWords), lastWord: \(AW.addingWordData.lastWord), cellIndexes: \(AW.addingWordData.callIndexesLeft)")
             }
         }
     }
@@ -100,14 +109,26 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         
     }
     
+    @objc private func stopSearching() {
+        fixWordsHeader.text = GV.language.getText(.tcFixWords)
+        AW.stopSearching = true
+        workItem!.cancel()
+    }
+    
+    var workItem: DispatchWorkItem?
     @objc private func findMoreWords() {
-        let globalQueue = DispatchQueue.global()
-//        run AddNewWordsToOrigRecord in Background thread
-        globalQueue.async { [self] in
-            fixWordsHeader.isHidden = true
+        workItem = DispatchWorkItem {
             let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
             addNewWordsToOrigRecord.findNewMandatoryWords()
         }
+        DispatchQueue.global().async(execute: workItem!)
+//        let globalQueue = DispatchQueue.global()
+////        run AddNewWordsToOrigRecord in Background thread
+//        globalQueue.async {
+////            fixWordsHeader.isHidden = true
+//            let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
+//            addNewWordsToOrigRecord.findNewMandatoryWords()
+//        }
     }
 
     
