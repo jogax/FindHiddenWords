@@ -77,14 +77,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     override func update(_ currentTime: TimeInterval) {
         if AW.addNewWordsRunning {
-            if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft && AW.addingWordData.lastWord != ""{
+            if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.horizontalAlignmentMode = .left
 //                fixWordsHeader.plPosSize?.PPos = GV.actWidth * 0.5
-                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language) / \(AW.addingWordData.finishedProLanguage) / "
+                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language) / \(AW.addingWordData.gameSize) / \(AW.addingWordData.finishedProLanguage) / "
                 fixWordsHeader.text! += "\(AW.addingWordData.countFoundedWords) / \(AW.addingWordData.lastWord) / \(AW.addingWordData.callIndexesLeft)"
                 lastAddingData.countFoundedWords = AW.addingWordData.countFoundedWords
                 lastAddingData.callIndexesLeft = AW.addingWordData.callIndexesLeft
-                print("In Update: countFoundedWords: \(AW.addingWordData.countFoundedWords), lastWord: \(AW.addingWordData.lastWord), cellIndexes: \(AW.addingWordData.callIndexesLeft)")
+//                print("In Update: countFoundedWords: \(AW.addingWordData.countFoundedWords), lastWord: \(AW.addingWordData.lastWord), cellIndexes: \(AW.addingWordData.callIndexesLeft)")
             }
         }
     }
@@ -111,13 +111,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func stopSearching() {
         fixWordsHeader.text = GV.language.getText(.tcFixWords)
+        gameHeader.isHidden = false
         AW.stopSearching = true
         workItem!.cancel()
     }
     
     var workItem: DispatchWorkItem?
     @objc private func findMoreWords() {
-        workItem = DispatchWorkItem {
+        workItem = DispatchWorkItem { [self] in
+            gameHeader.isHidden = true
             let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
             addNewWordsToOrigRecord.findNewMandatoryWords()
         }
@@ -1050,6 +1052,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     var positions = [ObjectSP]()
     var fixWordsHeader: MyLabel!
+    var gameHeader: MyLabel!
     var goBackButton: MyButton!
     var showMyWordsButton: MyButton!
     var showChooseLanguageButton: MyButton!
@@ -1074,7 +1077,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                      LPos: CGPoint(x: gridLposX, y: GV.minSide * 0.89 - GV.playingGrid!.size.height * 0.52),
                                      PSize: GV.playingGrid!.size,
                                      LSize: GV.playingGrid!.size)
-        let gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(GV.basicData.gameSize)x\(GV.basicData.gameSize)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
+        gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(GV.basicData.gameSize)x\(GV.basicData.gameSize)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(gameHeader) // index 0
         GV.playingGrid!.plPosSize = gridPosition
         GV.playingGrid!.setActPosSize()

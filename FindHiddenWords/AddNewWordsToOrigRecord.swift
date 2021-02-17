@@ -53,21 +53,28 @@ class AddNewWordsToOrigRecord {
                 language = actLanguage
                 let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
                 AW.addingWordData = AddingWordData()
+                var countRecords = 0
                 for record in origRecords {
                     try! origGamesRealm.safeWrite {
                         origGamesRealm.delete(record.myDemos)
                     }
                     workingRecord = record
                     let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
-                    let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d", language)
+                    let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize)
                     AW.addingWordData.countFinishedRecords = finishedRecords.count
                     AW.addingWordData.language = language
                     AW.addingWordData.finishedProLanguage = finishedProLanguage.count
                     AW.addingWordData.gameSize = gameSize
                     AW.addingWordData.language = actLanguage
                     AW.addingWordData.gameNumber = record.gameNumber
+                    AW.addingWordData.lastWord = ""
+                    AW.addingWordData.countFoundedWords = 0
                     print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
                     searchMoreWordsInRecord()
+                    countRecords += 1
+                    if countRecords == 1 {
+                        break
+                    }
                 }
             }
         }
@@ -79,6 +86,9 @@ class AddNewWordsToOrigRecord {
             for item in record.myDemos {
                 if !checkFoundedWordOK(foundedWord: item.getUsedWord()) {
                     print("this record must be deleted: \(item.usedLetters)")
+                    try! origGamesRealm.safeWrite {
+                        origGamesRealm!.delete(item)
+                    }
                 }
             }
         }
