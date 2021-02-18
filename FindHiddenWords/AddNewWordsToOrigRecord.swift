@@ -47,37 +47,61 @@ class AddNewWordsToOrigRecord {
         AW.addNewWordsRunning = true
         origGamesRealm = getOrigGamesRealm()
         checkOrigRecords()
-        for actSize in 5...10 {
-            gameSize = 15 - actSize
-            for actLanguage in ["hu", "ru", "de", "en"] {
-                language = actLanguage
-                let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
-                AW.addingWordData = AddingWordData()
-                var countRecords = 0
-                for record in origRecords {
-                    try! origGamesRealm.safeWrite {
-                        origGamesRealm.delete(record.myDemos)
+        var continueSize =  0
+        var continueLanguage = ""
+        let continueRecord = origGamesRealm.objects(GameModel.self).filter("OK = false")
+        for item in continueRecord {
+            if item.myDemos.count > 0 {
+                continueSize = item.gameSize
+                continueLanguage = item.language
+                break
+            }
+        }
+        repeat {
+            for actSize in 5...10 {
+                gameSize = 15 - actSize
+                if continueSize > 0 {
+                    if gameSize != continueSize {
+                        continue
                     }
-                    workingRecord = record
-                    let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
-                    let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize)
-                    AW.addingWordData.countFinishedRecords = finishedRecords.count
-                    AW.addingWordData.language = language
-                    AW.addingWordData.finishedProLanguage = finishedProLanguage.count
-                    AW.addingWordData.gameSize = gameSize
-                    AW.addingWordData.language = actLanguage
-                    AW.addingWordData.gameNumber = record.gameNumber
-                    AW.addingWordData.lastWord = ""
-                    AW.addingWordData.countFoundedWords = 0
-                    print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
-                    searchMoreWordsInRecord()
-                    countRecords += 1
-                    if countRecords == 1 {
-                        break
+                    continueSize = 0
+                }
+                for actLanguage in ["hu", "ru", "de", "en"] {
+                    language = actLanguage
+                    if continueLanguage != "" {
+                        if language != continueLanguage {
+                            continue
+                        }
+                        continueLanguage = ""
+                    }
+                    let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
+                    AW.addingWordData = AddingWordData()
+                    var countRecords = 0
+                    for record in origRecords {
+                        try! origGamesRealm.safeWrite {
+                            origGamesRealm.delete(record.myDemos)
+                        }
+                        workingRecord = record
+                        let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+                        let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize)
+                        AW.addingWordData.countFinishedRecords = finishedRecords.count
+                        AW.addingWordData.language = language
+                        AW.addingWordData.finishedProLanguage = finishedProLanguage.count
+                        AW.addingWordData.gameSize = gameSize
+                        AW.addingWordData.language = actLanguage
+                        AW.addingWordData.gameNumber = record.gameNumber
+                        AW.addingWordData.lastWord = ""
+                        AW.addingWordData.countFoundedWords = 0
+//                        print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
+                        searchMoreWordsInRecord()
+                        countRecords += 1
+                        if countRecords == 1 {
+                            break
+                        }
                     }
                 }
             }
-        }
+        } while origGamesRealm.objects(GameModel.self).filter("OK = true").count < 2400
     }
     
     private func checkOrigRecords() {
@@ -141,11 +165,13 @@ class AddNewWordsToOrigRecord {
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
         try! origGamesRealm.safeWrite {
-            let usedTime = Date().timeIntervalSince(startTime)
             workingRecord.OK = true
             AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
-            print("Search ended for game \(workingRecord.gameNumber), found \(workingRecord.myDemos.count) records in \(usedTime) seconds")
         }
+        let usedTime = Date().timeIntervalSince(startTime)
+        let finishedCunt = origGamesRealm!.objects(GameModel.self).filter("OK = true").count
+        let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize).count
+        print("\(finishedCunt) for size: \(gameSize), language: \(language), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime.twoDecimals) seconds")
     }
     var foundedWord = UsedWord()
 
