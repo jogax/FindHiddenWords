@@ -128,51 +128,74 @@ public func printChecked() {
     print(line)
 }
 
-public  func getRealm(type: RealmType)->Realm {
-    let shemaVersion: UInt64 = type == .PlayedGameRealm ? 6 : 4
-    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    let gamesURL = documentsURL.appendingPathComponent(type == .GamesRealm ? "OrigGames.realm" : "PlayedGames.realm")
-    let config = Realm.Configuration(
-        fileURL: gamesURL,
-        schemaVersion: shemaVersion,
-        migrationBlock: { migration, oldSchemaVersion in
-            switch (type, oldSchemaVersion) {
-            case (.PlayedGameRealm, _):
-                migration.enumerateObjects(ofType: PlayedGame.className())
-                { oldObject, newObject in
-//                        newObject!["buttonType"] = GV.ButtonTypeSimple
-                }
-            case (.GamesRealm, _):
-                migration.enumerateObjects(ofType: Games.className())
-                { oldObject, newObject in
-//                        newObject!["buttonType"] = GV.ButtonTypeSimple
-                }
-            }
-        },
-        shouldCompactOnLaunch: { totalBytes, usedBytes in
-            // totalBytes refers to the size of the file on disk in bytes (data + free space)
-            // usedBytes refers to the number of bytes used by data in the file
-
-            // Compact if the file is over 100MB in size and less than 50% 'used'
-            let oneMB = 10 * 1024 * 1024
-            return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
-    },
-        objectTypes: [(type == .GamesRealm ? Games.self : PlayedGame.self), FoundedWords.self])
-    do {
-        // Realm is compacted on the first open if the configuration block conditions were met.
-        _ = try Realm(configuration: config)
-    } catch {
-        print("error")
-        // handle error compacting or opening Realm
-    }
-
-    let realm = try! Realm(configuration: config)
+public func getOrigGamesRealm()->Realm {
+    let origGamesConfig = Realm.Configuration(
+        fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
+    readOnly: true,
+    schemaVersion: 1,
+        objectTypes: [GameModel.self, FoundedWords.self])
+    let realm = try! Realm(configuration: origGamesConfig)
     return realm
 }
 
+public func getPlayedGamesRealm()->Realm {
+    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let gamesURL = documentsURL.appendingPathComponent("PlayedGames.realm")
+    let origGamesConfig = Realm.Configuration(
+        fileURL: gamesURL,
+        schemaVersion: 6,
+        objectTypes: [GameModel.self, FoundedWords.self])
+    let realm = try! Realm(configuration: origGamesConfig)
+    return realm
+}
+
+
+
+//public  func getRealm(type: RealmType)->Realm {
+//    let shemaVersion: UInt64 = type == .PlayedGameRealm ? 6 : 4
+//    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//    let gamesURL = documentsURL.appendingPathComponent(type == .GamesRealm ? "OrigGames.realm" : "OrigGames.realm")
+//    let config = Realm.Configuration(
+//        fileURL: gamesURL,
+//        schemaVersion: shemaVersion,
+//        migrationBlock: { migration, oldSchemaVersion in
+//            switch (type, oldSchemaVersion) {
+//            case (.PlayedGameRealm, _):
+//                migration.enumerateObjects(ofType: PlayedGame.className())
+//                { oldObject, newObject in
+////                        newObject!["buttonType"] = GV.ButtonTypeSimple
+//                }
+//            case (.GamesRealm, _):
+//                migration.enumerateObjects(ofType: Games.className())
+//                { oldObject, newObject in
+////                        newObject!["buttonType"] = GV.ButtonTypeSimple
+//                }
+//            }
+//        },
+//        shouldCompactOnLaunch: { totalBytes, usedBytes in
+//            // totalBytes refers to the size of the file on disk in bytes (data + free space)
+//            // usedBytes refers to the number of bytes used by data in the file
+//
+//            // Compact if the file is over 100MB in size and less than 50% 'used'
+//            let oneMB = 10 * 1024 * 1024
+//            return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
+//    },
+//        objectTypes: [(type == .GamesRealm ? Games.self : PlayedGame.self), FoundedWords.self])
+//    do {
+//        // Realm is compacted on the first open if the configuration block conditions were met.
+//        _ = try Realm(configuration: config)
+//    } catch {
+//        print("error")
+//        // handle error compacting or opening Realm
+//    }
+//
+//    let realm = try! Realm(configuration: config)
+//    return realm
+//}
+
 public func getGames()->Realm? {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let gamesURL = documentsURL.appendingPathComponent("Games.realm")
+        let gamesURL = documentsURL.appendingPathComponent("OrigGames.realm")
         let config = Realm.Configuration(
             fileURL: gamesURL,
             schemaVersion: 4,
@@ -190,7 +213,7 @@ public func getGames()->Realm? {
                 let oneMB = 10 * 1024 * 1024
                 return (totalBytes > oneMB) && (Double(usedBytes) / Double(totalBytes)) < 0.8
         },
-            objectTypes: [Games.self])
+            objectTypes: [GameModel.self, FoundedWords.self])
         do {
             // Realm is compacted on the first open if the configuration block conditions were met.
             _ = try Realm(configuration: config)

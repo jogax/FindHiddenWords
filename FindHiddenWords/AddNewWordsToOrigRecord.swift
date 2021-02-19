@@ -14,7 +14,7 @@ import GameKit
 
 public var origGamesRealm: Realm!
 
-public func getOrigGamesRealm()->Realm {
+public func getOrigGamesRewriteableRealm()->Realm {
     let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     let gamesURL = documentsURL.appendingPathComponent("OrigGames.realm")
     let config = Realm.Configuration(
@@ -40,12 +40,22 @@ public func getOrigGamesRealm()->Realm {
 
 }
 
+private func getOriginalGamesRealm()->Realm {
+    let origGamesConfig = Realm.Configuration(
+        fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
+    readOnly: true,
+    schemaVersion: 1,
+        objectTypes: [GameModel.self, FoundedWords.self])
+    let realm = try! Realm(configuration: origGamesConfig)
+    return realm
+}
+
 class AddNewWordsToOrigRecord {
     var gameSize = 0
     var language = ""
     public func findNewMandatoryWords() {
         AW.addNewWordsRunning = true
-        origGamesRealm = getOrigGamesRealm()
+        origGamesRealm = getOriginalGamesRealm()
         checkOrigRecords()
         var continueSize =  0
         var continueLanguage = ""

@@ -9,7 +9,7 @@
 import Foundation
 import RealmSwift
 
-var playedGame = PlayedGame()
+var playedGame = GameModel()
 class PlayedGame: Object {
     @objc dynamic var primary = ""
     @objc dynamic var language = ""

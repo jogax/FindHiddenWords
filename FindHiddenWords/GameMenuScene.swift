@@ -13,7 +13,6 @@ import RealmSwift
 
 var grid: Grid?
 //var gamesRealm: Realm?
-var playedGamesRealm: Realm?
 var wordLabels = [SKLabelNode]()
 var errorLabel = SKLabelNode(fontNamed: GV.actFont)
 
@@ -443,7 +442,7 @@ class GameMenuScene: SKScene, PlaySearchingWordsDelegate {
     var maxGameNumber = 101
     
     private func checkGameRecords() {
-        let myRealm = getRealm(type: .GamesRealm)
+        let myRealm = getOrigGamesRealm()
         emptyCellsProSize1 = Array(repeating: [0, 0, 0, 0, 0, 0, 0, 0, 0], count: 3)
         emptyCellsProSize2 = Array(repeating: [0, 0, 0, 0, 0, 0, 0, 0, 0], count: 3)
 //        var repeats = 0

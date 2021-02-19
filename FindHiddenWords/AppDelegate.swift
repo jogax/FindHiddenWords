@@ -23,11 +23,12 @@ objectTypes: [NewWordListModel.self])
 let newWordListRealm:Realm = try! Realm(configuration: newWordListConfig)
 
 let origGamesConfig = Realm.Configuration(
-fileURL: URL(string: Bundle.main.path(forResource: "Games", ofType: "realm")!),
+fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
 readOnly: true,
 schemaVersion: 1,
-objectTypes: [Games.self])
-var gamesRealm: Realm = try! Realm(configuration: origGamesConfig)
+    objectTypes: [GameModel.self, FoundedWords.self])
+//var gamesRealm: Realm = try! Realm(configuration: origGamesConfig)
+var originalGamesRealm: Realm = try! Realm(configuration: origGamesConfig)
 
 
 @UIApplicationMain
@@ -136,7 +137,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        }
 //        setGlobalSizes()
         if GV.orientationHandler != nil && GV.target != nil {
-                _ = GV.target!.perform(GV.orientationHandler!)
+            _ = GV.target!.perform(GV.orientationHandler!)
         }
     }
     
@@ -149,7 +150,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        try! origGamesRealm.safeWrite() {
 //            origGamesRealm.delete(newRecords)
 //        }
-        let myOrigGames = gamesRealm.objects(Games.self)
+        let myOrigGames = origGamesRealm.objects(GameModel.self)
 //        let myWordList = realmWordList.objects(WordListModel.self)
         let countRecords = myOrigGames.count
         var countGeneratedRecords = 0
@@ -159,15 +160,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             newRecord.primary = item.primary
             newRecord.language = item.language
             newRecord.gameNumber = item.gameNumber
-            newRecord.gameSize = item.size
+            newRecord.gameSize = item.gameSize
             newRecord.gameArray = item.gameArray
             newRecord.finished = false
             newRecord.timeStamp = item.timeStamp
             newRecord.OK = false
             newRecord.errorCount = item.errorCount
-            let myOrigWords = item.words.components(separatedBy: GV.outerSeparator)
-            for item in myOrigWords {
-                newRecord.wordsToFind.append(FoundedWords(from: item, language: newRecord.language, actRealm: origGamesRealm))
+            for item in item.wordsToFind {
+                newRecord.wordsToFind.append(item)
             }
 
             countGeneratedRecords += 1

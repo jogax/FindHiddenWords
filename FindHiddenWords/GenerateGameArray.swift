@@ -139,7 +139,7 @@ class GenerateGameArray {
         self.size = size
     }
     public func start(new: Bool) {
-        myGamesRealm = getRealm(type: .GamesRealm)
+        myGamesRealm = getOrigGamesRealm()
         print("Start generating: Language: \(GV.actLanguage), Size: \(size), GamNumber: \(GV.gameNumber)")
         let modifierArray = ["en": 111, "de": 222, "hu": 333, "ru": 444]
         basicData = realm.objects(BasicData.self).first!

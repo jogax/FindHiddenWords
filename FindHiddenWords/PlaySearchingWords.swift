@@ -26,6 +26,9 @@ class ObjectSP {
     }
 }
 
+var playedGamesRealm: Realm?
+
+
 class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControllerDelegate, GKGameCenterControllerDelegate {
     func backFromShowGameCenterViewController() {
         self.isHidden = false
@@ -271,7 +274,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         GV.orientationHandler = #selector(handleOrientation)
         self.size = CGSize(width: GV.actWidth, height: GV.actHeight)
         myFont = UIFont(name: myFontName, size: GV.actHeight * 0.03)!
-        playedGamesRealm = getRealm(type: .PlayedGameRealm)
+        playedGamesRealm = getPlayedGamesRealm()
         if delegate != nil {
             myDelegate = delegate
         }
@@ -431,10 +434,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let maxGameNumber = 99
         let startGameNumber = 0
         var primary = GV.actLanguage + GV.innerSeparator + "*" + GV.innerSeparator + String(GV.basicData.gameSize)
-        playedGamesRealm = getRealm(type: .PlayedGameRealm)
-        let actGame = playedGamesRealm!.objects(PlayedGame.self).filter("finished = %d AND primary like %@", false, primary).sorted(byKeyPath: "timeStamp", ascending: true)
+        playedGamesRealm = getPlayedGamesRealm()
+        let actGame = playedGamesRealm!.objects(GameModel.self).filter("finished = %d AND primary like %@", false, primary).sorted(byKeyPath: "timeStamp", ascending: true)
         if actGame.count == 0 {
-            let finishedGames = playedGamesRealm!.objects(PlayedGame.self).filter("primary like %@ AND finished = true",
+            var foundedWordsTable = [FoundedWords]()
+            let finishedGames = playedGamesRealm!.objects(GameModel.self).filter("primary like %@ AND finished = true",
                                                                                   primary).sorted(byKeyPath: "gameNumber", ascending: false)
             if finishedGames.count == 0 {
 //                GV.basicData.gameSize = 8
@@ -450,17 +454,52 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
                 primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
             }
-            let origGame = gamesRealm.objects(Games.self).filter("primary = %@", primary)
+            let origGame = originalGamesRealm.objects(GameModel.self).filter("primary = %@", primary)
             if origGame.count > 0 {
-                let newGame = PlayedGame()
-                newGame.primary = primary
-                newGame.gameSize = GV.basicData.gameSize
-                newGame.language = GV.actLanguage
-                newGame.gameNumber = origGame.first!.gameNumber
-                newGame.gameArray = origGame.first!.gameArray
-                newGame.wordsToFind = mandatoryWordsToWordsToFind(words: origGame.first!.words)
+                var ID = getNextID.incrementID(actRealm: playedGamesRealm)
+                func appendNewFoundedWord(origWord: FoundedWords, mandatory: Bool) {
+                    let newWordToFind = FoundedWords()
+                    newWordToFind.ID = ID
+                    ID += 1
+                    newWordToFind.language = origWord.language
+                    newWordToFind.mandatory = mandatory
+                    newWordToFind.score = origWord.score
+                    newWordToFind.word = origWord.word
+                    newWordToFind.usedLetters = origWord.usedLetters
+                    foundedWordsTable.append(newWordToFind)
+                }
+                let item = origGame.first!
+                let newGame = GameModel()
+                newGame.primary = item.primary
+                newGame.gameSize = item.gameSize
+                newGame.language = item.language
+                newGame.gameNumber = item.gameNumber
+                newGame.gameArray = item.gameArray
+//                newGame.wordsToFind = item.wordsToFind //mandatoryWordsToWordsToFind(words: origGame.first!.words)
                 newGame.finished = false
+                newGame.timeStamp = NSDate()
+                newGame.OK = true
+                newGame.errorCount = 0
+
+                for wordToFind in item.wordsToFind {
+                    appendNewFoundedWord(origWord: wordToFind, mandatory: true)
+                }
+                for myDemo in item.myDemos {
+                    appendNewFoundedWord(origWord: myDemo, mandatory: false)
+                }
+                let sortedTable = foundedWordsTable.sorted(by: {$0.word.count > $1.word.count || $0.word.count == $1.word.count && $0.word < $1.word})
+                let countMandatorysProGameSize = [5 : 15, 6 : 20, 7 : 25, 8 : 35, 9 : 40, 10 : 50]
+                let maxMandatoryCounter = countMandatorysProGameSize[newGame.gameSize]
+                var actCounter = 0
                 try! playedGamesRealm!.safeWrite {
+                    for newItem in foundedWordsTable {
+                        if actCounter < maxMandatoryCounter! {
+                            newGame.wordsToFind.append(sortedTable[actCounter])
+                        } else {
+                            newGame.myDemos.append(sortedTable[actCounter])
+                        }
+                        actCounter += 1
+                    }
                     playedGamesRealm!.add(newGame)
                 }
             }
@@ -1091,13 +1130,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
 
         let primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
-        let origGames = gamesRealm.objects(Games.self).filter("primary = %@", primary)
+        let origGames = originalGamesRealm.objects(GameModel.self).filter("primary = %@", primary)
         if origGames.count > 0 {
             let origGame = origGames.first!
             fillGameArray(gameArray: GV.gameArray, content:  origGame.gameArray, toGrid: GV.playingGrid!)
-            let myGame = playedGamesRealm!.objects(PlayedGame.self).filter("primary = %@", primary)
+            let myGame = playedGamesRealm!.objects(GameModel.self).filter("primary = %@", primary)
             if myGame.count == 0 {
-                createNewPlayedGame(to: origGame)
+                createNewGame()//createNewPlayedGame(to: origGame)
             } else {
                 playedGame = myGame.first!
             }
@@ -1517,20 +1556,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     
-    private func createNewPlayedGame(to origGame: Games) {
+    private func createNewPlayedGame(to origGame: GameModel) {
         try! playedGamesRealm!.safeWrite {
-//            playedGame.myScore = 0
-            playedGame = PlayedGame()
+            playedGame = GameModel()
             playedGame.primary = origGame.primary
             playedGame.language = origGame.language
             playedGame.gameNumber = origGame.gameNumber
-            playedGame.gameSize = origGame.size
+            playedGame.gameSize = origGame.gameSize
             playedGame.gameArray = origGame.gameArray
-            let myWords = origGame.words.components(separatedBy: GV.outerSeparator)
-            for item in myWords {
-                playedGame.wordsToFind.append(FoundedWords(from: item))
-            }
-//            playedGame.wordsToFind = origGame.words
+//            let myWords = origGame.words.components(separatedBy: GV.outerSeparator)
+//            for item in myWords {
+//                playedGame.wordsToFind.append(FoundedWords(from: item))
+//            }
             playedGame.timeStamp = NSDate()
             playedGamesRealm!.add(playedGame)
         }

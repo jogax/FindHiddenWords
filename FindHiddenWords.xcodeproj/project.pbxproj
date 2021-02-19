@@ -85,6 +85,7 @@
 		D020C8D625BDC06100185EF6 /* LightRedOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D525BDC06100185EF6 /* LightRedOctagon.png */; };
 		D020C8DA25BDC66400185EF6 /* GelbOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D020C8D925BDC66400185EF6 /* GelbOctagon.png */; };
 		D02213CD25C448B500BAB3A7 /* LightLilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */; };
+		D03301C225DFDAF000268A69 /* OrigGames.realm in Resources */ = {isa = PBXBuildFile; fileRef = D03301C125DFDAF000268A69 /* OrigGames.realm */; };
 		D04190E325C1991C00621D08 /* offline.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E125C1991C00621D08 /* offline.png */; };
 		D04190E425C1991C00621D08 /* online.png in Resources */ = {isa = PBXBuildFile; fileRef = D04190E225C1991C00621D08 /* online.png */; };
 		D043EBD225D2DA2F008315D7 /* GameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D043EBD125D2DA2F008315D7 /* GameModel.swift */; };
@@ -186,6 +187,7 @@
 		D020C8D525BDC06100185EF6 /* LightRedOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightRedOctagon.png; sourceTree = "<group>"; };
 		D020C8D925BDC66400185EF6 /* GelbOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GelbOctagon.png; sourceTree = "<group>"; };
 		D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = LightLilaOctagon.png; sourceTree = "<group>"; };
+		D03301C125DFDAF000268A69 /* OrigGames.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = OrigGames.realm; sourceTree = "<group>"; };
 		D04190E125C1991C00621D08 /* offline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = offline.png; sourceTree = "<group>"; };
 		D04190E225C1991C00621D08 /* online.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = online.png; sourceTree = "<group>"; };
 		D043EBD125D2DA2F008315D7 /* GameModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameModel.swift; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 		D0124FF025A8ADFF000BCF89 /* ReadOnlyDB */ = {
 			isa = PBXGroup;
 			children = (
+				D03301C125DFDAF000268A69 /* OrigGames.realm */,
 				D0EFE8C025AA2C3A00AF0882 /* Games.realm */,
 				D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */,
 			);
@@ -468,6 +471,7 @@
 				D012502C25A8AEEB000BCF89 /* DarkGreenSprite.png in Resources */,
 				D012502225A8AEEB000BCF89 /* Connection0111x.png in Resources */,
 				D01EE31D25D02DA40099C1E9 /* finger.png in Resources */,
+				D03301C225DFDAF000268A69 /* OrigGames.realm in Resources */,
 				D012503C25A8AEEB000BCF89 /* Connection1000.png in Resources */,
 				D012502925A8AEEB000BCF89 /* RedOctagon.png in Resources */,
 				D012503D25A8AEEB000BCF89 /* Connection0000x.png in Resources */,
