@@ -103,7 +103,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         } catch {
             print("Unable to start notifier")
         }
-        generateNewOrigGamesDB()
         window = UIWindow(frame: UIScreen.main.bounds)
 //        let homeViewController = GameViewController3D()
         let homeViewController = GameViewController()
@@ -141,50 +140,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    private func generateNewOrigGamesDB() {
-        let origGamesRealm = getOrigGamesRealm()
-        let newRecords = origGamesRealm.objects(GameModel.self)
-        if newRecords.count == 2400 {
-            return
-        }
-//        try! origGamesRealm.safeWrite() {
-//            origGamesRealm.delete(newRecords)
-//        }
-        let myOrigGames = origGamesRealm.objects(GameModel.self)
-//        let myWordList = realmWordList.objects(WordListModel.self)
-        let countRecords = myOrigGames.count
-        var countGeneratedRecords = 0
-//        let myHints = realmHints.objects(HintModel.self)
-        for item in myOrigGames {
-            let newRecord = GameModel()
-            newRecord.primary = item.primary
-            newRecord.language = item.language
-            newRecord.gameNumber = item.gameNumber
-            newRecord.gameSize = item.gameSize
-            newRecord.gameArray = item.gameArray
-            newRecord.finished = false
-            newRecord.timeStamp = item.timeStamp
-            newRecord.OK = false
-            newRecord.errorCount = item.errorCount
-            for item in item.wordsToFind {
-                newRecord.wordsToFind.append(item)
-            }
-
-            countGeneratedRecords += 1
-            if countGeneratedRecords % 100 == 0 {
-                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
-            }
-            try! origGamesRealm.safeWrite() {
-                var startID = newRecord.wordsToFind.first!.ID
-                for index in 0..<newRecord.wordsToFind.count {
-                    newRecord.wordsToFind[index].ID = startID
-                    startID += 1
-                }
-                origGamesRealm.add(newRecord)
-            }
-        }
-    }
-
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.

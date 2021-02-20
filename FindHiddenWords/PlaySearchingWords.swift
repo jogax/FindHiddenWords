@@ -83,7 +83,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.horizontalAlignmentMode = .left
 //                fixWordsHeader.plPosSize?.PPos = GV.actWidth * 0.5
-                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language) / \(AW.addingWordData.gameSize) / \(AW.addingWordData.finishedProLanguage) / "
+                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language)(\(AW.addingWordData.gameSize)): \(AW.addingWordData.finishedProLanguage) / "
                 fixWordsHeader.text! += "\(AW.addingWordData.countFoundedWords) / \(AW.addingWordData.lastWord) / \(AW.addingWordData.callIndexesLeft)"
                 lastAddingData.countFoundedWords = AW.addingWordData.countFoundedWords
                 lastAddingData.callIndexesLeft = AW.addingWordData.callIndexesLeft
@@ -121,6 +121,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     var workItem: DispatchWorkItem?
     @objc private func findMoreWords() {
+        generateNewOrigGamesDB()
+
         workItem = DispatchWorkItem { [self] in
             gameHeader.isHidden = true
             let addNewWordsToOrigRecord = AddNewWordsToOrigRecord()
@@ -488,11 +490,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     appendNewFoundedWord(origWord: myDemo, mandatory: false)
                 }
                 let sortedTable = foundedWordsTable.sorted(by: {$0.word.count > $1.word.count || $0.word.count == $1.word.count && $0.word < $1.word})
-                let countMandatorysProGameSize = [5 : 15, 6 : 20, 7 : 25, 8 : 35, 9 : 40, 10 : 50]
+                let countMandatorysProGameSize = [5 : 15, 6 : 20, 7 : 25, 8 : 35, 9 : 40, 10 : 48]
                 let maxMandatoryCounter = countMandatorysProGameSize[newGame.gameSize]
                 var actCounter = 0
                 try! playedGamesRealm!.safeWrite {
-                    for newItem in foundedWordsTable {
+                    for _ in foundedWordsTable {
                         if actCounter < maxMandatoryCounter! {
                             newGame.wordsToFind.append(sortedTable[actCounter])
                         } else {
@@ -1660,7 +1662,67 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return playedGame.myWords.count
     }
 
-//    var myFoundedWords = [UsedWord]()
-    
+    private func generateNewOrigGamesDB() {
+        let origGamesRewriteableRealm = getOrigGamesRewriteableRealm()// getOrigGamesRealm()
+        let origGamesRealm = getOrigGamesRealm()
+        let newRecords = origGamesRewriteableRealm.objects(GameModel.self)
+        if newRecords.count == 2400 {
+            return
+        }
+//        try! origGamesRealm.safeWrite() {
+//            origGamesRealm.delete(newRecords)
+//        }
+        let myOrigGames = origGamesRealm.objects(GameModel.self)
+//        let myWordList = realmWordList.objects(WordListModel.self)
+        let countRecords = myOrigGames.count
+        var countGeneratedRecords = 0
+//        let myHints = realmHints.objects(HintModel.self)
+        for item in myOrigGames {
+//            --------------------
+            let newGame = GameModel()
+            var ID = getNextID.incrementID(actRealm: origGamesRewriteableRealm)
+            func appendNewFoundedWord(origWord: FoundedWords, mandatory: Bool) {
+                let newWord = FoundedWords()
+                newWord.ID = ID
+                ID += 1
+                newWord.language = origWord.language
+                newWord.mandatory = origWord.mandatory
+                newWord.score = origWord.score
+                newWord.word = origWord.word
+                newWord.usedLetters = origWord.usedLetters
+                if mandatory {
+                    newGame.wordsToFind.append(newWord)
+                } else {
+                    newGame.myDemos.append(newWord)
+                }
+            }
+            newGame.primary = item.primary
+            newGame.gameSize = item.gameSize
+            newGame.language = item.language
+            newGame.gameNumber = item.gameNumber
+            newGame.gameArray = item.gameArray
+//                newGame.wordsToFind = item.wordsToFind //mandatoryWordsToWordsToFind(words: origGame.first!.words)
+            newGame.finished = false
+            newGame.timeStamp = NSDate()
+            newGame.OK = item.OK
+            newGame.errorCount = 0
+
+            for wordToFind in item.wordsToFind {
+                appendNewFoundedWord(origWord: wordToFind, mandatory: true)
+            }
+            for demo in item.myDemos {
+                appendNewFoundedWord(origWord: demo, mandatory: false)
+            }
+
+            countGeneratedRecords += 1
+            if countGeneratedRecords % 100 == 0 {
+                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
+            }
+            try! origGamesRewriteableRealm.safeWrite() {
+                origGamesRewriteableRealm.add(newGame)
+            }
+        }
+    }
+
     
 }

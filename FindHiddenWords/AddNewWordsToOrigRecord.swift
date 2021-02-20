@@ -12,7 +12,6 @@ import SpriteKit
 import GameplayKit
 import GameKit
 
-public var origGamesRealm: Realm!
 
 public func getOrigGamesRewriteableRealm()->Realm {
     let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -51,15 +50,17 @@ private func getOriginalGamesRealm()->Realm {
 }
 
 class AddNewWordsToOrigRecord {
+    var origGamesRewriteableRealm: Realm!
     var gameSize = 0
     var language = ""
     public func findNewMandatoryWords() {
         AW.addNewWordsRunning = true
-        origGamesRealm = getOriginalGamesRealm()
+
+        origGamesRewriteableRealm = getOrigGamesRewriteableRealm()
         checkOrigRecords()
         var continueSize =  0
         var continueLanguage = ""
-        let continueRecord = origGamesRealm.objects(GameModel.self).filter("OK = false")
+        let continueRecord = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = false")
         for item in continueRecord {
             if item.myDemos.count > 0 {
                 continueSize = item.gameSize
@@ -84,16 +85,16 @@ class AddNewWordsToOrigRecord {
                         }
                         continueLanguage = ""
                     }
-                    let origRecords = origGamesRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
+                    let origRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("primary beginswith %d and primary endswith %d and OK = false", actLanguage, String(gameSize)).sorted(byKeyPath: "gameNumber", ascending: true)
                     AW.addingWordData = AddingWordData()
                     var countRecords = 0
                     for record in origRecords {
-                        try! origGamesRealm.safeWrite {
-                            origGamesRealm.delete(record.myDemos)
+                        try! origGamesRewriteableRealm.safeWrite {
+                            origGamesRewriteableRealm.delete(record.myDemos)
                         }
                         workingRecord = record
-                        let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
-                        let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize)
+                        let finishedRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true")
+                        let finishedProLanguage = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize)
                         AW.addingWordData.countFinishedRecords = finishedRecords.count
                         AW.addingWordData.language = language
                         AW.addingWordData.finishedProLanguage = finishedProLanguage.count
@@ -111,17 +112,17 @@ class AddNewWordsToOrigRecord {
                     }
                 }
             }
-        } while origGamesRealm.objects(GameModel.self).filter("OK = true").count < 2400
+        } while origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true").count < 2400
     }
     
     private func checkOrigRecords() {
-        let finishedRecords = origGamesRealm.objects(GameModel.self).filter("OK = true")
+        let finishedRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true")
         for record in finishedRecords {
             for item in record.myDemos {
                 if !checkFoundedWordOK(foundedWord: item.getUsedWord()) {
                     print("this record must be deleted: \(item.usedLetters)")
-                    try! origGamesRealm.safeWrite {
-                        origGamesRealm!.delete(item)
+                    try! origGamesRewriteableRealm.safeWrite {
+                        origGamesRewriteableRealm!.delete(item)
                     }
                 }
             }
@@ -174,14 +175,14 @@ class AddNewWordsToOrigRecord {
             AW.addingWordData.callIndexesLeft = cellIndexes.count
             cellIndexes.remove(at: index)
         } while cellIndexes.count > 0
-        try! origGamesRealm.safeWrite {
+        try! origGamesRewriteableRealm.safeWrite {
             workingRecord.OK = true
             AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
         }
         let usedTime = Date().timeIntervalSince(startTime)
-        let finishedCunt = origGamesRealm!.objects(GameModel.self).filter("OK = true").count
-        let finishedProLanguage = origGamesRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize).count
-        print("\(finishedCunt) for size: \(gameSize), language: \(language), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime.twoDecimals) seconds")
+        let finishedCunt = origGamesRewriteableRealm!.objects(GameModel.self).filter("OK = true").count
+        let finishedProLanguage = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize).count
+        print("\(finishedCunt) for language: \(language), size: \(gameSize), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime.twoDecimals) seconds")
     }
     var foundedWord = UsedWord()
 
@@ -198,8 +199,8 @@ class AddNewWordsToOrigRecord {
                 if  !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) &&
                     !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) &&
                     checkFoundedWordOK(foundedWord: foundedWord) {
-                    try! origGamesRealm.safeWrite {
-                        workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRealm))
+                    try! origGamesRewriteableRealm.safeWrite {
+                        workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRewriteableRealm))
                     }
                     AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
                     AW.addingWordData.callIndexesLeft = cellIndexes.count
@@ -283,6 +284,7 @@ class AddNewWordsToOrigRecord {
         }
         return gameArray
     }
-    
+
+
 
 }
