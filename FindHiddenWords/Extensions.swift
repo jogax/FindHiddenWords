@@ -187,6 +187,11 @@ public extension UIDevice {
 }
 
 extension Double {
+    var minSec: String {
+        let min = Int(self / 60)
+        let sec = Int(self) - (min * 60)
+        return "\(min) Min:\(sec) Sec"
+    }
     var twoDecimals: Double {
         return nDecimals(2)
     }

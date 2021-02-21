@@ -81,9 +81,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     override func update(_ currentTime: TimeInterval) {
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
+                fixWordsHeader.plPosSize?.PPos.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
+                fixWordsHeader.position.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
                 fixWordsHeader.horizontalAlignmentMode = .left
 //                fixWordsHeader.plPosSize?.PPos = GV.actWidth * 0.5
-                fixWordsHeader.text = "UPD: \(AW.addingWordData.countFinishedRecords) / \(AW.addingWordData.language)(\(AW.addingWordData.gameSize)): \(AW.addingWordData.finishedProLanguage) / "
+                fixWordsHeader.text = "UPD:\(AW.addingWordData.countFinishedRecords)-\(AW.addingWordData.language)(\(AW.addingWordData.gameSize)): \(AW.addingWordData.finishedProLanguage) / "
                 fixWordsHeader.text! += "\(AW.addingWordData.countFoundedWords) / \(AW.addingWordData.lastWord) / \(AW.addingWordData.callIndexesLeft)"
                 lastAddingData.countFoundedWords = AW.addingWordData.countFoundedWords
                 lastAddingData.callIndexesLeft = AW.addingWordData.callIndexesLeft

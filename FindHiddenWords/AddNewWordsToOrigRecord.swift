@@ -57,10 +57,11 @@ class AddNewWordsToOrigRecord {
         AW.addNewWordsRunning = true
 
         origGamesRewriteableRealm = getOrigGamesRewriteableRealm()
+        printWordCounters()
         checkOrigRecords()
         var continueSize =  0
         var continueLanguage = ""
-        let continueRecord = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = false")
+        let continueRecord = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = false").sorted(byKeyPath: "timeStamp")
         for item in continueRecord {
             if item.myDemos.count > 0 {
                 continueSize = item.gameSize
@@ -103,7 +104,6 @@ class AddNewWordsToOrigRecord {
                         AW.addingWordData.gameNumber = record.gameNumber
                         AW.addingWordData.lastWord = ""
                         AW.addingWordData.countFoundedWords = 0
-//                        print("Start searching in new record: Size: \(gameSize), Language: \(actLanguage), countFinishedRecords: \(finishedRecords.count)")
                         searchMoreWordsInRecord()
                         countRecords += 1
                         if countRecords == 1 {
@@ -171,6 +171,7 @@ class AddNewWordsToOrigRecord {
             let row = actIndex % workingRecord.gameSize
             let workingCell = GV.gameArray[col][row]
             foundedWord.append(UsedLetter(col: workingCell.col, row: workingCell.row, letter: workingCell.letter))
+            resultArray.removeAll()
             recursionWithCells(cell: workingCell)
             AW.addingWordData.callIndexesLeft = cellIndexes.count
             cellIndexes.remove(at: index)
@@ -179,13 +180,14 @@ class AddNewWordsToOrigRecord {
             workingRecord.OK = true
             AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
         }
-        let usedTime = Date().timeIntervalSince(startTime)
+        let usedTime = Double(Date().timeIntervalSince(startTime)).minSec
         let finishedCunt = origGamesRewriteableRealm!.objects(GameModel.self).filter("OK = true").count
         let finishedProLanguage = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true and language = %d and gameSize = %d", language, gameSize).count
-        print("\(finishedCunt) for language: \(language), size: \(gameSize), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime.twoDecimals) seconds")
+        print("\(finishedCunt) for language: \(language), size: \(gameSize), gameNumber: \(workingRecord.gameNumber), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime) seconds")
     }
     var foundedWord = UsedWord()
-
+    var resultArray = [Results<NewWordListModel>]()
+    
     private func recursionWithCells(cell:GameboardItem) {
         if AW.stopSearching {
             AW.stopSearching = false
@@ -194,24 +196,41 @@ class AddNewWordsToOrigRecord {
         let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
         for secondCell in cellsAround {
             foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
-            let possibleWords = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
-            if possibleWords.count == 1 && possibleWords[0].word.endingSubString(at: 2) == foundedWord.word.lowercased() {
-                if  !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) &&
+            var results: Results<NewWordListModel>!
+            if resultArray.count == 0 {
+                results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
+            } else {
+                results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
+//                results = resultArray.last!.filter("word beginswith %d", (language + foundedWord.word).lowercased())
+            }
+            resultArray.append(results)
+//            print("resultArray.count: \(resultArray.count)")
+//            print("foundedWord.word.count: \(foundedWord.word.count), results.count: \(results.count), foundedWord: \(foundedWord.word)")
+            if foundedWord.word.count >= 5 && foundedWord.word.count <= 10 && results.count > 0 {
+                let items = results.filter("word = %d", (language + foundedWord.word).lowercased())
+                if items.count == 1 {
+                    if  !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) &&
                     !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) &&
                     checkFoundedWordOK(foundedWord: foundedWord) {
-                    try! origGamesRewriteableRealm.safeWrite {
-                        workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRewriteableRealm))
+                        try! origGamesRewriteableRealm.safeWrite {
+                            workingRecord.myDemos.append(FoundedWords(fromUsedWord: foundedWord, actRealm: origGamesRewriteableRealm))
+                        }
+                        AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
+                        AW.addingWordData.callIndexesLeft = cellIndexes.count
+                        AW.addingWordData.lastWord = foundedWord.word
+    //                    print ("foundedWord: \(foundedWord.word), CellIndexes left: \(cellIndexes.count)")
                     }
-                    AW.addingWordData.countFoundedWords = workingRecord.myDemos.count
-                    AW.addingWordData.callIndexesLeft = cellIndexes.count
-                    AW.addingWordData.lastWord = foundedWord.word
-//                    print ("foundedWord: \(foundedWord.word), CellIndexes left: \(cellIndexes.count)")
                 }
-            } else if possibleWords.count > 0 {
+            }
+            if results.count > 0 {
                 recursionWithCells(cell: secondCell)
             } else {
-               foundedWord.removeLast()
+                foundedWord.removeLast()
+                resultArray.removeLast()
             }
+        }
+        if resultArray.count > 0 {
+            resultArray.removeLast()
         }
         foundedWord.removeLast()
     }
@@ -283,6 +302,29 @@ class AddNewWordsToOrigRecord {
             }
         }
         return gameArray
+    }
+    
+    private func printWordCounters() {
+        var counterTable = Array(repeating: Array(repeating: 0, count: 6), count: 4)
+        let languageCode = ["hu": 0, "ru": 1, "de": 2, "en": 3]
+        for language in ["hu", "ru", "de", "en"] {
+            for size in 5...10 {
+                let OKCounter = origGamesRewriteableRealm.objects(GameModel.self).filter("language = %d and gameSize = %d and OK = true", language, size).count
+                counterTable[languageCode[language]!][size - 5] = OKCounter
+            }
+        }
+        let huSum = counterTable[0][0] + counterTable[0][1] + counterTable[0][2] + counterTable[0][3] + counterTable[0][4] + counterTable[0][5]
+        let ruSum = counterTable[1][0] + counterTable[1][1] + counterTable[1][2] + counterTable[1][3] + counterTable[1][4] + counterTable[1][5]
+        let deSum = counterTable[2][0] + counterTable[2][1] + counterTable[2][2] + counterTable[2][3] + counterTable[2][4] + counterTable[2][5]
+        let enSum = counterTable[3][0] + counterTable[3][1] + counterTable[3][2] + counterTable[3][3] + counterTable[3][4] + counterTable[3][5]
+        print("Size    hu    ru    de    en   ")
+        print("  5     \(counterTable[0][0])    \(counterTable[1][0])    \(counterTable[2][0])    \(counterTable[3][0])")
+        print("  6     \(counterTable[0][1])    \(counterTable[1][1])    \(counterTable[2][1])    \(counterTable[3][1])")
+        print("  7     \(counterTable[0][2])    \(counterTable[1][2])    \(counterTable[2][2])    \(counterTable[3][2])")
+        print("  8     \(counterTable[0][3])    \(counterTable[1][3])    \(counterTable[2][3])    \(counterTable[3][3])")
+        print("  9     \(counterTable[0][4])    \(counterTable[1][4])    \(counterTable[2][4])    \(counterTable[3][4])")
+        print(" 10    \(counterTable[0][5])   \(counterTable[1][5])    \(counterTable[2][5])    \(counterTable[3][5])")
+        print("All    \(huSum)   \(ruSum)   \(deSum)   \(enSum)")
     }
 
 
