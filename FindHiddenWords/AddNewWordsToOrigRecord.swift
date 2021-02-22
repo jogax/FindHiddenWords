@@ -116,22 +116,34 @@ class AddNewWordsToOrigRecord {
     }
     
     private func checkOrigRecords() {
-        let finishedRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true")
+        let finishedRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true").sorted(byKeyPath: "primary")
+        countDeletedItems = 0
         for record in finishedRecords {
+            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items before: \(record.myDemos.count)")
             for item in record.myDemos {
                 if !checkFoundedWordOK(foundedWord: item.getUsedWord()) {
-                    print("this record must be deleted: \(item.usedLetters)")
+                    countDeletedItems += 1
+                    print("\(countDeletedItems). Item \(item.word) (\(item.usedLetters)) must be deleted from record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))")
                     try! origGamesRewriteableRealm.safeWrite {
                         origGamesRewriteableRealm!.delete(item)
                     }
                 }
             }
+            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items after: \(record.myDemos.count)")
+            print()
         }
     }
+    var countDeletedItems = 0
     private func checkFoundedWordOK(foundedWord: UsedWord)->Bool {
         let letters = foundedWord.usedLetters
+        func notNeighbours(letter1: UsedLetter, letter2: UsedLetter)->Bool {
+            return abs(letter1.col - letter2.col) > 1 || abs(letter1.row - letter2.row) > 1
+        }
         for (index, usedLetter) in letters.enumerated() {
             if index < letters.count - 1 {
+                if notNeighbours(letter1: usedLetter, letter2: letters[index + 1]) {
+                    return false
+                }
                 for ind in index + 1..<letters.count {
                     if usedLetter == letters[ind] {
                         return false

@@ -445,7 +445,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let finishedGames = playedGamesRealm!.objects(GameModel.self).filter("primary like %@ AND finished = true",
                                                                                   primary).sorted(byKeyPath: "gameNumber", ascending: false)
             if finishedGames.count == 0 {
-//                GV.basicData.gameSize = 8
                 GV.gameNumber = startGameNumber
                 primary = GV.actLanguage + GV.innerSeparator + String(GV.gameNumber) + GV.innerSeparator + String(GV.basicData.gameSize)
             } else {
