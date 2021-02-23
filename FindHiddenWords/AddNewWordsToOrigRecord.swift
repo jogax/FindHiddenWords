@@ -53,6 +53,7 @@ class AddNewWordsToOrigRecord {
     var origGamesRewriteableRealm: Realm!
     var gameSize = 0
     var language = ""
+    
     public func findNewMandatoryWords() {
         AW.addNewWordsRunning = true
 

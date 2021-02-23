@@ -620,6 +620,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //    }
     var choosedWord = UsedWord()
     var movingLocations = [CGPoint]()
+    let MovingValue = 1000
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         demoModus = false
         let touchLocation = touches.first!.location(in: self)
@@ -637,8 +638,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             choosedWord.append(UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter))
             colRowTable.append(ColRow(col: col, row: row, count: 1))
             GV.gameArray[col][row].setStatus(toStatus: .Temporary)
+        } else if col == MovingValue {
+            actPosition = touchLocation
         }
     }
+    
+    var actPosition = CGPoint()
     
     private func stopShowingTableIfNeeded() {
         if tableType == .None {
@@ -681,13 +686,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     private func myTouchesMoved(touchLocation: CGPoint) {
         movingLocations.append(touchLocation)
         let (OK, col, row) = analyzeNodesAtLocation(location: touchLocation)
-        let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
-        if demoModus {
-            choosedWord.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
-            GV.gameArray[col][row].setStatus(toStatus: .Temporary)
-            return
-        }
+        
         if OK {
+            let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
+            if demoModus {
+                choosedWord.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
+                GV.gameArray[col][row].setStatus(toStatus: .Temporary)
+                return
+            }
             var lastIndex = colRowTable.count - 1
             if lastIndex >= 0 && colRowTable[lastIndex].col == col && colRowTable[lastIndex].row == row  {
                 colRowTable[lastIndex].count += 1
@@ -719,6 +725,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     colRowTable.removeLast()
                 }
             }
+        } else if col == MovingValue {
+            for child in gameLayer.children {
+                if child.name == LabelName {
+                    let label = child as! MyFoundedWord
+                    label.position.x += touchLocation.x - actPosition.x
+                }
+            }
+            actPosition.x = touchLocation.x
         }
     }
     
@@ -1073,7 +1087,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return connectionTypes
     }
 
-    
     private func analyzeNodesAtLocation(location: CGPoint)->(OK: Bool, col: Int, row: Int) {
         let nodes = self.nodes(at: location)
         for node in nodes {
@@ -1084,6 +1097,17 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         if let row = Int(parts![2]) {
                             return(OK: true, col: col, row: row)
                         }
+                    }
+                }
+            }
+            if node.name == MovingLayerName {
+                if UIDevice.current.orientation.isPortrait {
+                    if location.x < (GV.playingGrid?.frame.minY)! {
+                        return(OK: false, col: MovingValue, row: 0)
+                    }
+                } else {
+                    if location.y < (GV.playingGrid?.frame.minX)! {
+                        return(OK: false, col: MovingValue, row: 0)
                     }
                 }
             }
@@ -1102,6 +1126,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     var scoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
+    var movingLayer: SKSpriteNode?
+    let MovingLayerName = "MovingLayer"
     public func playingGame() {
 
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
@@ -1148,7 +1174,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
-//            fillMandatoryWords()
+            if movingLayer == nil {
+                movingLayer = SKSpriteNode()
+                movingLayer!.position = CGPoint(x: GV.actWidth * 0.5, y: GV.actHeight * 0.25)
+                movingLayer!.size = CGSize(width: GV.actWidth, height: GV.actHeight * 0.4)
+                movingLayer!.name = MovingLayerName
+                gameLayer.addChild(movingLayer!)
+            }
             generateLabels()
 //            setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
@@ -1466,6 +1498,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return (returnWords, maxLength)
     }
     
+    let LabelName = "WordToFind"
+    
     private func generateLabels() {
         var counter = 0
         func setPLPos(counter: Int)->PLPosSize {
@@ -1482,8 +1516,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         for item in playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
             if !myLabels.contains(where: {$0.usedWord! == item.getUsedWord()}) {
                 let myWord = MyFoundedWord(usedWord: item.getUsedWord(), mandatory: true, prefixValue: counter + 1)
+                myWord.name = LabelName
                 myWord.plPosSize = setPLPos(counter: counter)
                 myWord.setActPosSize()
+                myWord.zPosition = GV.playingGrid!.zPosition
                 gameLayer.addChild(myWord)
                 myLabels.append(myWord)
             }
