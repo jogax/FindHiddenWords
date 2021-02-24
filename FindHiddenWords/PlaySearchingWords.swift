@@ -72,11 +72,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         } else {
             myAlert.addAction(text: .tcSearchingMoreWords, action: #selector(self.findMoreWords))
         }
+        myAlert.addAction(text: .tcDisable, action: #selector(self.disableDeveloperMenu))
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
     var lastAddingData = AddingWordData()
+    
+    @objc private func disableDeveloperMenu() {
+        showDeveloperButton.isHidden = true
+    }
 
     override func update(_ currentTime: TimeInterval) {
         if AW.addNewWordsRunning {
@@ -1100,7 +1105,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     }
                 }
             }
-            if node.name == MovingLayerName {
+            
+            if node.name == MovingLayerName && labelsMoveable {
                 if UIDevice.current.orientation.isPortrait {
                     if location.x < (GV.playingGrid?.frame.minY)! {
                         return(OK: false, col: MovingValue, row: 0)
@@ -1499,7 +1505,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     let LabelName = "WordToFind"
-    
+    var labelsMoveable = false
     private func generateLabels() {
         var counter = 0
         func setPLPos(counter: Int)->PLPosSize {
@@ -1524,6 +1530,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myLabels.append(myWord)
             }
             counter += 1
+        }
+        if myLabels.last!.frame.maxX - myLabels[0].frame.minX > GV.actWidth {
+            labelsMoveable = true
         }
 
     }

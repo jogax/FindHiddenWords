@@ -65,4 +65,5 @@ let huDictionary: [TextConstants: String] = [
     .tcGameCenter:              "GameCenter ViewController",
     .tcSearchingMoreWords:      "Új szavak keresése",
     .tcStopSearching:           "Keresés leállítása",
+    .tcDisable:                 "Fejlesztői menü deakt.",
 ]

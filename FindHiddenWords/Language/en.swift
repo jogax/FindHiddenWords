@@ -67,4 +67,5 @@ let enDictionary: [TextConstants: String] = [
     .tcGameCenter:              "GameCenter ViewController",
     .tcSearchingMoreWords:      "Search new words",
     .tcStopSearching:           "Stop searching",
+    .tcDisable:                 "Disable DeveloperButton",
 ]

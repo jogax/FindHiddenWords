@@ -65,4 +65,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcGameCenter:              "GameCenter ViewController",
     .tcSearchingMoreWords:      "Ищи новые слова",
     .tcStopSearching:           "Поиск остановить",
+    .tcDisable:                 "Отключить кнопку разработчика",
 ]
