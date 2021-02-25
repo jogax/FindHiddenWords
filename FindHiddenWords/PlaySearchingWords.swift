@@ -731,10 +731,17 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
         } else if col == MovingValue {
-            for child in gameLayer.children {
-                if child.name == LabelName {
-                    let label = child as! MyFoundedWord
-                    label.position.x += touchLocation.x - actPosition.x
+            if (touchLocation.x - actPosition.x) > 0 {
+                if myLabels.first!.frame.minX < 10 {
+                    for label in myLabels {
+                        label.position.x += (touchLocation.x - actPosition.x)
+                    }
+                }
+            } else {
+                if myLabels.last!.frame.maxX > GV.actWidth - 15 {
+                    for label in myLabels {
+                        label.position.x += (touchLocation.x - actPosition.x)
+                    }
                 }
             }
             actPosition.x = touchLocation.x
@@ -1108,14 +1115,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             
             if node.name == MovingLayerName && labelsMoveable {
                 if UIDevice.current.orientation.isPortrait {
-                    if location.x < (GV.playingGrid?.frame.minY)! {
+//                    if location.x < (GV.playingGrid?.frame.minY)! {
                         return(OK: false, col: MovingValue, row: 0)
-                    }
-                } else {
+//                    }
+                } /*else {
                     if location.y < (GV.playingGrid?.frame.minX)! {
                         return(OK: false, col: MovingValue, row: 0)
                     }
-                }
+                }*/
             }
         }
         return (OK:false, col: 0, row: 0)
@@ -1180,14 +1187,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
-            if movingLayer == nil {
+            generateLabels()
+
+            if movingLayer == nil && labelsMoveable {
+                let labelsSize = CGSize(width: abs(maxPosition.x - myLabels.first!.frame.minX), height: abs(myLabels.first!.frame.maxY - maxPosition.y) + myLabels.first!.frame.size.height)
+//                let labelsMidPoint = CGPoint(x: abs(myLabels.last!.frame.maxX - myLabels.first!.frame.minX) / 2, y: labelsSize.height)
+                let labelsMidPoint = CGPoint(x: GV.actWidth / 2, y: labelsSize.height)
                 movingLayer = SKSpriteNode()
-                movingLayer!.position = CGPoint(x: GV.actWidth * 0.5, y: GV.actHeight * 0.25)
-                movingLayer!.size = CGSize(width: GV.actWidth, height: GV.actHeight * 0.4)
+                movingLayer!.position = labelsMidPoint
+                movingLayer!.size = labelsSize
+//                movingLayer!.color = .green
                 movingLayer!.name = MovingLayerName
                 gameLayer.addChild(movingLayer!)
             }
-            generateLabels()
 //            setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
             showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getCountWords())), action: #selector(showMyWords), buttonType: .WordsButton)
@@ -1506,6 +1518,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     let LabelName = "WordToFind"
     var labelsMoveable = false
+    var maxPosition = CGPoint(x: 0, y: 10000)
     private func generateLabels() {
         var counter = 0
         func setPLPos(counter: Int)->PLPosSize {
@@ -1528,10 +1541,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myWord.zPosition = GV.playingGrid!.zPosition
                 gameLayer.addChild(myWord)
                 myLabels.append(myWord)
+                if myWord.frame.maxX > maxPosition.x {
+                    maxPosition.x = myWord.frame.maxX
+                }
+                if myWord.frame.maxY < maxPosition.y {
+                    maxPosition.y = myWord.frame.maxY
+                }
             }
             counter += 1
         }
-        if myLabels.last!.frame.maxX - myLabels[0].frame.minX > GV.actWidth {
+        if maxPosition.x + myLabels[0].frame.minX > GV.actWidth {
             labelsMoveable = true
         }
 

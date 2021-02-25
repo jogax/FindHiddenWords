@@ -32,6 +32,8 @@ class MySounds {
         return audioPlayer
     }
     public func play(_ sound: Sounds) {
-        players[sound]!.play()
+        #if !targetEnvironment(simulator)
+            players[sound]!.play()
+        #endif
     }
 }
