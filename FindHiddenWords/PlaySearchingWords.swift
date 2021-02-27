@@ -496,7 +496,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     appendNewFoundedWord(origWord: myDemo, mandatory: false)
                 }
                 let sortedTable = foundedWordsTable.sorted(by: {$0.word.count > $1.word.count || $0.word.count == $1.word.count && $0.word < $1.word})
-                let countMandatorysProGameSize = [5 : 15, 6 : 20, 7 : 25, 8 : 35, 9 : 40, 10 : 48]
+                let countMandatorysProGameSize = [5 : 30, 6 : 35, 7 : 40, 8 : 50, 9 : 55, 10 : 60]
                 let maxMandatoryCounter = countMandatorysProGameSize[newGame.gameSize]
                 var actCounter = 0
                 try! playedGamesRealm!.safeWrite {
@@ -1728,6 +1728,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
 
     private func generateNewOrigGamesDB() {
+        var gameNumberArray: [Int] = (0..<100).indices.map { $0 } // 0,1,2,3...99
+        var newGameNumberArray = [Int]()
+        while gameNumberArray.count > 0 {
+            let index = Int.random(in: 0..<gameNumberArray.count)
+            newGameNumberArray.append(gameNumberArray[index])
+            gameNumberArray.remove(at: index)
+        }
         let origGamesRewriteableRealm = getOrigGamesRewriteableRealm()// getOrigGamesRealm()
         let origGamesRealm = getOrigGamesRealm()
         let newRecords = origGamesRewriteableRealm.objects(GameModel.self)
@@ -1737,7 +1744,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        try! origGamesRealm.safeWrite() {
 //            origGamesRealm.delete(newRecords)
 //        }
-        let myOrigGames = origGamesRealm.objects(GameModel.self)
+        let myOrigGames = origGamesRealm.objects(GameModel.self).sorted(byKeyPath: "gameNumber", ascending: true)
 //        let myWordList = realmWordList.objects(WordListModel.self)
         let countRecords = myOrigGames.count
         var countGeneratedRecords = 0
@@ -1761,12 +1768,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     newGame.myDemos.append(newWord)
                 }
             }
-            newGame.primary = item.primary
             newGame.gameSize = item.gameSize
             newGame.language = item.language
-            newGame.gameNumber = item.gameNumber
+            newGame.gameNumber = newGameNumberArray[item.gameNumber]
             newGame.gameArray = item.gameArray
-//                newGame.wordsToFind = item.wordsToFind //mandatoryWordsToWordsToFind(words: origGame.first!.words)
+            newGame.primary = item.language + GV.innerSeparator + String(newGame.gameNumber) + GV.innerSeparator + String(item.gameSize)
             newGame.finished = false
             newGame.timeStamp = NSDate()
             newGame.OK = item.OK

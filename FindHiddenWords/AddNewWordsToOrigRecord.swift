@@ -39,16 +39,16 @@ public func getOrigGamesRewriteableRealm()->Realm {
 
 }
 
-private func getOriginalGamesRealm()->Realm {
-    let origGamesConfig = Realm.Configuration(
-        fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
-    readOnly: true,
-    schemaVersion: 1,
-        objectTypes: [GameModel.self, FoundedWords.self])
-    let realm = try! Realm(configuration: origGamesConfig)
-    return realm
-}
-
+//private func getOriginalGamesRealm()->Realm {
+//    let origGamesConfig = Realm.Configuration(
+//        fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
+//    readOnly: true,
+//    schemaVersion: 1,
+//        objectTypes: [GameModel.self, FoundedWords.self])
+//    let realm = try! Realm(configuration: origGamesConfig)
+//    return realm
+//}
+//
 class AddNewWordsToOrigRecord {
     var origGamesRewriteableRealm: Realm!
     var gameSize = 0
