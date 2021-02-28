@@ -199,7 +199,6 @@ class AddNewWordsToOrigRecord {
         print("\(finishedCunt) for language: \(language), size: \(gameSize), gameNumber: \(workingRecord.gameNumber), finished: \(finishedProLanguage) found: \(workingRecord.myDemos.count) words in \(usedTime) seconds")
     }
     var foundedWord = UsedWord()
-//    var resultArray = [Results<NewWordListModel>]()
     
     private func recursionWithCells(cell:GameboardItem) {
         if AW.stopSearching {
@@ -208,21 +207,16 @@ class AddNewWordsToOrigRecord {
         }
         let cellsAround = getCellsAround(cell: cell, exclude: foundedWord.usedLetters)
         for secondCell in cellsAround {
+            var countResults = 0
+            var results: Results<NewWordListModel>
             foundedWord.append(UsedLetter(col: secondCell.col, row: secondCell.row, letter: secondCell.letter))
-//            var results: Results<NewWordListModel>!
-            let results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
-//            if resultArray.count == 0 {
-//                results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
-//            } else {
-//                results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
-////                results = resultArray.last!.filter("word beginswith %d", (language + foundedWord.word).lowercased())
-//            }
-//            resultArray.append(results)
-//            print("resultArray.count: \(resultArray.count)")
-//            print("foundedWord.word.count: \(foundedWord.word.count), results.count: \(results.count), foundedWord: \(foundedWord.word)")
-            if foundedWord.word.count >= 5 && foundedWord.word.count <= 10 && results.count > 0 {
-                let items = results.filter("word = %d", (language + foundedWord.word).lowercased())
-                if items.count == 1 {
+            if foundedWord.word.count < 5 {
+                results = allCheckedWords.filter("word beginswith %d", (language + foundedWord.word).lowercased())
+                countResults = results.count
+            } else if foundedWord.word.count >= 5 && foundedWord.word.count <= 10 {
+                results = allCheckedWords.filter("word = %d", (language + foundedWord.word).lowercased())
+                countResults = results.count
+                if results.count == 1 {
                     if  !workingRecord.wordsToFind.contains(where: {$0.word == foundedWord.word}) &&
                     !workingRecord.myDemos.contains(where: {$0.word == foundedWord.word}) &&
                     checkFoundedWordOK(foundedWord: foundedWord) {
@@ -236,16 +230,12 @@ class AddNewWordsToOrigRecord {
                     }
                 }
             }
-            if results.count > 0 {
+            if countResults > 0 {
                 recursionWithCells(cell: secondCell)
             } else {
                 foundedWord.removeLast()
-//                resultArray.removeLast()
             }
         }
-//        if resultArray.count > 0 {
-//            resultArray.removeLast()
-//        }
         foundedWord.removeLast()
     }
     
