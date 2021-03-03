@@ -956,7 +956,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             animateLetters(newWord: choosedWord, type: .WordIsOK)
             mySounds.play(.OKWord)
             setGameArrayToActualState()
-            let title = GV.language.getText(.tcShowMyWords, values: String(getCountWords()))
+            let title = GV.language.getText(.tcShowMyWords, values: String(countWords))
             showMyWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         }
     }
@@ -1029,9 +1029,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             playedGame.finished = true
         }
         let score = getScore()
-        let countWords = getCountWords()
         let myAlert = MyAlertController(title: GV.language.getText(.tcCongratulations),
-                                        message: GV.language.getText(.tcFinishGameMessage, values: String(countWords), String(score)),
+                                        message: GV.language.getText(.tcFinishGameMessage, values: String(countWords), String(countNewWords), String(score)),
                                           size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
                                           target: self,
                                           type: .Green)
@@ -1202,7 +1201,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
 //            setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
-            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(getCountWords())), action: #selector(showMyWords), buttonType: .WordsButton)
+            showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
             #if DEBUG
             if GCHelper.shared.getName() == GV.myGCName {
                 showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
@@ -1723,9 +1722,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return playedGame.myWords.sum(ofProperty: "score")
     }
     
-    private func getCountWords()->Int {
-        return playedGame.myWords.count
+    var countWords: Int {
+        get {
+            return playedGame.myWords.count
+        }
     }
+    var countNewWords: Int {
+        get {
+            return playedGame.myWords.count - playedGame.wordsToFind.count
+        }
+    }
+//    private func getCountWords()->(Int, Int) {
+//        let countWords = playedGame.myWords.count
+//        let countNewWords = countWords - playedGame.wordsToFind.count
+//        return (countWords, countNewWords)
+//    }
 
     private func generateNewOrigGamesDB() {
         var gameNumberArray: [Int] = (0..<100).indices.map { $0 } // 0,1,2,3...99
@@ -1746,8 +1757,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        }
         let myOrigGames = origGamesRealm.objects(GameModel.self).sorted(byKeyPath: "gameNumber", ascending: true)
 //        let myWordList = realmWordList.objects(WordListModel.self)
-        let countRecords = myOrigGames.count
+//        let countRecords = myOrigGames.count
         var countGeneratedRecords = 0
+        var countRecordsToGenerate = 0
 //        let myHints = realmHints.objects(HintModel.self)
         for item in myOrigGames {
 //            --------------------
@@ -1770,7 +1782,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             newGame.gameSize = item.gameSize
             newGame.language = item.language
-            newGame.gameNumber = newGameNumberArray[item.gameNumber]
+            newGame.gameNumber = item.gameNumber //newGameNumberArray[item.gameNumber]
             newGame.gameArray = item.gameArray
             newGame.primary = item.language + GV.innerSeparator + String(newGame.gameNumber) + GV.innerSeparator + String(item.gameSize)
             newGame.finished = false
@@ -1784,10 +1796,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for demo in item.myDemos {
                 appendNewFoundedWord(origWord: demo, mandatory: false)
             }
+            if newGame.OK && item.myDemos.count < 5 {
+                countRecordsToGenerate += 1
+                print ("countRecords: \(countRecordsToGenerate), language: \(newGame.language), size: \(newGame.gameSize), gameNumber: \(newGame.gameNumber), countWords: \(item.myDemos.count)")
+            }
 
             countGeneratedRecords += 1
             if countGeneratedRecords % 100 == 0 {
-                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
+//                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
             }
             try! origGamesRewriteableRealm.safeWrite() {
                 origGamesRewriteableRealm.add(newGame)

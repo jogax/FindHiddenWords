@@ -120,7 +120,7 @@ class AddNewWordsToOrigRecord {
         let finishedRecords = origGamesRewriteableRealm.objects(GameModel.self).filter("OK = true").sorted(byKeyPath: "primary")
         countDeletedItems = 0
         for record in finishedRecords {
-            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items before: \(record.myDemos.count)")
+//            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items before: \(record.myDemos.count)")
             for item in record.myDemos {
                 if !checkFoundedWordOK(foundedWord: item.getUsedWord()) {
                     countDeletedItems += 1
@@ -130,7 +130,7 @@ class AddNewWordsToOrigRecord {
                     }
                 }
             }
-            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items after: \(record.myDemos.count)")
+//            print("In Record: (\(record.language)-\(record.gameSize)-\(record.gameNumber))  count items after: \(record.myDemos.count)")
             print()
         }
     }

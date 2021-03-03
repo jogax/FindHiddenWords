@@ -43,7 +43,7 @@ let enDictionary: [TextConstants: String] = [
     .tcFinishedGame:            "Finished Games",
     .tcAlphabet:                "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     .tcCongratulations:         "Congratulations!",
-    .tcFinishGameMessage:       "You have finished the Game. ° You found % new words ° and got % points! ° Now starts a new game.",
+    .tcFinishGameMessage:       "You have finished the Game. ° You found % words ° (% new) ° and got % points! ° Now starts a new game.",
     .tcOK:                      "OK",
     .tcScore:                   "My Score: %, Best Score: %",
     .tcShowMyWords:             "Words (%)",
