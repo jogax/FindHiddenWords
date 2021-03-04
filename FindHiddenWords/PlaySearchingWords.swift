@@ -1760,6 +1760,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        let countRecords = myOrigGames.count
         var countGeneratedRecords = 0
         var countRecordsToGenerate = 0
+        var lineCount = 0
+
 //        let myHints = realmHints.objects(HintModel.self)
         for item in myOrigGames {
 //            --------------------
@@ -1793,14 +1795,39 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for wordToFind in item.wordsToFind {
                 appendNewFoundedWord(origWord: wordToFind, mandatory: true)
             }
+            var countWords5 = 0
+            var countWords6 = 0
+            var countWords7 = 0
+            var countWords8 = 0
+            var countWords9 = 0
+            var countWords10 = 0
+            var countWordsLongerAsFive = 0
+            for demo in item.myDemos {
+                countWords5 += demo.word.count == 5 ? 1 : 0
+                countWords6 += demo.word.count == 6 ? 1 : 0
+                countWords7 += demo.word.count == 7 ? 1 : 0
+                countWords8 += demo.word.count == 8 ? 1 : 0
+                countWords9 += demo.word.count == 9 ? 1 : 0
+                countWords10 += demo.word.count == 10 ? 1 : 0
+                countWordsLongerAsFive += demo.word.count > 5 ? 1 : 0
+            }
+            if countWordsLongerAsFive < 2 {
+                lineCount += 1
+                print("LineCount: \(lineCount): countWordsLongerAsFive: \(countWordsLongerAsFive), language: \(item.language), size: \(item.gameSize), gameNumber: \(item.gameNumber)")
+                try! origGamesRewriteableRealm.safeWrite {
+                    newGame.OK = false
+                }
+            }
             for demo in item.myDemos {
                 appendNewFoundedWord(origWord: demo, mandatory: false)
             }
-            if newGame.OK && item.myDemos.count < 5 {
+            if newGame.OK && item.myDemos.count < 4 {
                 countRecordsToGenerate += 1
                 print ("countRecords: \(countRecordsToGenerate), language: \(newGame.language), size: \(newGame.gameSize), gameNumber: \(newGame.gameNumber), countWords: \(item.myDemos.count)")
+                try! origGamesRewriteableRealm.safeWrite {
+                    newGame.OK = false
+                }
             }
-
             countGeneratedRecords += 1
             if countGeneratedRecords % 100 == 0 {
 //                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
