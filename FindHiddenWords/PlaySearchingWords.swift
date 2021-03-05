@@ -604,7 +604,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
                     setGameArrayToActualState()
                     if GV.justStarted && GV.basicData.showDemo {
-//                        showDemo()
+                        showDemo()
 //                        xxx
                     }
 
@@ -793,7 +793,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWord()
+                                animateWords()
                             } else {
                                 demoModus = false
                             }
@@ -829,7 +829,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWord()
+                                animateWords()
                             } else {
                                 demoModus = false
                             }
@@ -887,7 +887,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWord()
+                                animateWords()
                             } else {
                                 demoModus = false
                             }
@@ -1222,7 +1222,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var wordsToAnimate = [WordsToAnimate]()
     private func showDemo() {
         
-        for item in playedGame.myWords {
+        for item in playedGame.wordsToFind {
             let usedWord = item.getUsedWord()
             let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
             wordsToAnimate.append(wordToAppend)
@@ -1232,7 +1232,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
         })
-        animateWord()
+        animateWords()
 //        var myActions = [SKAction]()
 
 //        for item in wordsToAnimate {
@@ -1250,7 +1250,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        fingerSprite.run(sequence)
     }
     
-    @objc private func animateWord() {
+    @objc private func animateWords() {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
             let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
@@ -1706,6 +1706,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
 
 
+        } else if demoModus {
+            return true
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
         }
@@ -1759,8 +1761,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        let myWordList = realmWordList.objects(WordListModel.self)
 //        let countRecords = myOrigGames.count
         var countGeneratedRecords = 0
-        var countRecordsToGenerate = 0
-        var lineCount = 0
+//        var countRecordsToGenerate = 0
+//        var lineCount = 0
 
 //        let myHints = realmHints.objects(HintModel.self)
         for item in myOrigGames {
@@ -1784,7 +1786,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             newGame.gameSize = item.gameSize
             newGame.language = item.language
-            newGame.gameNumber = item.gameNumber //newGameNumberArray[item.gameNumber]
+            if item.errorCount == 0 {
+                newGame.errorCount = item.gameNumber
+            }
+            newGame.gameNumber = newGameNumberArray[item.gameNumber]
             newGame.gameArray = item.gameArray
             newGame.primary = item.language + GV.innerSeparator + String(newGame.gameNumber) + GV.innerSeparator + String(item.gameSize)
             newGame.finished = false
@@ -1795,39 +1800,39 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for wordToFind in item.wordsToFind {
                 appendNewFoundedWord(origWord: wordToFind, mandatory: true)
             }
-            var countWords5 = 0
-            var countWords6 = 0
-            var countWords7 = 0
-            var countWords8 = 0
-            var countWords9 = 0
-            var countWords10 = 0
-            var countWordsLongerAsFive = 0
-            for demo in item.myDemos {
-                countWords5 += demo.word.count == 5 ? 1 : 0
-                countWords6 += demo.word.count == 6 ? 1 : 0
-                countWords7 += demo.word.count == 7 ? 1 : 0
-                countWords8 += demo.word.count == 8 ? 1 : 0
-                countWords9 += demo.word.count == 9 ? 1 : 0
-                countWords10 += demo.word.count == 10 ? 1 : 0
-                countWordsLongerAsFive += demo.word.count > 5 ? 1 : 0
-            }
-            if countWordsLongerAsFive < 2 {
-                lineCount += 1
-                print("LineCount: \(lineCount): countWordsLongerAsFive: \(countWordsLongerAsFive), language: \(item.language), size: \(item.gameSize), gameNumber: \(item.gameNumber)")
-                try! origGamesRewriteableRealm.safeWrite {
-                    newGame.OK = false
-                }
-            }
+//            var countWords5 = 0
+//            var countWords6 = 0
+//            var countWords7 = 0
+//            var countWords8 = 0
+//            var countWords9 = 0
+//            var countWords10 = 0
+//            var countWordsLongerAsFive = 0
+//            for demo in item.myDemos {
+//                countWords5 += demo.word.count == 5 ? 1 : 0
+//                countWords6 += demo.word.count == 6 ? 1 : 0
+//                countWords7 += demo.word.count == 7 ? 1 : 0
+//                countWords8 += demo.word.count == 8 ? 1 : 0
+//                countWords9 += demo.word.count == 9 ? 1 : 0
+//                countWords10 += demo.word.count == 10 ? 1 : 0
+//                countWordsLongerAsFive += demo.word.count > 5 ? 1 : 0
+//            }
+//            if newGame.OK && countWordsLongerAsFive == 0  {
+//                lineCount += 1
+//                print("LineCount: \(lineCount): countWordsLongerAsFive: \(countWordsLongerAsFive), language: \(item.language), size: \(item.gameSize), gameNumber: \(item.gameNumber)")
+//                try! origGamesRewriteableRealm.safeWrite {
+//                    newGame.OK = false
+//                }
+//            }
             for demo in item.myDemos {
                 appendNewFoundedWord(origWord: demo, mandatory: false)
             }
-            if newGame.OK && item.myDemos.count < 4 {
-                countRecordsToGenerate += 1
-                print ("countRecords: \(countRecordsToGenerate), language: \(newGame.language), size: \(newGame.gameSize), gameNumber: \(newGame.gameNumber), countWords: \(item.myDemos.count)")
-                try! origGamesRewriteableRealm.safeWrite {
-                    newGame.OK = false
-                }
-            }
+//            if newGame.OK && item.myDemos.count + item.wordsToFind.count  < 9 {
+//                countRecordsToGenerate += 1
+//                print ("countRecords: \(countRecordsToGenerate), language: \(newGame.language), size: \(newGame.gameSize), gameNumber: \(newGame.gameNumber), countWords: \(item.myDemos.count)")
+//                try! origGamesRewriteableRealm.safeWrite {
+//                    newGame.OK = false
+//                }
+//            }
             countGeneratedRecords += 1
             if countGeneratedRecords % 100 == 0 {
 //                print("Generated \(countGeneratedRecords) Records from \(countRecords) (\(((CGFloat(countGeneratedRecords) / CGFloat(countRecords)) * 100).nDecimals(n: 3)) %)")
