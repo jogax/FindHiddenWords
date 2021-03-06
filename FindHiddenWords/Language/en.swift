@@ -68,4 +68,6 @@ let enDictionary: [TextConstants: String] = [
     .tcSearchingMoreWords:      "Search new words",
     .tcStopSearching:           "Stop searching",
     .tcDisable:                 "Disable DeveloperButton",
+    .tcStopDemo:                "I understood",
+    .tcShowDemoLater:           "Show later",
 ]

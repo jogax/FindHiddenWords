@@ -66,4 +66,6 @@ let deDictionary: [TextConstants: String] = [
     .tcSearchingMoreWords:      "Suche neue Wörter",
     .tcStopSearching:           "Suche anhalten",
     .tcDisable:                 "DeveloperButton Deaktivieren",
+    .tcStopDemo:                "Habe verstanden",
+    .tcShowDemoLater:           "Zeige später",
 ]

@@ -356,6 +356,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                          LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.10)),
                                          PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
                                          LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .StopDemoModus {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * 0.04)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.04)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .ShowDemoLater {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.04)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.04)),
+                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
+                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
         }
         button.myType = .MyButton
         button.setActPosSize()
@@ -390,7 +400,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     enum ButtonType: Int {
-        case SizeButton = 0, LanguageButton, WordsButton, DeveloperButton
+        case SizeButton = 0, LanguageButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater
     }
     
     @objc private func goBack() {
@@ -604,8 +614,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
                     setGameArrayToActualState()
                     if GV.justStarted && GV.basicData.showDemo {
+                        startDemoModus()
+                        GV.justStarted = false
                         showDemo()
-//                        xxx
                     }
 
                 }
@@ -627,7 +638,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var movingLocations = [CGPoint]()
     let MovingValue = 1000
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        demoModus = false
+//        stopDemoModus()
         let touchLocation = touches.first!.location(in: self)
         myTouchesBegan(touchLocation: touchLocation)
     }
@@ -763,6 +774,41 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         case WordIsOK = 0, NoSuchWord, WordIsActiv
     }
     var counter = 0
+    
+    private func startDemoModus() {
+        stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(stopDemoModus), buttonType: .StopDemoModus)
+        showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
+        showChooseLanguageButton.isHidden = true
+        chooseSizeButton.isHidden = true
+        if showDeveloperButton != nil {
+            showDeveloperButton.isHidden = true
+        }
+        showMyWordsButton.isHidden = true
+    }
+    
+    
+    @objc private func stopDemoModus(later: Bool = false) {
+        demoModus = false
+        showChooseLanguageButton.isHidden = false
+        chooseSizeButton.isHidden = false
+        if showDeveloperButton != nil {
+            showDeveloperButton.isHidden = false
+        }
+        showMyWordsButton.isHidden = false
+        stopDemoButton.removeFromParent()
+        showDemoNextTimeButton.removeFromParent()
+        stopDemoButton = nil
+        showDeveloperButton = nil
+        if !later {
+            try! realm.safeWrite {
+                GV.basicData.showDemo = false
+            }
+        }
+    }
+    
+    @objc private func showDemoLater() {
+        stopDemoModus(later: true)
+    }
     private func animateLetters(newWord: UsedWord, earlierWord: UsedWord? = nil, type: animationType) {
         var cellsToAnimate = [GameboardItem]()
         var oldCellsToAnimate = [GameboardItem]()
@@ -795,7 +841,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             if wordsToAnimate.count > 0 {
                                 animateWords()
                             } else {
-                                demoModus = false
+                                stopDemoModus()
                             }
                         }
                     }
@@ -831,7 +877,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             if wordsToAnimate.count > 0 {
                                 animateWords()
                             } else {
-                                demoModus = false
+                                stopDemoModus()
                             }
                         }
                     }
@@ -889,7 +935,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             if wordsToAnimate.count > 0 {
                                 animateWords()
                             } else {
-                                demoModus = false
+                                stopDemoModus()
                             }
                         }
                     }
@@ -1131,10 +1177,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var positions = [ObjectSP]()
     var fixWordsHeader: MyLabel!
     var gameHeader: MyLabel!
-    var goBackButton: MyButton!
+    var chooseSizeButton: MyButton!
     var showMyWordsButton: MyButton!
     var showChooseLanguageButton: MyButton!
     var showDeveloperButton: MyButton!
+    var stopDemoButton: MyButton!
+    var showDemoNextTimeButton: MyButton!
 
     var scoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
@@ -1181,9 +1229,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             } else {
                 playedGame = myGame.first!
             }
-            goBackButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
-            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
-            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (goBackButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
+            chooseSizeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
+            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
+            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             generateLabels()

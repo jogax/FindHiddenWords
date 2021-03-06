@@ -66,4 +66,6 @@ let huDictionary: [TextConstants: String] = [
     .tcSearchingMoreWords:      "Új szavak keresése",
     .tcStopSearching:           "Keresés leállítása",
     .tcDisable:                 "Fejlesztői menü deakt.",
+    .tcStopDemo:                "Megértettem",
+    .tcShowDemoLater:           "Mutasd később",
 ]
