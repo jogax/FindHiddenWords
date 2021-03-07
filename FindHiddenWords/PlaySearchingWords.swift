@@ -80,7 +80,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var lastAddingData = AddingWordData()
     
     @objc private func disableDeveloperMenu() {
-        developerButton.isHidden = true
+        if developerButton != nil {
+            developerButton.isHidden = true
+        }
     }
 
     override func update(_ currentTime: TimeInterval) {
