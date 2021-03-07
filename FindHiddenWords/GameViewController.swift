@@ -30,17 +30,19 @@ class GameViewController: UIViewController, GCHelperDelegate {
     
     func localPlayerAuthenticated() {
         #if DEBUG
+        GV.debugModus = true
         if GCHelper.shared.getName() == GV.myGCName {
             GV.playSearchingWordsScene!.generateDebugButton()
         }
         #endif
+        GV.connectedToGameCenter = true
         GCHelper.shared.getBestScore(completion: {
-            
+        
         })
     }
     
     func localPlayerNotAuthenticated() {
-        
+        GV.connectedToInternet = false
     }
     
     func continueTimeCount() {

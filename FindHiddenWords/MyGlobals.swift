@@ -139,6 +139,8 @@ struct GV {
         }
     }
 //    static var size: Int = 0
+    static var connectedToGameCenter = false
+    static var debugModus = false
     static var justStarted = true
     static var oldSize: Int = 0
     static var gameArray = [[GameboardItem]]()

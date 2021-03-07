@@ -778,11 +778,10 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 (scores, error) in
                 if scores != nil {
                     if scores!.count > 0 {
-//                        try! realm.safeWrite() {
-//                            GV.basicData.setBestScore(score: Int(scores![0].value), name: scores![0].player.alias,
-//                                        myRank: self.leaderboardForBestScore!.localPlayerScore == nil ? 0 : self.leaderboardForBestScore!.localPlayerScore!.rank)
-//                            completion()
-//                        }
+                        try! realm.safeWrite() {
+                            GV.basicData.setGCMaxScore(score: Int(scores![0].value))
+                            completion()
+                        }
                     }
                 }
             })

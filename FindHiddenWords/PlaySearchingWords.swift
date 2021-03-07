@@ -55,7 +55,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
 
     public func generateDebugButton() {
-        showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+        developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
     }
     
     @objc private func developerMenu() {
@@ -80,7 +80,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var lastAddingData = AddingWordData()
     
     @objc private func disableDeveloperMenu() {
-        showDeveloperButton.isHidden = true
+        developerButton.isHidden = true
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -780,8 +780,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
         showChooseLanguageButton.isHidden = true
         chooseSizeButton.isHidden = true
-        if showDeveloperButton != nil {
-            showDeveloperButton.isHidden = true
+        if developerButton != nil {
+            developerButton.isHidden = true
         }
         showMyWordsButton.isHidden = true
     }
@@ -791,14 +791,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         demoModus = false
         showChooseLanguageButton.isHidden = false
         chooseSizeButton.isHidden = false
-        if showDeveloperButton != nil {
-            showDeveloperButton.isHidden = false
+        if developerButton != nil {
+            developerButton.isHidden = false
         }
         showMyWordsButton.isHidden = false
         stopDemoButton.removeFromParent()
         showDemoNextTimeButton.removeFromParent()
         stopDemoButton = nil
-        showDeveloperButton = nil
+        developerButton = nil
         if !later {
             try! realm.safeWrite {
                 GV.basicData.showDemo = false
@@ -1159,15 +1159,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             
             if node.name == MovingLayerName && labelsMoveable {
-                if UIDevice.current.orientation.isPortrait {
-//                    if location.x < (GV.playingGrid?.frame.minY)! {
-                        return(OK: false, col: MovingValue, row: 0)
-//                    }
-                } /*else {
-                    if location.y < (GV.playingGrid?.frame.minX)! {
-                        return(OK: false, col: MovingValue, row: 0)
-                    }
-                }*/
+                if GV.deviceOrientation == .Portrait {
+                    return(OK: false, col: MovingValue, row: 0)
+                }
             }
         }
         return (OK:false, col: 0, row: 0)
@@ -1180,11 +1174,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var chooseSizeButton: MyButton!
     var showMyWordsButton: MyButton!
     var showChooseLanguageButton: MyButton!
-    var showDeveloperButton: MyButton!
+    var developerButton: MyButton!
     var stopDemoButton: MyButton!
     var showDemoNextTimeButton: MyButton!
 
-    var scoreLabel: MyLabel!
+    var myScoreLabel: MyLabel!
+    var bestScoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     var movingLayer: SKSpriteNode?
     let MovingLayerName = "MovingLayer"
@@ -1199,9 +1194,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         GV.gameArray = createNewGameArray(size: GV.basicData.gameSize)
         let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.92),
                                            LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.94))
-        let scoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: gameHeaderPosition.PPos.y - GV.maxSide * 0.02),
-                                           LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.90))
-        let gridPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: scoreLabelPosition.PPos.y - GV.maxSide * 0.02 - (GV.playingGrid!.size.height) / 2),
+        let myScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.88),
+                                             LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.90))
+        let bestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.84),
+                                               LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.86))
+        let gridPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: bestScoreLabelPosition.PPos.y - GV.maxSide * 0.02 - (GV.playingGrid!.size.height) / 2),
                                      LPos: CGPoint(x: gridLposX, y: GV.minSide * 0.89 - GV.playingGrid!.size.height * 0.52),
                                      PSize: GV.playingGrid!.size,
                                      LSize: GV.playingGrid!.size)
@@ -1250,15 +1247,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //            setGameArrayToActualState()
             showChooseLanguageButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcLanguage), action: #selector(chooseLanguage), buttonType: .LanguageButton)
             showMyWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
-            #if DEBUG
             if GCHelper.shared.getName() == GV.myGCName {
-                showDeveloperButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+                developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
             }
-            #endif
             let score = getScore()
-            let maxScore = GV.basicData.maxScores[GV.basicData.gameSize].maxScore
-            scoreLabel = MyLabel(text: GV.language.getText(.tcScore, values: String(score), String(maxScore)), position: scoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
-            gameLayer.addChild(scoreLabel!) // index 0
+            let maxScore = GV.basicData.getMaxScore()
+            myScoreLabel = MyLabel(text: GV.language.getText(.tcMyScore, values: String(score)), position: myScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+            if GV.connectedToGameCenter {
+                bestScoreLabel = MyLabel(text: GV.language.getText(.tcWorldBestScore, values: String(maxScore)), position: bestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+            } else {
+                bestScoreLabel = MyLabel(text: GV.language.getText(.tcDeviceBestScore, values: String(maxScore)), position: bestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+           }
+            gameLayer.addChild(myScoreLabel!) // index 0
+            gameLayer.addChild(bestScoreLabel!) // index 0
          }
     }
     
@@ -1647,14 +1648,17 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             let score = getScore()
             try! realm.safeWrite {
-                if GV.basicData.maxScores[GV.basicData.gameSize].maxScore < score {
-                    GV.basicData.maxScores[GV.basicData.gameSize].maxScore = score
-                }
+                GV.basicData.setLocalMaxScore(score: score)
             }
-            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.maxScores[GV.basicData.gameSize].maxScore, completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
-            if scoreLabel != nil {
-                scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(GV.basicData.maxScores[GV.basicData.gameSize].maxScore))
+            if myScoreLabel != nil {
+                myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
+                if GV.connectedToGameCenter {
+                    bestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: String(GV.basicData.getMaxScore()))
+                } else {
+                    bestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(GV.basicData.getMaxScore()))
+                }
             }
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
@@ -1764,8 +1768,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func modifyScoreLabel() {
         let score = getScore()
-        let maxScore = GV.basicData.maxScores[GV.basicData.gameSize].maxScore
-        scoreLabel!.text = GV.language.getText(.tcScore, values: String(score), String(maxScore))
+        myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
+        if GV.connectedToGameCenter {
+            bestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: String(GV.basicData.getMaxScore()))
+        } else {
+            bestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(GV.basicData.getMaxScore()))
+        }
     }
     
     private func getScore()->Int {

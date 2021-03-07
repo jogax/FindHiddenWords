@@ -15,7 +15,7 @@ enum GCEnabledType: Int {
     case AskForGameCenter = 0, GameCenterEnabled, GameCenterSupressed
 }
 
-class MaxScoresProLanguageAndSize {
+class MaxScoresProLanguageAndSizeAndDevice {
     var arr = Array(repeating: Array(repeating: 0, count: 6), count: 4)
     public func toString()->String {
         var strValue = ""
@@ -34,7 +34,7 @@ class MaxScoresProLanguageAndSize {
             arr[lIndex][size - 5] = maxValue
         }
     }
-    public func getValue (language: String, size: Int)->Int {
+    public func getValue (language: String, size: Int, type: String)->Int {
         var returnValue = 0
         if let lIndex = languageIndex[language] {
             returnValue = arr[lIndex][size - 5]
@@ -58,6 +58,17 @@ class MaxScoresProLanguageAndSize {
 }
 let NoGamePlayed = 50000
 
+enum MaxScoreType: Int {
+    case GameCenter = 0, Device
+    var description : String {
+      switch self {
+      // Use Internationalization, as appropriate.
+      case .GameCenter: return "W"
+      case .Device: return "D"
+      }
+    }
+
+}
 
 class BasicData: Object {
     @objc dynamic var showDemo = true
@@ -80,22 +91,43 @@ class BasicData: Object {
     @objc dynamic var deviceRecordInCloudID = ""
     @objc dynamic var showingScoreType = 0 // ScoreType
     @objc dynamic var showingTimeScope = 0 // TimeScope
-    let maxScores = List<MaxScores>()
+    let deviceMaxScores = List<MaxScores>()
+    let worldMaxScores = List<MaxScores>()
     let allFoundedWords = List<FoundedWords>()
 
     override  class func primaryKey() -> String {
         return "ID"
     }
+    
+    public func getMaxScore()->Int {
+        if GV.connectedToGameCenter {
+            return worldMaxScores[gameSize - 5].maxScore
+        } else {
+            return deviceMaxScores[gameSize - 5].maxScore
+        }
+    }
+    public func getLocalMaxScore()->Int {
+        return deviceMaxScores[gameSize - 5].maxScore
+    }
+    public func setLocalMaxScore(score: Int) {
+        if deviceMaxScores[gameSize - 5].maxScore < score {
+            deviceMaxScores[gameSize - 5].maxScore = score
+        }
+    }
+    public func setGCMaxScore(score: Int) {
+        worldMaxScores[gameSize - 5].maxScore = score
+    }
 }
 
 class MaxScores: Object {
+    @objc dynamic var ID = "" // W5...10, D5...10
     @objc dynamic var size = 0
     @objc dynamic var maxScore = 0
     override  class func primaryKey() -> String {
-        return "size"
+        return "ID"
     }
-    init(newSize: Int) {
-        size = newSize
+    init(newSize: Int, type: MaxScoreType) {
+        ID = type.description + String(newSize)
     }
     override init() {
         

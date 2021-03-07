@@ -499,9 +499,10 @@ public func getBasicData() {
         GV.basicData.land = GV.convertLocaleToInt()
         GV.basicData.lastPlayingDay = Date().yearMonthDay
         GV.basicData.gameSize = 8
+        
         for size in 0...10 {
-            let maxScore = MaxScores(newSize: size)
-            GV.basicData.maxScores.append(maxScore)
+            GV.basicData.worldMaxScores.append(MaxScores(newSize: size, type: .GameCenter))
+            GV.basicData.deviceMaxScores.append(MaxScores(newSize: size, type: .Device))
         }
 
         try! realm.safeWrite() {
