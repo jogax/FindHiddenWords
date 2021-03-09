@@ -1181,7 +1181,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var showDemoNextTimeButton: MyButton!
 
     var myScoreLabel: MyLabel!
-    var bestScoreLabel: MyLabel!
+    var myBestScoreLabel: MyLabel!
+    var worldBestScoreLabel: MyLabel!
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     var movingLayer: SKSpriteNode?
     let MovingLayerName = "MovingLayer"
@@ -1196,11 +1197,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         GV.gameArray = createNewGameArray(size: GV.basicData.gameSize)
         let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.92),
                                            LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.94))
-        let myScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.88),
-                                             LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.90))
-        let bestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.84),
-                                               LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.86))
-        let gridPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: bestScoreLabelPosition.PPos.y - GV.maxSide * 0.02 - (GV.playingGrid!.size.height) / 2),
+        let myScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.89),
+                                             LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.91))
+        let myBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.86),
+                                               LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.88))
+        let worldBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.83),
+                                               LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.85))
+        let gridPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: worldBestScoreLabelPosition.PPos.y - GV.maxSide * 0.02 - (GV.playingGrid!.size.height) / 2),
                                      LPos: CGPoint(x: gridLposX, y: GV.minSide * 0.89 - GV.playingGrid!.size.height * 0.52),
                                      PSize: GV.playingGrid!.size,
                                      LSize: GV.playingGrid!.size)
@@ -1252,16 +1255,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             if GCHelper.shared.getName() == GV.myGCName {
                 developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
             }
-            let score = getScore()
-            let maxScore = GV.basicData.getMaxScore()
-            myScoreLabel = MyLabel(text: GV.language.getText(.tcMyScore, values: String(score)), position: myScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
-            if GV.connectedToGameCenter {
-                bestScoreLabel = MyLabel(text: GV.language.getText(.tcWorldBestScore, values: String(maxScore)), position: bestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
-            } else {
-                bestScoreLabel = MyLabel(text: GV.language.getText(.tcDeviceBestScore, values: String(maxScore)), position: bestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
-           }
+            let myScore = getScore()
+            let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
+            let (bestPlayer, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)
+            myScoreLabel = MyLabel(text: GV.language.getText(.tcMyScore, values: String(myScore)), position: myScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+            myBestScoreLabel = MyLabel(text: GV.language.getText(.tcDeviceBestScore, values: String(myBestScore)), position: myBestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
+            worldBestScoreLabel = MyLabel(text: GV.language.getText(.tcWorldBestScore, values: bestPlayer, String(worldBestScore)), position: worldBestScoreLabelPosition, fontName: GV.headerFontName, fontSize: fontSize)
             gameLayer.addChild(myScoreLabel!) // index 0
-            gameLayer.addChild(bestScoreLabel!) // index 0
+            gameLayer.addChild(myBestScoreLabel!) // index 0
+            gameLayer.addChild(worldBestScoreLabel!) // index 0
          }
     }
     
@@ -1656,11 +1658,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
             if myScoreLabel != nil {
                 myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
-                if GV.connectedToGameCenter {
-                    bestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: String(GV.basicData.getMaxScore()))
-                } else {
-                    bestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(GV.basicData.getMaxScore()))
-                }
+                let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
+                let (player, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)
+                myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
+                worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
             }
         }
         iterateGameArray(doing: {(col: Int, row: Int) in
@@ -1769,13 +1770,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func modifyScoreLabel() {
-        let score = getScore()
-        myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
-        if GV.connectedToGameCenter {
-            bestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: String(GV.basicData.getMaxScore()))
-        } else {
-            bestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(GV.basicData.getMaxScore()))
-        }
+        let myScore = getScore()
+        let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
+        let (player, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)
+        myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(myScore))
+        myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
+        worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
     }
     
     private func getScore()->Int {

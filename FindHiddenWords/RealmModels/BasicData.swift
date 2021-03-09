@@ -8,6 +8,7 @@
 
 import Foundation
 import RealmSwift
+import GameKit
 
 let languageIndex = ["en": 0, "de": 1, "hu": 2, "ru":3]
 
@@ -99,12 +100,15 @@ class BasicData: Object {
         return "ID"
     }
     
-    public func getMaxScore()->Int {
-        if GV.connectedToGameCenter {
-            return worldMaxScores[gameSize - 5].maxScore
+    public func getMaxScore(type: MaxScoreType)->(String, Int) {
+        if type == .GameCenter {
+            if GV.connectedToGameCenter {
+                return (worldMaxScores[gameSize - 5].player, worldMaxScores[gameSize - 5].maxScore)
+            }
         } else {
-            return deviceMaxScores[gameSize - 5].maxScore
+            return (GKLocalPlayer.local.alias, deviceMaxScores[gameSize - 5].maxScore)
         }
+        return ("", 0)
     }
     public func getLocalMaxScore()->Int {
         return deviceMaxScores[gameSize - 5].maxScore
@@ -114,8 +118,9 @@ class BasicData: Object {
             deviceMaxScores[gameSize - 5].maxScore = score
         }
     }
-    public func setGCMaxScore(score: Int) {
+    public func setGCMaxScore(score: Int, player: String) {
         worldMaxScores[gameSize - 5].maxScore = score
+        worldMaxScores[gameSize - 5].player = player
     }
 }
 
@@ -123,6 +128,7 @@ class MaxScores: Object {
     @objc dynamic var ID = "" // W5...10, D5...10
     @objc dynamic var size = 0
     @objc dynamic var maxScore = 0
+    @objc dynamic var player = ""
     override  class func primaryKey() -> String {
         return "ID"
     }

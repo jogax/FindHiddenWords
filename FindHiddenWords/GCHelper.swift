@@ -779,7 +779,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                 if scores != nil {
                     if scores!.count > 0 {
                         try! realm.safeWrite() {
-                            GV.basicData.setGCMaxScore(score: Int(scores![0].value))
+                            GV.basicData.setGCMaxScore(score: Int(scores![0].value), player: scores![0].player.alias)
                             completion()
                         }
                     }
