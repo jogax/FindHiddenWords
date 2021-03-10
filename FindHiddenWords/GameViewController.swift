@@ -43,6 +43,7 @@ class GameViewController: UIViewController, GCHelperDelegate {
     
     func localPlayerNotAuthenticated() {
         GV.connectedToInternet = false
+        GV.playSearchingWordsScene!.hideWorldBestResults()
     }
     
     func continueTimeCount() {

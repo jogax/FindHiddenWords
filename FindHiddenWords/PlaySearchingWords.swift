@@ -696,6 +696,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     var colRowTable = [ColRow]()
     var demoModus = false
+    
+    public func hideWorldBestResults() {
+        worldBestScoreLabel.isHidden = true
+    }
+    
+    public func showWorldBestResults() {
+        worldBestScoreLabel.isHidden = false
+    }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touchLocation = touches.first!.location(in: self)
@@ -1187,7 +1195,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var movingLayer: SKSpriteNode?
     let MovingLayerName = "MovingLayer"
     public func playingGame() {
-
+        let testLabel = MyLabel(text: "ABC", position: CGPoint(), fontName: GV.headerFontName, fontSize: fontSize)
+        let decrementY = testLabel.frame.height * 1.2
+        let firstY = GV.maxSide - (UIDevice.current.hasNotch ? 60 : 40)
         removeChildrenExceptTypes(from: gameLayer, types: [.Background])
         let sizeMultiplier = GV.onIpad ? GV.sizeMultiplierIPad : GV.sizeMultiplierIPhone
         let blockSize = GV.minSide * sizeMultiplier[GV.basicData.gameSize]
@@ -1195,13 +1205,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: GV.basicData.gameSize, cols: GV.basicData.gameSize)
         let gridLposX = GV.maxSide - GV.playingGrid!.size.width * 0.65
         GV.gameArray = createNewGameArray(size: GV.basicData.gameSize)
-        let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.92),
+        let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: firstY /*GV.maxSide * 0.92*/),
                                            LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.94))
-        let myScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.89),
+        let myScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: firstY - decrementY /*GV.maxSide * 0.89*/),
                                              LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.91))
-        let myBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.86),
+        let myBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: firstY - 2 * decrementY /*GV.maxSide * 0.86*/),
                                                LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.88))
-        let worldBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: GV.maxSide * 0.83),
+        let worldBestScoreLabelPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: firstY - 3 * decrementY /*GV.maxSide * 0.83*/),
                                                LPos: CGPoint(x: gridLposX , y: GV.minSide * 0.85))
         let gridPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: worldBestScoreLabelPosition.PPos.y - GV.maxSide * 0.02 - (GV.playingGrid!.size.height) / 2),
                                      LPos: CGPoint(x: gridLposX, y: GV.minSide * 0.89 - GV.playingGrid!.size.height * 0.52),

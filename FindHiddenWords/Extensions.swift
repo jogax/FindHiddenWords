@@ -180,7 +180,7 @@ public extension UIDevice {
     }
     
     var hasNotch: Bool {
-        let bottom = UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0
+        let bottom = UIApplication.shared.delegate?.window??.safeAreaInsets.bottom ?? 0
         return bottom > 0
     }
 
