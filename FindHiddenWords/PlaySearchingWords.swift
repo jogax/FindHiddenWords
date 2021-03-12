@@ -809,11 +809,25 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         showDemoNextTimeButton.removeFromParent()
         stopDemoButton = nil
         developerButton = nil
-        if !later {
-            try! realm.safeWrite {
-                GV.basicData.showDemo = false
-            }
+        try! realm.safeWrite {
+            GV.basicData.showDemo = later
         }
+        if fingerSprite.hasActions() {
+            fingerSprite.removeAllActions()
+            fingerSprite.isHidden = true
+        }
+        iterateGameArray(doing:  {(col: Int, row: Int) in
+            let cell = GV.gameArray[col][row]
+            if cell.hasActions() {
+                cell.removeAllActions()
+            }
+            if cell.status == .Temporary {
+                cell.setStatus(toStatus: cell.origStatus)
+            }
+            if cell.status == .Lila {
+                cell.setStatus(toStatus: .WholeWord)
+            }
+        })
     }
     
     @objc private func showDemoLater() {
@@ -1274,6 +1288,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             gameLayer.addChild(myScoreLabel!) // index 0
             gameLayer.addChild(myBestScoreLabel!) // index 0
             gameLayer.addChild(worldBestScoreLabel!) // index 0
+            GCHelper.shared.getBestScore(completion: { [self] in modifyScoreLabel()})
          }
     }
     
@@ -1313,10 +1328,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        fingerSprite.run(sequence)
     }
     
+    let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
     @objc private func animateWords() {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
-            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+//            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+            fingerSprite.isHidden = false
             demoModus = true
             fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
             fingerSprite.zPosition += 100
@@ -1329,6 +1346,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cellsToAnimate.append(GV.gameArray[letter.col][letter.row])
             }
             for (index, cell) in cellsToAnimate.enumerated() {
+                myActions.append(SKAction.fadeIn(withDuration: 0.0))
+
                 let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
                 myActions.append(moveAction)
                 let touchAction = SKAction.run { [self] in
@@ -1767,7 +1786,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     }
                  }
                 let actWordCounter = GV.basicData.allFoundedWords.filter("language = %d", GV.actLanguage).count
-                GCHelper.shared.sendCountWordsToGameCenter(counter: actWordCounter, completion: {})
+                GCHelper.shared.sendCountWordsToGameCenter(counter: actWordCounter, completion: {
+                    GCHelper.shared.getBestScore(completion: {
+                        [self] in modifyScoreLabel()
+                    })
+                })
+//                GCHelper.shared.getBestScore(completion: { [self] in modifyScoreLabel()})
             }
 
 
@@ -1779,7 +1803,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return returnValue
     }
     
-    @objc private func modifyScoreLabel() {
+    @objc public func modifyScoreLabel() {
         let myScore = getScore()
         let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
         let (player, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)

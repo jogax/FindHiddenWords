@@ -37,7 +37,7 @@ class GameViewController: UIViewController, GCHelperDelegate {
         #endif
         GV.connectedToGameCenter = true
         GCHelper.shared.getBestScore(completion: {
-        
+            GV.playSearchingWordsScene!.modifyScoreLabel()
         })
     }
     

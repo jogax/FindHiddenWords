@@ -196,18 +196,19 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
     }
     
     
-    private func sendInfoToGC(infos: [GCInfo]) {
+    private func sendInfoToGC(infos: [GCInfo], completion: @escaping ()->()) {
         var scoreArray = [GKScore]()
         for info in infos {
             let score = GKScore(leaderboardIdentifier: info.identifier, player: GKLocalPlayer.local)
             score.value = Int64(info.value)
             scoreArray.append(score)
         }
-        GKScore.report(scoreArray) { (error) in
+        GKScore.report(scoreArray) { [self] (error) in
             if error != nil {
                 print("Error by send score to GameCenter: \(error!.localizedDescription)")
             } else {
                 self.getGlobalInfos()
+                getBestScore(completion: {completion()})
             }
         }
     }
@@ -393,7 +394,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let scoreID = actScoreID
             infoArray.append(GCInfo(identifier: scoreID, value: Int64(score!), modifyValue: 0))
-            sendInfoToGC(infos: infoArray)
+            sendInfoToGC(infos: infoArray, completion: completion)
         }
     }
     
@@ -403,7 +404,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
         if GKLocalPlayer.local.isAuthenticated && GV.connectedToInternet {
             let identifier = actWordCounterID
             infoArray.append(GCInfo(identifier: identifier, value: Int64(counter), modifyValue: 0))
-            sendInfoToGC(infos: infoArray)
+            sendInfoToGC(infos: infoArray, completion: completion)
         }
     }
     
@@ -425,7 +426,7 @@ public class GCHelper: NSObject, GKMatchmakerViewControllerDelegate, GKGameCente
                     infoArray.append(GCInfo(identifier: myVersionName, value: Int64(GV.basicData.version)))
                 }
             }
-            sendInfoToGC(infos: infoArray)
+            sendInfoToGC(infos: infoArray, completion: {})
         }
         // send infos to GC each 1 minute
         if globalInfosTimer != nil {

@@ -106,7 +106,11 @@ class BasicData: Object {
                 return (worldMaxScores[gameSize - 5].player, worldMaxScores[gameSize - 5].maxScore)
             }
         } else {
-            return (GKLocalPlayer.local.alias, deviceMaxScores[gameSize - 5].maxScore)
+            if GKLocalPlayer.local.isAuthenticated {
+                return (GKLocalPlayer.local.alias, deviceMaxScores[gameSize - 5].maxScore)
+            } else {
+                return ("", 0)
+            }
         }
         return ("", 0)
     }
