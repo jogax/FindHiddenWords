@@ -334,7 +334,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //    }
 //
     private func addButtonPL(to: SKNode, text: String, action: Selector, buttonType: ButtonType)->MyButton {
-        let button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05))
+        var button: MyButton!
+        var texture: SKTexture!
+        switch buttonType {
+        case .NewSizeButton:
+            texture = SKTexture(imageNamed: "Numbers")
+        case .SettingsButton:
+            texture = SKTexture(image: DrawImages.drawSettings(frame: CGRect(origin: CGPoint(), size: CGSize(width: 100, height: 100))))
+        default: break
+        }
+        if texture != nil {
+            button = MyButton(texture: texture, fontName: GV.fontName)
+        } else {
+            button = MyButton(fontName: GV.fontName, size: CGSize(width: GV.minSide * 0.3, height: GV.maxSide * 0.05))
+        }
         button.zPosition = self.zPosition + 20
         button.setButtonLabel(title: text, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
@@ -402,7 +415,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     enum ButtonType: Int {
-        case SizeButton = 0, LanguageButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater
+        case SizeButton = 0, LanguageButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, NewSizeButton, SettingsButton
     }
     
     @objc private func goBack() {
@@ -1201,6 +1214,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var developerButton: MyButton!
     var stopDemoButton: MyButton!
     var showDemoNextTimeButton: MyButton!
+    var sizeButton: MyButton!
 
     var myScoreLabel: MyLabel!
     var myBestScoreLabel: MyLabel!
@@ -1255,6 +1269,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             } else {
                 playedGame = myGame.first!
             }
+            sizeButton = addButtonPL(to: gameLayer, text: "Size", action: #selector(chooseSize), buttonType: .NewSizeButton)
             chooseSizeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
             possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))

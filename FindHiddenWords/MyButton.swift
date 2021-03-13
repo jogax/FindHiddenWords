@@ -63,9 +63,23 @@ class MyButton: SKSpriteNode {
         setActPosSize()
     }
     
+//    buttonTexture = atlas.textureNamed("myRoundButton")
+
+    init(texture: SKTexture, fontName: String) {
+        let bgTexture = SKTexture(imageNamed: "myRoundButton")
+        defaultTexture = texture
+        selectedTexture = texture
+        disabledTexture = texture
+        rect = CGRect()
+        self.label = SKLabelNode(fontNamed: fontName)
+        super.init(texture: bgTexture, color: UIColor.black, size: bgTexture.size())
+        let overLay = SKSpriteNode(texture: texture)
+        self.addChild(overLay)
+        
+    }
     
     
-    init(normalTexture defaultTexture: SKTexture!, selectedTexture:SKTexture!, disabledTexture: SKTexture!) {
+    init(normalTexture defaultTexture: SKTexture!, selectedTexture:SKTexture!, disabledTexture: SKTexture) {
 //        MyLabel.countInstances += 1
         self.rect = CGRect()
         self.defaultTexture = defaultTexture

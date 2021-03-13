@@ -101,6 +101,8 @@
 		D0E64EB425A899D7006BACC6 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EB325A899D7006BACC6 /* GameScene.swift */; };
 		D0E64EB925A899D7006BACC6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EB725A899D7006BACC6 /* Main.storyboard */; };
 		D0E64EBB25A899D7006BACC6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EBA25A899D7006BACC6 /* Assets.xcassets */; };
+		D0E7CC6425FD178400C8B400 /* myRoundButton.png in Resources */ = {isa = PBXBuildFile; fileRef = D0E7CC6325FD178400C8B400 /* myRoundButton.png */; };
+		D0E7CC6B25FD36E000C8B400 /* Numbers.png in Resources */ = {isa = PBXBuildFile; fileRef = D0E7CC6A25FD36E000C8B400 /* Numbers.png */; };
 		D0EFE8AD25AA258A00AF0882 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8AC25AA258A00AF0882 /* Reachability.framework */; };
 		D0EFE8B125AA259200AF0882 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8B025AA259200AF0882 /* Realm.framework */; };
 		D0EFE8B425AA259800AF0882 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8B325AA259800AF0882 /* RealmSwift.framework */; };
@@ -211,6 +213,8 @@
 		D0E64EB825A899D7006BACC6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		D0E64EBA25A899D7006BACC6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D0E64EBC25A899D7006BACC6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D0E7CC6325FD178400C8B400 /* myRoundButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = myRoundButton.png; sourceTree = "<group>"; };
+		D0E7CC6A25FD36E000C8B400 /* Numbers.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Numbers.png; sourceTree = "<group>"; };
 		D0EFE8AC25AA258A00AF0882 /* Reachability.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reachability.framework; path = Carthage/Build/iOS/Reachability.framework; sourceTree = "<group>"; };
 		D0EFE8B025AA259200AF0882 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		D0EFE8B325AA259800AF0882 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
@@ -279,6 +283,8 @@
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
 			isa = PBXGroup;
 			children = (
+				D0E7CC6A25FD36E000C8B400 /* Numbers.png */,
+				D0E7CC6325FD178400C8B400 /* myRoundButton.png */,
 				D01EE31C25D02DA40099C1E9 /* finger.png */,
 				D08B5B8D25C06A6C007C04D5 /* hook.png */,
 				D02213CC25C448B500BAB3A7 /* LightLilaOctagon.png */,
@@ -468,6 +474,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D012504025A8AEEB000BCF89 /* Connection1011.png in Resources */,
+				D0E7CC6425FD178400C8B400 /* myRoundButton.png in Resources */,
 				D012502C25A8AEEB000BCF89 /* DarkGreenSprite.png in Resources */,
 				D012502225A8AEEB000BCF89 /* Connection0111x.png in Resources */,
 				D01EE31D25D02DA40099C1E9 /* finger.png in Resources */,
@@ -526,6 +533,7 @@
 				D012502325A8AEEB000BCF89 /* Rosa Button.png in Resources */,
 				D0E64EB225A899D7006BACC6 /* Actions.sks in Resources */,
 				D08B5B8E25C06A6C007C04D5 /* hook.png in Resources */,
+				D0E7CC6B25FD36E000C8B400 /* Numbers.png in Resources */,
 				D012503225A8AEEB000BCF89 /* Connection0011x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

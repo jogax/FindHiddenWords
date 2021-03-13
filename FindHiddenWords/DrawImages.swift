@@ -210,6 +210,71 @@ class DrawImages {
         return pointOfCircle
     }
     
+    static func drawSettings(frame: CGRect) -> UIImage {
+        let size = CGSize(width: frame.width, height: frame.height)
+        let endAngle = CGFloat(2 * Double.pi)
+        
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.beginPath()
+        
+        ctx!.setLineWidth(4.0)
+        
+        let adder:CGFloat = 10.0
+        let center = CGPoint(x: frame.origin.x + frame.width / 2, y: frame.origin.y + frame.height / 2)
+        let r0 = frame.width / 2.2 - adder
+        let r1 = frame.width / 3.0 - adder
+        let r2 = frame.width / 4.0 - adder
+        let count: CGFloat = 8
+        let countx2 = count * 2
+        let firstAngle = (endAngle / countx2) / 2
+        
+        ctx!.setFillColor(UIColor.black.cgColor)
+        
+        //CGContextSetRGBFillColor(ctx, UIColor(red: 180/255, green: 180/255, blue: 180/255, alpha: 1).CGColor);
+        for ind in 0..<Int(count) {
+            let minAngle1 = firstAngle + CGFloat(ind) * endAngle / count
+            let maxAngle1 = minAngle1 + endAngle / countx2
+            let minAngle2 = maxAngle1
+            let maxAngle2 = minAngle2 + endAngle / countx2
+            
+            
+            let startP = DrawImages.pointOfCircle(radius: r1, center: center, angle: maxAngle1)
+            let midP1 = DrawImages.pointOfCircle(radius: r0, center: center, angle: maxAngle1)
+            let midP2 = DrawImages.pointOfCircle(radius: r0, center: center, angle: maxAngle2)
+            let endP = DrawImages.pointOfCircle(radius: r1, center: center, angle: maxAngle2)
+//            CGContextAddArc(ctx, center.x, center.y, r0, max(minAngle1, maxAngle1) , min(minAngle1, maxAngle1), 1)
+            ctx!.addArc(center: center, radius: r0, startAngle: max(minAngle1, maxAngle1), endAngle: min(minAngle1, maxAngle1), clockwise: true)
+            ctx!.strokePath()
+            ctx!.move(to: CGPoint(x: startP.x, y: startP.y))
+            ctx!.addLine(to: CGPoint(x: midP1.x, y: midP1.y))
+            ctx!.strokePath()
+//            CGContextAddArc(ctx, center.x, center.y, r1, max(minAngle2, maxAngle2), min(minAngle2, maxAngle2), 1)
+            ctx!.addArc(center: center, radius: r1, startAngle: max(minAngle2, maxAngle2), endAngle: min(minAngle2, maxAngle2), clockwise: true)
+            ctx!.strokePath()
+            ctx!.move(to: CGPoint(x: midP2.x, y: midP2.y))
+            ctx!.addLine(to: CGPoint(x: endP.x, y: endP.y))
+            ctx!.strokePath()
+        }
+        ctx!.fillPath()
+        
+//        CGContextAddArc(ctx, center.x, center.y, r2, 0, endAngle, 1)
+        ctx!.addArc(center: center, radius: r2, startAngle: 0, endAngle: endAngle, clockwise: true)
+        ctx!.strokePath()
+        
+        /*
+        let center2 = CGPoint(x: frame.width / 2, y: frame.height / 2)
+        let radius = frame.width / 2 - 5
+        CGContextAddArc(ctx, center2.x, center2.y, radius, CGFloat(0), CGFloat(2 * M_PI), 1)
+        CGContextStrokePath(ctx)
+        */
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+
 
 }
 
