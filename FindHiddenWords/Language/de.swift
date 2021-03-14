@@ -70,4 +70,5 @@ let deDictionary: [TextConstants: String] = [
     .tcDisable:                 "DeveloperButton Deaktivieren",
     .tcStopDemo:                "Habe verstanden",
     .tcShowDemoLater:           "Zeige später",
+    .tcSettings:                "Einstellungen",
 ]

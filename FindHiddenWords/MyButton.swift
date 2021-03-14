@@ -18,18 +18,18 @@ class MyButton: SKSpriteNode {
     var isEnabled: Bool = true {
         didSet {
             if (disabledTexture != nil) {
-                texture = isEnabled ? defaultTexture : disabledTexture
+//                texture = isEnabled ? defaultTexture : disabledTexture
             }
         }
     }
     var isSelected: Bool = false {
         didSet {
-            texture = isSelected ? selectedTexture : defaultTexture
+//            texture = isSelected ? selectedTexture : defaultTexture
         }
     }
     
-    var defaultTexture: SKTexture
-    var selectedTexture: SKTexture
+    var defaultTexture: SKTexture!
+    var selectedTexture: SKTexture!
     var label: SKLabelNode
     var rect: CGRect
     
@@ -65,44 +65,41 @@ class MyButton: SKSpriteNode {
     
 //    buttonTexture = atlas.textureNamed("myRoundButton")
 
-    init(texture: SKTexture, fontName: String) {
+    init(text: String, texture: SKTexture, fontName: String, target: AnyObject, action:Selector, size: CGSize) {
+        let nodeForTexture = SKSpriteNode(imageNamed: "myRoundButton")
+        let overLay = SKSpriteNode(texture: texture)
+        overLay.size = nodeForTexture.size * 0.8
+        nodeForTexture.addChild(overLay)
+//        self.label = SKLabelNode(fontNamed: fontName)
+//        self.label.text = text
+        let generatedTexture = GV.parentView.texture(from: nodeForTexture)
+
         let bgTexture = SKTexture(imageNamed: "myRoundButton")
+        rect = CGRect()
+        self.label = SKLabelNode(fontNamed: fontName)
+        self.label.text = text
+        super.init(texture: generatedTexture, color: UIColor.black, size: bgTexture.size())
+        isUserInteractionEnabled = true
+        self.size = size
+//        let overLay = SKSpriteNode(texture: texture)
+//        overLay.size = bgTexture.size() * 0.9
+//        self.addChild(overLay)
+        self.targetTouchUpInside = target
+        self.actionTouchUpInside = action
+        self.label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center;
+        self.label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.center;
+        self.label.fontSize = size.height * 0.2
+        self.label.zPosition = self.zPosition + 1
+        self.label.position = CGPoint(x: self.position.x, y: self.position.y - self.size.height * 0.6)
+        self.label.fontColor = .black
+        addChild(self.label)
         defaultTexture = texture
         selectedTexture = texture
         disabledTexture = texture
-        rect = CGRect()
-        self.label = SKLabelNode(fontNamed: fontName)
-        super.init(texture: bgTexture, color: UIColor.black, size: bgTexture.size())
-        let overLay = SKSpriteNode(texture: texture)
-        self.addChild(overLay)
-        
+
     }
     
-    
-    init(normalTexture defaultTexture: SKTexture!, selectedTexture:SKTexture!, disabledTexture: SKTexture) {
-//        MyLabel.countInstances += 1
-        self.rect = CGRect()
-        self.defaultTexture = defaultTexture
-        self.selectedTexture = selectedTexture
-        self.disabledTexture = disabledTexture
-        self.label = SKLabelNode(fontNamed: "Helvetica");
         
-        super.init(texture: defaultTexture, color: UIColor.black, size: defaultTexture.size())
-        isUserInteractionEnabled = true
-        
-        //Creating and adding a blank label, centered on the button
-        self.label.verticalAlignmentMode = SKLabelVerticalAlignmentMode.center;
-        self.label.horizontalAlignmentMode = SKLabelHorizontalAlignmentMode.center;
-        addChild(self.label)
-        
-        // Adding this node as an empty layer. Without it the touch functions are not being called
-        // The reason for this is unknown when this was implemented...?
-//        let bugFixLayerNode = SKSpriteNode(texture: nil, color: UIColor.clear, size: defaultTexture.size())
-//        bugFixLayerNode.position = self.position
-//        addChild(bugFixLayerNode)
-        
-    }
-    
     /**
      * Taking a target object and adding an action that is triggered by a button event.
      */

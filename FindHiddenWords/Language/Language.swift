@@ -71,7 +71,8 @@ enum TextConstants: Int {
     tcStopSearching,
     tcDisable,
     tcStopDemo,
-    tcShowDemoLater
+    tcShowDemoLater,
+    tcSettings
 }
     let LanguageEN = "en" // index 0
     let LanguageDE = "de" // index 1

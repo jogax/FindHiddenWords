@@ -108,6 +108,7 @@
 		D0EFE8B425AA259800AF0882 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D0EFE8B325AA259800AF0882 /* RealmSwift.framework */; };
 		D0EFE8C225AA2C3B00AF0882 /* Games.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0EFE8C025AA2C3A00AF0882 /* Games.realm */; };
 		D0EFE8C325AA2C3B00AF0882 /* NewWordList.realm in Resources */ = {isa = PBXBuildFile; fileRef = D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */; };
+		D0F5086625FE672600E38F92 /* me.png in Resources */ = {isa = PBXBuildFile; fileRef = D0F5086525FE672500E38F92 /* me.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -220,6 +221,7 @@
 		D0EFE8B325AA259800AF0882 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		D0EFE8C025AA2C3A00AF0882 /* Games.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = Games.realm; sourceTree = "<group>"; };
 		D0EFE8C125AA2C3B00AF0882 /* NewWordList.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = NewWordList.realm; sourceTree = "<group>"; };
+		D0F5086525FE672500E38F92 /* me.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = me.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +285,7 @@
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
 			isa = PBXGroup;
 			children = (
+				D0F5086525FE672500E38F92 /* me.png */,
 				D0E7CC6A25FD36E000C8B400 /* Numbers.png */,
 				D0E7CC6325FD178400C8B400 /* myRoundButton.png */,
 				D01EE31C25D02DA40099C1E9 /* finger.png */,
@@ -521,6 +524,7 @@
 				D012504125A8AEEB000BCF89 /* background.png in Resources */,
 				D012502525A8AEEB000BCF89 /* whiteSprite.png in Resources */,
 				D012504425A8AEEB000BCF89 /* LilaSprite.png in Resources */,
+				D0F5086625FE672600E38F92 /* me.png in Resources */,
 				D012503025A8AEEB000BCF89 /* LandscapeBG.png in Resources */,
 				D0EFE8C225AA2C3B00AF0882 /* Games.realm in Resources */,
 				D08B5B9425C06B05007C04D5 /* RightSimple.png in Resources */,

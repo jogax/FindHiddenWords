@@ -72,4 +72,5 @@ let enDictionary: [TextConstants: String] = [
     .tcDisable:                 "Disable DeveloperButton",
     .tcStopDemo:                "I understood",
     .tcShowDemoLater:           "Show later",
+    .tcSettings:                "Settings",
 ]

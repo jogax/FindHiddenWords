@@ -70,4 +70,5 @@ let huDictionary: [TextConstants: String] = [
     .tcDisable:                 "Fejlesztői menü deakt.",
     .tcStopDemo:                "Megértettem",
     .tcShowDemoLater:           "Mutasd később",
+    .tcSettings:                "Beállítások",
 ]

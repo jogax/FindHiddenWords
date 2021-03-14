@@ -210,7 +210,8 @@ class DrawImages {
         return pointOfCircle
     }
     
-    static func drawSettings(frame: CGRect) -> UIImage {
+    static func drawSettings() -> UIImage {
+        let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
         let size = CGSize(width: frame.width, height: frame.height)
         let endAngle = CGFloat(2 * Double.pi)
         
@@ -275,7 +276,45 @@ class DrawImages {
         return image!
     }
 
+    static func drawWordList() -> UIImage {
+        let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
+        let size = CGSize(width: frame.width, height: frame.height)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.beginPath()
+        ctx!.setLineWidth(6.0)
+        let pointSize = size * 0.05
+        var firstPoint = CGPoint(x: size.width * 0.1, y: size.height * 0.2)
+        var secondPoint = CGPoint(x: size.width * 0.25, y: size.height * 0.225)
+        var thirdPoint = CGPoint(x: size.width * 0.9, y: size.height * 0.225)
 
+        for _ in 1...3 {
+            let rectangle = CGRect(origin: firstPoint, size: pointSize)
+            ctx!.addEllipse(in: rectangle)
+//            ctx!.drawPath(using: .fillStroke)
+            ctx!.move(to: firstPoint)
+            ctx!.move(to: secondPoint)
+            ctx?.addLine(to: thirdPoint)
+            firstPoint.y += size.height * 0.2
+            secondPoint.y += size.height * 0.2
+            thirdPoint.y += size.height * 0.2
+        }
+        
+        
+        ctx!.setFillColor(UIColor.black.cgColor)
+        ctx!.setStrokeColor(UIColor.black.cgColor)
+        
+//        ctx!.fillPath()
+        
+        ctx!.strokePath()
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+
+    
 }
 
 

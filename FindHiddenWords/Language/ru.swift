@@ -70,4 +70,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcDisable:                 "Отключить кнопку разработчика",
     .tcStopDemo:                "Я понял",
     .tcShowDemoLater:           "Покажи позже",
+    .tcSettings:                "Настройки",
 ]
