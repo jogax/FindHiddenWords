@@ -134,12 +134,12 @@ class MyButton: SKSpriteNode {
      */
     
     func setButtonLabel(title: String, font: UIFont) {
-        let size = font.pointSize
-        let name = font.fontName
+//        let size = font.pointSize
+//        let name = font.fontName
         self.label.text = title
-        self.label.fontSize = size
-        self.label.fontName = name
-        self.label.fontColor = .white
+//        self.label.fontSize = size
+//        self.label.fontName = name
+//        self.label.fontColor = .white
     }
     
     var disabledTexture: SKTexture?

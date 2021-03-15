@@ -314,7 +314,69 @@ class DrawImages {
         return image!
     }
 
-    
+    static func drawStop() -> UIImage {
+        let sizeMpx: CGFloat = 0.7
+        let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
+        let size = CGSize(width: frame.width, height: frame.height)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.beginPath()
+        ctx!.setLineWidth(6.0)
+        let startX = size.width * (1 - sizeMpx) / 2
+        let startY = size.height * (1 - sizeMpx) / 2
+        let rect = CGRect(origin: CGPoint(x: startX, y: startY), size: size * sizeMpx)
+        let clipPath = UIBezierPath(roundedRect: rect, cornerRadius: size.width * 0.12).cgPath
+
+        ctx!.addPath(clipPath)
+
+        ctx!.setFillColor(UIColor.red.cgColor)
+        ctx!.setStrokeColor(UIColor.black.cgColor)
+        
+        ctx!.fillPath()
+        
+        ctx!.strokePath()
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+
+    static func drawLater() -> UIImage {
+        let sizeMpx: CGFloat = 0.7
+        let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
+        let size = CGSize(width: frame.width, height: frame.height)
+        let startX = size.width * (1 - sizeMpx) / 2
+        let startY = size.height * (1 - sizeMpx) / 2
+        let rect = CGRect(origin: CGPoint(x: startX, y: startY), size: size * 0.7)
+        let p1 = CGPoint(x: rect.minX, y: rect.minY)
+        let p2 = CGPoint(x: rect.maxX, y: rect.midY)
+        let p3 = CGPoint(x: rect.minX, y: rect.maxY)
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.beginPath()
+        ctx!.setLineWidth(10.0)
+        ctx!.setLineJoin(.round)
+        ctx!.setLineCap(.round)
+        ctx!.setLineWidth(25)
+        ctx!.move(to: p1)
+        ctx!.addLine(to: p2)
+        ctx!.addLine(to: p3)
+//        trianglePath.close()
+//        ctx!.addPath(trianglePath)
+
+        ctx!.setFillColor(UIColor.red.cgColor)
+        ctx!.setStrokeColor(UIColor.red.cgColor)
+        
+        ctx!.fillPath()
+        
+        ctx!.strokePath()
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
 }
 
 

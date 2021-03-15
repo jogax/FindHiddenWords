@@ -348,8 +348,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         case .NewWordsButton:
             texture = SKTexture(image: DrawImages.drawWordList())
         case .NewDeveloperButton:
-            texture = SKTexture(imageNamed: "me")
-        default: break
+            texture = SKTexture(imageNamed: "developer")
+        case .StopDemoModusNew:
+            texture = SKTexture(image: DrawImages.drawStop())
+        case .ShowDemoLaterNew:
+            texture = SKTexture(image: DrawImages.drawLater())
+//        default: break
         }
         if texture != nil {
             button = MyButton(text: text, texture: texture, fontName: GV.fontName, target: self, action: action, size: buttonSize)
@@ -395,16 +399,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                          LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
-        } else if buttonType == .StopDemoModus {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * 0.04)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * 0.04)),
-                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
-                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
-        } else if buttonType == .ShowDemoLater {
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * 0.04)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * 0.04)),
-                                         PSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05),
-                                         LSize: CGSize(width: GV.minSide * 0.25, height: GV.maxSide * 0.05))
+        } else if buttonType == .StopDemoModusNew {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.30, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.30, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        } else if buttonType == .ShowDemoLaterNew {
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
         }
         button.myType = .MyButton
         button.setActPosSize()
@@ -439,7 +443,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     enum ButtonType: Int {
-        case /*SizeButton = 0, LanguageButton, WordsButton, DeveloperButton,*/ StopDemoModus, ShowDemoLater, NewSizeButton, SettingsButton, NewWordsButton, NewDeveloperButton
+        case /*SizeButton = 0, LanguageButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, */
+            NewSizeButton, SettingsButton, NewWordsButton, NewDeveloperButton, StopDemoModusNew, ShowDemoLaterNew
     }
     
     @objc private func goBack() {
@@ -823,8 +828,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var counter = 0
     
     private func startDemoModus() {
-        stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(stopDemoModus), buttonType: .StopDemoModus)
-        showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
+        stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(stopDemoModus), buttonType: .StopDemoModusNew)
+        showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLaterNew)
         settingsButton.isHidden = true
         chooseSizeButton.isHidden = true
         if developerButton != nil {
@@ -845,7 +850,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         stopDemoButton.removeFromParent()
         showDemoNextTimeButton.removeFromParent()
         stopDemoButton = nil
-        developerButton = nil
+        showDemoNextTimeButton = nil
         try! realm.safeWrite {
             GV.basicData.showDemo = later
         }

@@ -68,7 +68,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcSearchingMoreWords:      "Ищи новые слова",
     .tcStopSearching:           "Поиск остановить",
     .tcDisable:                 "Отключить кнопку разработчика",
-    .tcStopDemo:                "Я понял",
+    .tcStopDemo:                "Стоп показ",
     .tcShowDemoLater:           "Покажи позже",
     .tcSettings:                "Настройки",
 ]

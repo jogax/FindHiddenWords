@@ -70,7 +70,7 @@ let enDictionary: [TextConstants: String] = [
     .tcSearchingMoreWords:      "Search new words",
     .tcStopSearching:           "Stop searching",
     .tcDisable:                 "Disable DeveloperButton",
-    .tcStopDemo:                "I understood",
+    .tcStopDemo:                "Stpp Demo",
     .tcShowDemoLater:           "Show later",
     .tcSettings:                "Settings",
 ]
