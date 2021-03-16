@@ -71,4 +71,5 @@ let huDictionary: [TextConstants: String] = [
     .tcStopDemo:                "Stop demo",
     .tcShowDemoLater:           "Mutasd később",
     .tcSettings:                "Beállítások",
+    .tcTipp:                    "Súgó",
 ]

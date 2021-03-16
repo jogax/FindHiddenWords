@@ -139,6 +139,7 @@ struct GV {
         }
     }
 //    static var size: Int = 0
+    static let oneGrad:CGFloat = CGFloat(Double.pi) / 180
     static var parentView: SKView!
     static var connectedToGameCenter = false
     static var debugModus = false

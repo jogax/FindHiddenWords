@@ -73,4 +73,5 @@ let enDictionary: [TextConstants: String] = [
     .tcStopDemo:                "Stpp Demo",
     .tcShowDemoLater:           "Show later",
     .tcSettings:                "Settings",
+    .tcTipp:                    "Tip",
 ]

@@ -210,6 +210,117 @@ class DrawImages {
         return pointOfCircle
     }
     
+    static func drawTipps() -> UIImage {
+        let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
+        let size = CGSize(width: frame.width, height: frame.height)
+        //let endAngle = CGFloat(2*M_PI)
+        
+        UIGraphicsBeginImageContextWithOptions(size, DrawImages.opaque, DrawImages.scale)
+        let ctx = UIGraphicsGetCurrentContext()
+        ctx!.setStrokeColor(UIColor.black.cgColor)
+        
+        ctx!.beginPath()
+        ctx!.setLineWidth(4.0)
+        
+        let adder:CGFloat = frame.width * 0.05
+        let r0 = frame.width * 0.25
+        
+        let center1 = CGPoint(x: frame.origin.x + frame.width / 2, y: frame.origin.y + adder + r0 * 1.8)
+        //        let center2 = CGPoint(x: frame.origin.x + frame.width / 2, y: frame.origin.y + frame.height - adder - r0 * 1.5)
+        
+        
+        let minAngle1 = 410 * GV.oneGrad
+        let maxAngle1 = 130 * GV.oneGrad
+        let blitzAngle1 = 200 * GV.oneGrad
+        let blitzAngle2 = 230 * GV.oneGrad
+        let blitzAngle3 = 270 * GV.oneGrad
+        let blitzAngle4 = 310 * GV.oneGrad
+        let blitzAngle5 = 340 * GV.oneGrad
+        //println("1 Grad: \(oneGrad)")
+        
+        //        let minAngle2 = 150 * oneGrad
+        //        let maxAngle2 = 30 * oneGrad
+        
+//        CGContextAddArc(ctx, center1.x, center1.y, r0, minAngle1, maxAngle1, 1)
+        ctx!.addArc(center: center1, radius: r0, startAngle: minAngle1, endAngle: maxAngle1, clockwise: true)
+        ctx!.strokePath()
+        
+        //        CGContextAddArc(ctx, center2.x, center2.y, r0, minAngle2, maxAngle2, 1)
+        //        CGContextStrokePath(ctx)
+        
+        let endPoint = DrawImages.pointOfCircle(radius: r0, center: center1, angle: minAngle1)
+        let p1 = DrawImages.pointOfCircle(radius: r0, center: center1, angle: maxAngle1)
+        let p2 = CGPoint(x: p1.x, y: p1.y + 4 * adder)
+        let p3 = CGPoint(x: endPoint.x, y: p2.y)
+        let p4 = CGPoint(x: p3.x, y: endPoint.y)
+        let p5 = CGPoint(x: p1.x, y: p1.y + 1.3 * adder)
+        let p6 = CGPoint(x: p3.x, y: p5.y)
+        let p7 = CGPoint(x: p1.x, y: p1.y + 2.6 * adder)
+        let p8 = CGPoint(x: p3.x, y: p7.y)
+        
+        let blitzStartAdder = adder * 1
+        let blitzEndAdder = adder * 4
+        
+        let blitzStartPoint1 = DrawImages.pointOfCircle(radius: r0 + blitzStartAdder, center: center1, angle: blitzAngle1)
+        let blitzEndPoint1 = DrawImages.pointOfCircle(radius: r0 + blitzEndAdder, center: center1, angle: blitzAngle1)
+        let blitzStartPoint2 = DrawImages.pointOfCircle(radius: r0 + blitzStartAdder, center: center1, angle: blitzAngle2)
+        let blitzEndPoint2 = DrawImages.pointOfCircle(radius: r0 + blitzEndAdder, center: center1, angle: blitzAngle2)
+        let blitzStartPoint3 = DrawImages.pointOfCircle(radius: r0 + blitzStartAdder, center: center1, angle: blitzAngle3)
+        let blitzEndPoint3 = DrawImages.pointOfCircle(radius: r0 + blitzEndAdder, center: center1, angle: blitzAngle3)
+        let blitzStartPoint4 = DrawImages.pointOfCircle(radius: r0 + blitzStartAdder, center: center1, angle: blitzAngle4)
+        let blitzEndPoint4 = DrawImages.pointOfCircle(radius: r0 + blitzEndAdder, center: center1, angle: blitzAngle4)
+        let blitzStartPoint5 = DrawImages.pointOfCircle(radius: r0 + blitzStartAdder, center: center1, angle: blitzAngle5)
+        let blitzEndPoint5 = DrawImages.pointOfCircle(radius: r0 + blitzEndAdder, center: center1, angle: blitzAngle5)
+
+        
+        
+        ctx!.move(to: CGPoint(x: p1.x, y: p1.y))
+        ctx!.addLine(to: CGPoint(x: p2.x, y: p2.y))
+        ctx!.addLine(to: CGPoint(x: p3.x, y: p3.y))
+        ctx!.addLine(to: CGPoint(x: p4.x, y: p4.y))
+        ctx!.strokePath()
+
+        ctx!.setLineWidth(2.0)
+        ctx!.move(to: CGPoint(x: p5.x, y: p5.y))
+        ctx!.addLine(to: CGPoint(x: p6.x, y: p6.y))
+        ctx!.strokePath()
+        
+        ctx!.move(to: CGPoint(x: p7.x, y: p7.y))
+        ctx!.addLine(to: CGPoint(x: p8.x, y: p8.y))
+        ctx!.strokePath()
+        
+        ctx!.move(to: CGPoint(x: blitzStartPoint1.x, y: blitzStartPoint1.y))
+        ctx!.addLine(to: CGPoint(x: blitzEndPoint1.x, y: blitzEndPoint1.y))
+        ctx!.strokePath()
+
+        ctx!.move(to: CGPoint(x: blitzStartPoint2.x, y: blitzStartPoint2.y))
+        ctx!.addLine(to: CGPoint(x: blitzEndPoint2.x, y: blitzEndPoint2.y))
+        ctx!.strokePath()
+        
+        ctx!.move(to: CGPoint(x: blitzStartPoint3.x, y: blitzStartPoint3.y))
+        ctx!.addLine(to: CGPoint(x: blitzEndPoint3.x, y: blitzEndPoint3.y))
+        ctx!.strokePath()
+        
+        ctx!.move(to: CGPoint(x: blitzStartPoint4.x, y: blitzStartPoint4.y))
+        ctx!.addLine(to: CGPoint(x: blitzEndPoint4.x, y: blitzEndPoint4.y))
+        ctx!.strokePath()
+        
+        ctx!.move(to: CGPoint(x: blitzStartPoint5.x, y: blitzStartPoint5.y))
+        ctx!.addLine(to: CGPoint(x: blitzEndPoint5.x, y: blitzEndPoint5.y))
+        ctx!.strokePath()
+        
+//        CGContextAddArc(ctx, center1.x, center1.y, r0, maxAngle1, minAngle1, 1)
+        ctx!.addArc(center: center1, radius: r0, startAngle: maxAngle1, endAngle: minAngle1, clockwise: true)
+        ctx!.strokePath()
+
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        return image!
+    }
+    
+
+    
     static func drawSettings() -> UIImage {
         let frame = CGRect(origin: CGPoint(), size: CGSize(width: 250, height: 250))
         let size = CGSize(width: frame.width, height: frame.height)
@@ -219,7 +330,7 @@ class DrawImages {
         let ctx = UIGraphicsGetCurrentContext()
         ctx!.beginPath()
         
-        ctx!.setLineWidth(4.0)
+        ctx!.setLineWidth(8.0)
         
         let adder:CGFloat = 10.0
         let center = CGPoint(x: frame.origin.x + frame.width / 2, y: frame.origin.y + frame.height / 2)

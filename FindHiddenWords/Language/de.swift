@@ -71,4 +71,5 @@ let deDictionary: [TextConstants: String] = [
     .tcStopDemo:                "Demo beenden",
     .tcShowDemoLater:           "Zeige später",
     .tcSettings:                "Einstellungen",
+    .tcTipp:                    "Tipp",
 ]
