@@ -52,10 +52,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             return 0
         }
     }
+    
+    var countButtons = 4
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
 
+    public func resetDeveloperButton() {
+        countButtons = 4
+        developerButton.removeFromParent()
+        developerButton = nil
+        setButtonsPositions()
+    }
     public func generateDebugButton() {
+        countButtons = 5
         developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+        setButtonsPositions()
     }
     
     @objc private func developerMenu() {
@@ -306,13 +316,48 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     var headerMpx: CGFloat = 0
+    
+    private func setButtonsPositions() {
+        let firstPosXP = countButtons == 4 ? (GV.minSide / 4) / 2 : (GV.minSide / 5) / 2
+        let firstPosXL = countButtons == 4 ? (GV.maxSide / 4) / 2 : (GV.maxSide / 5) / 2
+        let xAdderP = countButtons == 4 ? GV.minSide / 4 : GV.minSide / 5
+        let xAdderL = countButtons == 4 ? GV.maxSide / 4 : GV.maxSide / 5
+        chooseSizeButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP, y: (GV.maxSide * posMpx)),
+                                             LPos: CGPoint(x: firstPosXL, y: (GV.maxSide * posMpx)),
+                                             PSize: buttonSize,
+                                             LSize: buttonSize)
+        chooseSizeButton.setActPosSize()
+        settingsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 1 * xAdderP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL + 1 * xAdderL, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        settingsButton.setActPosSize()
+        tippButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 2 * xAdderP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL + 2 * xAdderL, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        tippButton.setActPosSize()
+        myWordsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 3 * xAdderP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL + 3 * xAdderL, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        myWordsButton.setActPosSize()
+        if GV.developerModus {
+            developerButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 4 * xAdderP, y: (GV.maxSide * posMpx)),
+                                     LPos: CGPoint(x: firstPosXL + 4 * xAdderL, y: (GV.maxSide * posMpx)),
+                                     PSize: buttonSize,
+                                     LSize: buttonSize)
+            developerButton.setActPosSize()
+        }
+    }
+    let sizeMpx: CGFloat = GV.onIpad ? 0.1 : 0.15
+    let posMpx: CGFloat = GV.onIpad ? 0.06 : 0.07
+    var buttonSize = CGSize()
 
     private func addButtonPL(to: SKNode, text: String, action: Selector, buttonType: ButtonType)->MyButton {
         var button: MyButton!
+        buttonSize = CGSize(width: GV.minSide * sizeMpx, height: GV.minSide * sizeMpx)
         var texture: SKTexture!
-        let sizeMpx: CGFloat = GV.onIpad ? 0.1 : 0.15
-        let posMpx: CGFloat = GV.onIpad ? 0.06 : 0.07
-        let buttonSize = CGSize(width: GV.minSide * sizeMpx, height: GV.minSide * sizeMpx)
         switch buttonType {
         case .SizeButton:
             texture = SKTexture(imageNamed: "Numbers")
@@ -337,27 +382,36 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
         }
         button.zPosition = self.zPosition + 20
+        let firstPosX = countButtons == 4 ? (GV.actWidth / 4) / 2 : (GV.actWidth / 5) / 2
+        let xAdder = countButtons == 4 ? GV.actWidth / 4 : GV.actWidth / 5
         switch buttonType {
         case .SizeButton:
-                button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.20, y: (GV.maxSide * posMpx)),
-                                             LPos: CGPoint(x: GV.maxSide * 0.20, y: (GV.maxSide * posMpx)),
+                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
+                                             LPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
                                              PSize: buttonSize,
                                              LSize: buttonSize)
         case .SettingsButton:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.4, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.4, y: (GV.maxSide * posMpx)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 1 * xAdder, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX + 1 * xAdder, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        case .TippButton:
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 2 * xAdder, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX + 2 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
         case .WordsButton:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.60, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.60, y: (GV.maxSide * posMpx)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
         case .DeveloperButton:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * posMpx)),
+            if GV.developerModus {
+                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 4 * xAdder, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX + 4 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
+            }
         case .StopDemoModus:
             button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.30, y: (GV.maxSide * posMpx)),
                                          LPos: CGPoint(x: GV.maxSide * 0.30, y: (GV.maxSide * posMpx)),
@@ -368,11 +422,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                          LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
-        case .TippButton:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.90, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.90, y: (GV.maxSide * posMpx)),
-                                         PSize: buttonSize,
-                                         LSize: buttonSize)
         }
         button.myType = .MyButton
         button.setActPosSize()
@@ -380,7 +429,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         to.addChild(button)
         return button
     }
-
+    
     private func setPosItionsAndSizesOfNodesWithActNames(layer: SKNode, objects: [ObjectSP]) {
         for index in 0..<objects.count {
             let name = objects[index].name
@@ -1293,7 +1342,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             settingsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcSettings), action: #selector(settings), buttonType: .SettingsButton)
             tippButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcTipp), action: #selector(showTipp), buttonType: .TippButton)
             myWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
-            if GCHelper.shared.getName() == GV.myGCName {
+            if GV.developerModus {
                 developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
             }
             let myScore = getScore()

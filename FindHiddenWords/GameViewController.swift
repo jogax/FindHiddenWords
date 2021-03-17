@@ -29,12 +29,10 @@ class GameViewController: UIViewController, GCHelperDelegate {
     }
     
     func localPlayerAuthenticated() {
-        #if DEBUG
-        GV.debugModus = true
-        if GCHelper.shared.getName() == GV.myGCName {
+        GV.developerModus = GCHelper.shared.getName() == GV.myGCName ? true : false
+        if GV.developerModus {
             GV.playSearchingWordsScene!.generateDebugButton()
         }
-        #endif
         GV.connectedToGameCenter = true
         GCHelper.shared.getBestScore(completion: {
             GV.playSearchingWordsScene!.modifyScoreLabel()
@@ -44,6 +42,7 @@ class GameViewController: UIViewController, GCHelperDelegate {
     func localPlayerNotAuthenticated() {
         GV.connectedToInternet = false
         GV.playSearchingWordsScene!.hideWorldBestResults()
+        GV.playSearchingWordsScene!.resetDeveloperButton()
     }
     
     func continueTimeCount() {
@@ -95,7 +94,9 @@ class GameViewController: UIViewController, GCHelperDelegate {
 //
     override func viewDidLoad() {
         super.viewDidLoad()
-//        NotificationCenter.default.addObserver(self, selector: #selector(rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
+//        #if DEBUG
+//        GV.debugModus = true
+//        #endif
 
         GV.minSide = min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
         GV.maxSide = max(UIScreen.main.bounds.width, UIScreen.main.bounds.height)

@@ -16,15 +16,12 @@ enum DataSource: Int {
     case GameCenter = 0, ICloud
 }
 
-
-//#if DEBUG
 public protocol ShowGameCenterViewControllerDelegate: class {
     func backFromShowGameCenterViewController()
 }
 class ShowGameCenterViewController: UIViewController, TableViewDelegate {
     var showGameCenterView: TableView? = TableView()
     var myDelegate: ShowGameCenterViewControllerDelegate?
-//    var headerLine = [String]()
     let color = UIColor(red: 230/255, green: 230/255, blue: 240/255, alpha: 1.0)
     let indexOfOnlineImage = 0
     let indexOfAlias = 1

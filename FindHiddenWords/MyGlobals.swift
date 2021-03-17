@@ -143,6 +143,7 @@ struct GV {
     static var parentView: SKView!
     static var connectedToGameCenter = false
     static var debugModus = false
+    static var developerModus = false
     static var justStarted = true
     static var oldSize: Int = 0
     static var gameArray = [[GameboardItem]]()
