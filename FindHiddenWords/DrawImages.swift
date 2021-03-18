@@ -220,7 +220,7 @@ class DrawImages {
         ctx!.setStrokeColor(UIColor.black.cgColor)
         
         ctx!.beginPath()
-        ctx!.setLineWidth(4.0)
+        ctx!.setLineWidth(8.0)
         
         let adder:CGFloat = frame.width * 0.05
         let r0 = frame.width * 0.25
@@ -280,7 +280,7 @@ class DrawImages {
         ctx!.addLine(to: CGPoint(x: p4.x, y: p4.y))
         ctx!.strokePath()
 
-        ctx!.setLineWidth(2.0)
+        ctx!.setLineWidth(8.0)
         ctx!.move(to: CGPoint(x: p5.x, y: p5.y))
         ctx!.addLine(to: CGPoint(x: p6.x, y: p6.y))
         ctx!.strokePath()

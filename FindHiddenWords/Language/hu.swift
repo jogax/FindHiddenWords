@@ -72,4 +72,7 @@ let huDictionary: [TextConstants: String] = [
     .tcShowDemoLater:           "Mutasd később",
     .tcSettings:                "Beállítások",
     .tcTipp:                    "Súgó",
+    .tcChooseShowingType:       "Talált betűk vagy pontok megjelenítése",
+    .tcShowLetters:             "Betűk megjelenítése",
+    .tcShowDots:             "Pontok megjelenítése",
 ]

@@ -72,4 +72,7 @@ let ruDictionary: [TextConstants: String] = [
     .tcShowDemoLater:           "Покажи позже",
     .tcSettings:                "Настройки",
     .tcTipp:                    "Помощь",
+    .tcChooseShowingType:        "Показывать найденные буквы или точки",
+    .tcShowLetters:             "Показать буквы",
+    .tcShowDots:                 "Показать точки",
 ]

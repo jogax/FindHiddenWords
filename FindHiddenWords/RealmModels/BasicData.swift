@@ -83,6 +83,7 @@ class BasicData: Object {
     @objc dynamic var countPlaysToday = 0
     @objc dynamic var lastPlayingDay = 0
     @objc dynamic var deviceType = 0
+    @objc dynamic var showDots = true
     @objc dynamic var land = 0
     @objc dynamic var version = 0
     @objc dynamic var countPlays = 0

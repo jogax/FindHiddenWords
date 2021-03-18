@@ -26,9 +26,11 @@ class MyFoundedWord: MyLabel {
     
     public func setQuestionMarks() {
         var newText = text!.startingSubString(length: 4)
+        let showLetters = mandatory && founded ? true : !GV.basicData.showDots
         for letter in usedWord!.usedLetters {
-            newText += GV.gameArray[letter.col][letter.row].status == .WholeWord ? letter.letter : GV.questionMark
+            newText += GV.gameArray[letter.col][letter.row].status == .WholeWord ? (showLetters ? letter.letter : "°") : GV.questionMark
         }
+
         text = newText
     }
     

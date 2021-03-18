@@ -58,8 +58,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     public func resetDeveloperButton() {
         countButtons = 4
-        developerButton.removeFromParent()
-        developerButton = nil
+        if developerButton != nil {
+            developerButton.removeFromParent()
+            developerButton = nil
+        }
         setButtonsPositions()
     }
     public func generateDebugButton() {
@@ -845,6 +847,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
         settingsButton.isHidden = true
         chooseSizeButton.isHidden = true
+        tippButton.isHidden = true
         if developerButton != nil {
             developerButton.isHidden = true
         }
@@ -856,6 +859,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         demoModus = false
         settingsButton.isHidden = false
         chooseSizeButton.isHidden = false
+        tippButton.isHidden = false
         if developerButton != nil {
             developerButton.isHidden = false
         }
@@ -1277,7 +1281,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let blockSize = GV.minSide * sizeMultiplier[GV.basicData.gameSize]
         GV.blockSize = blockSize
         GV.playingGrid = Grid(blockSize: blockSize * 1.1, rows: GV.basicData.gameSize, cols: GV.basicData.gameSize)
-        let gridLposX = GV.maxSide - GV.playingGrid!.size.width * 0.65
+        let gridLposX = GV.maxSide - GV.playingGrid!.size.width * 0.55
         GV.gameArray = createNewGameArray(size: GV.basicData.gameSize)
         let gameHeaderPosition = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.5, y: firstYP),
                                            LPos: CGPoint(x: gridLposX , y: firstYL))
@@ -1521,9 +1525,25 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                           target: self,
                                           type: .Green)
         myAlert.addAction(text: .tcChooseLanguage, action: #selector(self.chooseLanguage), isActive: false)
+        myAlert.addAction(text: .tcShowLetters, action: #selector(setShowLetters), isActive: !GV.basicData.showDots)
+        myAlert.addAction(text: .tcShowDots, action: #selector(setShowDots), isActive: GV.basicData.showDots)
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
+    }
+    
+    @objc private func setShowLetters() {
+        try! realm.safeWrite {
+            GV.basicData.showDots = false
+            setGameArrayToActualState()
+        }
+    }
+    
+    @objc private func setShowDots() {
+        try! realm.safeWrite {
+            GV.basicData.showDots = true
+            setGameArrayToActualState()
+        }
     }
     
     @objc private func setLanguage(language: String) {
@@ -1752,13 +1772,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             for myWord in myLabels {
                 if myWord.mandatory {
-                    myWord.setQuestionMarks()
                     if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
 //                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
                         myWord.fontColor = GV.darkGreen
                         myWord.founded = true
                      }
-                } else {
+                    myWord.setQuestionMarks()
+               } else {
                     myWord.isHidden = true
                     myWord.fontColor = .red
                 }
