@@ -922,7 +922,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWords()
+                                animateWords(demo: true)
                             } else {
                                 stopDemoModus()
                             }
@@ -958,7 +958,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWords()
+                                animateWords(demo: false)
                             } else {
                                 stopDemoModus()
                             }
@@ -1016,7 +1016,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         if demoModus {
                             if wordsToAnimate.count > 0 {
-                                animateWords()
+                                animateWords(demo: false)
                             } else {
                                 stopDemoModus()
                             }
@@ -1370,7 +1370,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var wordsToAnimate = [WordsToAnimate]()
     
     @objc private func showTipp() {
-        
+        for item in playedGame.wordsToFind {
+            let usedWord = item.getUsedWord()
+            if !playedGame.myWords.contains(where: {$0.getUsedWord() == usedWord}) {
+                let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
+                wordsToAnimate.append(wordToAppend)
+            }
+        }
+        wordsToAnimate = wordsToAnimate.sorted(by: {
+            ($0.calculatedDiagonalConnections>$1.calculatedDiagonalConnections) ||
+            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
+            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
+        })
+        animateWords(demo: false)
+
     }
     private func showDemo() {
         
@@ -1384,31 +1397,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
             ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
         })
-        animateWords()
-//        var myActions = [SKAction]()
-
-//        for item in wordsToAnimate {
-//            var cellsToAnimate = [GameboardItem]()
-//            for letter in item.usedLetters {
-//                cellsToAnimate.append(GV.gameArray[letter.col][letter.row])
-//            }
-//            for cell in cellsToAnimate {
-//                let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
-//                print("Position: \(cell.position)")
-//                myActions.append(moveAction)
-//            }
-//        }
-//        let sequence = SKAction.sequence(myActions)
-//        fingerSprite.run(sequence)
+        animateWords(demo: true)
     }
     
     let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
-    @objc private func animateWords() {
+    @objc private func animateWords(demo: Bool) {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
 //            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
             fingerSprite.isHidden = false
-            demoModus = true
+            demoModus = demo
             fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
             fingerSprite.zPosition += 100
             fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
