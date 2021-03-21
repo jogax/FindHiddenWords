@@ -752,7 +752,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     var colRowTable = [ColRow]()
-    var demoModus = false
+    enum DemoModus: Int {
+        case Demo = 0, Help, Normal
+    }
+    var demoModus: DemoModus = .Normal
     
     public func hideWorldBestResults() {
         worldBestScoreLabel.isHidden = true
@@ -772,7 +775,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         
         if OK {
             let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
-            if demoModus {
+            if demoModus == .Demo || demoModus == .Help {
                 choosedWord.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
                 GV.gameArray[col][row].setStatus(toStatus: .Temporary)
                 return
@@ -856,7 +859,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     
     @objc private func stopDemoModus(later: Bool = false) {
-        demoModus = false
+        demoModus = .Normal
         settingsButton.isHidden = false
         chooseSizeButton.isHidden = false
         tippButton.isHidden = false
@@ -864,10 +867,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             developerButton.isHidden = false
         }
         myWordsButton.isHidden = false
-        stopDemoButton.removeFromParent()
-        showDemoNextTimeButton.removeFromParent()
-        stopDemoButton = nil
-        showDemoNextTimeButton = nil
+        if stopDemoButton != nil {
+            stopDemoButton.removeFromParent()
+            showDemoNextTimeButton.removeFromParent()
+            stopDemoButton = nil
+            showDemoNextTimeButton = nil
+        }
         try! realm.safeWrite {
             GV.basicData.showDemo = later
         }
@@ -920,12 +925,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 })
                 if index == cellsToAnimate.count - 1 {
                     let finishAction = SKAction.run { [self] in
-                        if demoModus {
+                        switch demoModus {
+                        case .Demo:
                             if wordsToAnimate.count > 0 {
-                                animateWords(demo: true)
+                                demoModus = .Demo
+                                animateWords()
                             } else {
                                 stopDemoModus()
                             }
+                        case .Help:
+                            stopDemoModus()
+                        case .Normal:
+                            break
                         }
                     }
                     myActions.append(finishAction)
@@ -939,7 +950,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for item in newWord.usedLetters {
                 cellsToAnimate.append(GV.gameArray[item.col][item.row])
             }
-            for (index, cell) in cellsToAnimate.enumerated() {
+            for (_, cell) in cellsToAnimate.enumerated() {
                 myActions.removeAll()
                 cell.setStatus(toStatus: .OrigStatus)
 //                myActions.append(SKAction.wait(forDuration: 0.2))
@@ -954,18 +965,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: 0.2))
                 }
-                if index == cellsToAnimate.count - 1 {
-                    let finishAction = SKAction.run { [self] in
-                        if demoModus {
-                            if wordsToAnimate.count > 0 {
-                                animateWords(demo: false)
-                            } else {
-                                stopDemoModus()
-                            }
-                        }
-                    }
-                    myActions.append(finishAction)
-                }
+//                if index == cellsToAnimate.count - 1 {
+//                    let finishAction = SKAction.run { [self] in
+//                        if demoModus {
+//                            if wordsToAnimate.count > 0 {
+//                                animateWords(demo: false)
+//                            } else {
+//                                stopDemoModus()
+//                            }
+//                        }
+//                    }
+//                    myActions.append(finishAction)
+//                }
 
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
@@ -998,7 +1009,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cell.run(sequence)
             }
             let longWaitAction = SKAction.wait(forDuration: 3 * 2 * duration)
-            for (index, cell) in oldCellsToAnimate.enumerated() {
+            for (_, cell) in oldCellsToAnimate.enumerated() {
                 myActions.removeAll()
 //                cell.setStatus(toStatus: .OrigStatus)
                 myActions.append(longWaitAction)
@@ -1012,18 +1023,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: duration))
                 }
-                if index == cellsToAnimate.count - 1 {
-                    let finishAction = SKAction.run { [self] in
-                        if demoModus {
-                            if wordsToAnimate.count > 0 {
-                                animateWords(demo: false)
-                            } else {
-                                stopDemoModus()
-                            }
-                        }
-                    }
-                    myActions.append(finishAction)
-                }
+//                if index == cellsToAnimate.count - 1 {
+//                    let finishAction = SKAction.run { [self] in
+//                        if demoModus {
+//                            if wordsToAnimate.count > 0 {
+//                                animateWords(demo: false)
+//                            } else {
+//                                stopDemoModus()
+//                            }
+//                        }
+//                    }
+//                    myActions.append(finishAction)
+//                }
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
@@ -1370,19 +1381,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var wordsToAnimate = [WordsToAnimate]()
     
     @objc private func showTipp() {
-        for item in playedGame.wordsToFind {
-            let usedWord = item.getUsedWord()
-            if !playedGame.myWords.contains(where: {$0.getUsedWord() == usedWord}) {
-                let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
-                wordsToAnimate.append(wordToAppend)
-            }
+        let index = Int.random(min: 0, max: playedGame.wordsToFind.count - 1)
+        let item = playedGame.wordsToFind[index]
+        let usedWord = item.getUsedWord()
+        if !playedGame.myWords.contains(where: {$0.getUsedWord() == usedWord}) {
+            let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
+            wordsToAnimate.append(wordToAppend)
         }
-        wordsToAnimate = wordsToAnimate.sorted(by: {
-            ($0.calculatedDiagonalConnections>$1.calculatedDiagonalConnections) ||
-            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
-            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
-        })
-        animateWords(demo: false)
+        demoModus = .Help
+        animateWords()
 
     }
     private func showDemo() {
@@ -1392,21 +1399,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
             wordsToAnimate.append(wordToAppend)
         }
-        wordsToAnimate = wordsToAnimate.sorted(by: {
-            ($0.calculatedDiagonalConnections>$1.calculatedDiagonalConnections) ||
-            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
-            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
-        })
-        animateWords(demo: true)
+//        wordsToAnimate = wordsToAnimate.sorted(by: {
+//            ($0.calculatedDiagonalConnections>$1.calculatedDiagonalConnections) ||
+//            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
+//            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
+//        })
+        demoModus = .Demo
+        animateWords()
     }
     
     let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
-    @objc private func animateWords(demo: Bool) {
+    @objc private func animateWords() {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
 //            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
             fingerSprite.isHidden = false
-            demoModus = demo
+//            demoModus = demo
             fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
             fingerSprite.zPosition += 100
             fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
@@ -1897,7 +1905,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
 
 
-        } else if demoModus {
+        } else if demoModus == .Demo {
             return true
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
