@@ -924,6 +924,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     cell.setStatus(toStatus: .WholeWord)
                 })
                 if index == cellsToAnimate.count - 1 {
+                    if demoModus == .Demo || demoModus == .Help {
+                        let undoAction = SKAction.run {
+                            for cell in cellsToAnimate {
+                                cell.setStatus(toStatus: .OrigStatus)
+                            }
+                            try! playedGamesRealm!.safeWrite {
+                                playedGame.myWords.removeLast()
+                            }
+                            self.choosedWord = UsedWord()
+                            self.setGameArrayToActualState()
+                        }
+                        myActions.append(undoAction)
+                    }
                     let finishAction = SKAction.run { [self] in
                         switch demoModus {
                         case .Demo:
@@ -965,18 +978,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: 0.2))
                 }
-//                if index == cellsToAnimate.count - 1 {
-//                    let finishAction = SKAction.run { [self] in
-//                        if demoModus {
-//                            if wordsToAnimate.count > 0 {
-//                                animateWords(demo: false)
-//                            } else {
-//                                stopDemoModus()
-//                            }
-//                        }
-//                    }
-//                    myActions.append(finishAction)
-//                }
 
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
@@ -1023,18 +1024,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     })
                     myActions.append(SKAction.wait(forDuration: duration))
                 }
-//                if index == cellsToAnimate.count - 1 {
-//                    let finishAction = SKAction.run { [self] in
-//                        if demoModus {
-//                            if wordsToAnimate.count > 0 {
-//                                animateWords(demo: false)
-//                            } else {
-//                                stopDemoModus()
-//                            }
-//                        }
-//                    }
-//                    myActions.append(finishAction)
-//                }
                 let sequence = SKAction.sequence(myActions)
                 cell.run(sequence)
             }
@@ -1767,7 +1756,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
             }
         }
-        if playedGame.myWords.count > 0 {
+//        if playedGame.myWords.count > 0 {
             if choosedWord.word.count > 0 {
                 setWordStatus(usedWord: choosedWord)
             } else {
@@ -1782,7 +1771,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
                         myWord.fontColor = GV.darkGreen
                         myWord.founded = true
-                     }
+                    } else {
+                        myWord.fontColor = .black
+                        myWord.founded = false
+                    }
                     myWord.setQuestionMarks()
                } else {
                     myWord.isHidden = true
@@ -1793,8 +1785,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             try! realm.safeWrite {
                 GV.basicData.setLocalMaxScore(score: score)
             }
-            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
-            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+            if demoModus == .Normal {
+                    GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
+                    GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+            }
             if myScoreLabel != nil {
                 myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
                 let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
@@ -1802,7 +1796,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
                 worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
             }
-        }
+//        }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
         })
