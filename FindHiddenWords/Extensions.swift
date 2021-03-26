@@ -1371,6 +1371,12 @@ extension UIWindow {
 }
 
 extension SKSpriteNode {
+    
+    func removeChildWithName(name: String) {
+        if let childToRemove = self.childNode(withName: name) {
+            childToRemove.removeFromParent()
+        }
+    }
 
     func drawBorder() {
         let color:UIColor = .darkGray

@@ -913,7 +913,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for (index, cell) in cellsToAnimate.enumerated() {
 //                cell.setStatus(toStatus: .GoldStatus)
                 myActions.removeAll()
-                waiting += 0.4
+                waiting += 0.2
                 myActions.append(SKAction.wait(forDuration: waiting))
                 myActions.append(SKAction.run {
                     cell.setStatus(toStatus: .Lila)
@@ -925,6 +925,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 })
                 if index == cellsToAnimate.count - 1 {
                     if demoModus == .Demo || demoModus == .Help {
+                        myActions.append(SKAction.wait(forDuration: waiting))
                         let undoAction = SKAction.run {
                             for cell in cellsToAnimate {
                                 cell.setStatus(toStatus: .OrigStatus)
@@ -933,6 +934,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                 playedGame.myWords.removeLast()
                             }
                             self.choosedWord = UsedWord()
+                            self.iterateGameArray(doing: {(col: Int, row: Int) in
+                                GV.gameArray[col][row].removeConnections()
+                            })
                             self.setGameArrayToActualState()
                         }
                         myActions.append(undoAction)
@@ -1757,45 +1761,45 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
 //        if playedGame.myWords.count > 0 {
-            if choosedWord.word.count > 0 {
-                setWordStatus(usedWord: choosedWord)
-            } else {
-                for item in playedGame.myWords {
-                    let usedWord = item.getUsedWord()
-                    setWordStatus(usedWord: usedWord)
-                }
+        if choosedWord.word.count > 0 {
+            setWordStatus(usedWord: choosedWord)
+        } else {
+            for item in playedGame.myWords {
+                let usedWord = item.getUsedWord()
+                setWordStatus(usedWord: usedWord)
             }
-            for myWord in myLabels {
-                if myWord.mandatory {
-                    if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
+        }
+        for myWord in myLabels {
+            if myWord.mandatory {
+                if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
 //                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
-                        myWord.fontColor = GV.darkGreen
-                        myWord.founded = true
-                    } else {
-                        myWord.fontColor = .black
-                        myWord.founded = false
-                    }
-                    myWord.setQuestionMarks()
-               } else {
-                    myWord.isHidden = true
-                    myWord.fontColor = .red
+                    myWord.fontColor = GV.darkGreen
+                    myWord.founded = true
+                } else {
+                    myWord.fontColor = .black
+                    myWord.founded = false
                 }
+                myWord.setQuestionMarks()
+           } else {
+                myWord.isHidden = true
+                myWord.fontColor = .red
             }
-            let score = getScore()
-            try! realm.safeWrite {
-                GV.basicData.setLocalMaxScore(score: score)
-            }
-            if demoModus == .Normal {
-                    GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
-                    GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
-            }
-            if myScoreLabel != nil {
-                myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
-                let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
-                let (player, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)
-                myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
-                worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
-            }
+        }
+        let score = getScore()
+        try! realm.safeWrite {
+            GV.basicData.setLocalMaxScore(score: score)
+        }
+        if demoModus == .Normal {
+                GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
+                GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+        }
+        if myScoreLabel != nil {
+            myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))
+            let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
+            let (player, worldBestScore) = GV.basicData.getMaxScore(type: .GameCenter)
+            myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
+            worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
+        }
 //        }
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()

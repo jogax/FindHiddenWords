@@ -424,9 +424,9 @@ class GameboardItem: SKSpriteNode {
             self.countWordsLabel.text = ""
         }
 //        print("In SetStatus: caller: \(calledFrom), letter: \(letter), oldStatus: \(oldStatus), status: \(newStatus), newStatus: \(status)")
-        if connectionType.isSet() {
+//        if connectionType.isSet() {
             setConnectionType(connectionType: connectionType)
-        }
+//        }
         let name = textureName[StatusType(itemStatus: status, fixItem: fixItem)]!
         self.texture = SKTexture(imageNamed: name)
  
@@ -446,10 +446,12 @@ class GameboardItem: SKSpriteNode {
     }
     
     public func showConnections() {
-        if connectionType.isSet() {
-            setTexture()
-
-        }
+        setTexture()
+    }
+    
+    public func removeConnections() {
+        connectionType = ConnectionType()
+        showConnections()
     }
     
 
@@ -469,8 +471,9 @@ class GameboardItem: SKSpriteNode {
         let child = SKSpriteNode(texture: connectedSprite) // imageNamed: connectionName)
 //        child.size = self.size * 1.1
         child.zPosition = self.zPosition - 10
-        child.name = ConnectionName
-//        let main = self
+        let name = "\(ConnectionName)-\(col)-\(row)"
+        GV.playingGrid!.removeChildWithName(name: name)
+        child.name = name
         child.position = self.position
         GV.playingGrid!.addChild(child)
 //        self.addChild(child)
