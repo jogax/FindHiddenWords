@@ -913,7 +913,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             for (index, cell) in cellsToAnimate.enumerated() {
 //                cell.setStatus(toStatus: .GoldStatus)
                 myActions.removeAll()
-                waiting += 0.2
+                waiting += 0.4
                 myActions.append(SKAction.wait(forDuration: waiting))
                 myActions.append(SKAction.run {
                     cell.setStatus(toStatus: .Lila)
@@ -925,7 +925,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 })
                 if index == cellsToAnimate.count - 1 {
                     if demoModus == .Demo || demoModus == .Help {
-                        myActions.append(SKAction.wait(forDuration: waiting))
+                        myActions.append(SKAction.wait(forDuration: 0.1))
                         let undoAction = SKAction.run {
                             for cell in cellsToAnimate {
                                 cell.setStatus(toStatus: .OrigStatus)
@@ -1374,13 +1374,18 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var wordsToAnimate = [WordsToAnimate]()
     
     @objc private func showTipp() {
-        let index = Int.random(min: 0, max: playedGame.wordsToFind.count - 1)
-        let item = playedGame.wordsToFind[index]
-        let usedWord = item.getUsedWord()
-        if !playedGame.myWords.contains(where: {$0.getUsedWord() == usedWord}) {
-            let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
-            wordsToAnimate.append(wordToAppend)
+        var tippsForShow = [FoundedWords]()
+        for item in playedGame.wordsToFind {
+            let usedWord = item.getUsedWord()
+            if !playedGame.myWords.contains(where: {$0.getUsedWord() == usedWord}) {
+                tippsForShow.append(item)
+            }
         }
+        let index = Int.random(min: 0, max: tippsForShow.count - 1)
+        let item = tippsForShow[index]
+        let usedWord = item.getUsedWord()
+        let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
+        wordsToAnimate.append(wordToAppend)
         demoModus = .Help
         animateWords()
 
@@ -1422,26 +1427,34 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myActions.append(SKAction.fadeIn(withDuration: 0.0))
 
                 let moveAction = SKAction.move(to: cell.position + GV.playingGrid!.position - CGPoint(x: 0, y: GV.blockSize / 2), duration: 0.5)
+                let touchLocation = cell.position + GV.playingGrid!.position
                 myActions.append(moveAction)
                 let touchAction = SKAction.run { [self] in
                     switch index {
                     case 0:
-                        myTouchesBegan(touchLocation: cell.position + GV.playingGrid!.position)
-                    case 1..<cellsToAnimate.count:
-                        myTouchesMoved(touchLocation: cell.position + GV.playingGrid!.position)
-                        if index == cellsToAnimate.count - 1 {
-                            myTouchesEnded()
-                        }
+                        myTouchesBegan(touchLocation: touchLocation)
+                    case 1..<cellsToAnimate.count - 1:
+                        myTouchesMoved(touchLocation: touchLocation)
+                    case cellsToAnimate.count - 1:
+                        myTouchesMoved(touchLocation: touchLocation)
+//                        myTouchesEnded()
                     default:
                         break
                     }
                 }
                 myActions.append(touchAction)
-                if index == cellsToAnimate.count - 1 {
-                    myActions.append(SKAction.fadeOut(withDuration: 0.5))
-                    myActions.append(SKAction.removeFromParent())
-                }
+//                if index == cellsToAnimate.count - 1 {
+//                    myActions.append(SKAction.fadeOut(withDuration: 0.1))
+//                    myActions.append(SKAction.removeFromParent())
+//                }
             }
+            myActions.append(SKAction.wait(forDuration: 0.1))
+            let touchesEndedAction = SKAction.run { [self] in
+                self.myTouchesEnded()
+            }
+            myActions.append(SKAction.fadeOut(withDuration: 0.1))
+            myActions.append(SKAction.removeFromParent())
+            myActions.append(touchesEndedAction)
             let sequence = SKAction.sequence(myActions)
             fingerSprite.run(sequence)
         }
@@ -1519,28 +1532,46 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func settings() {
         let myAlert = MyAlertController(title: GV.language.getText(.tcSettings),
-                                        message: "",
-                                        size: CGSize(width: GV.actWidth * (GV.onIpad ? 0.5 : 0.8), height: GV.actHeight * 0.5),
-                                          target: self,
-                                          type: .Green)
+                                        message: "", size: CGSize(width: GV.actWidth * (GV.onIpad ? 0.5 : 0.8), height: GV.actHeight * 0.5), target: self, type: .Green)
         myAlert.addAction(text: .tcChooseLanguage, action: #selector(self.chooseLanguage), isActive: false)
-        myAlert.addAction(text: .tcShowLetters, action: #selector(setShowLetters), isActive: !GV.basicData.showDots)
-        myAlert.addAction(text: .tcShowDots, action: #selector(setShowDots), isActive: GV.basicData.showDots)
+        myAlert.addAction(text: .tcChooseSize, action: #selector(self.chooseSize), isActive: false)
+        myAlert.addAction(text: .tcChooseDifficulty, action: #selector(self.chooseDifficulty), isActive: false)
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
     
-    @objc private func setShowLetters() {
+    @objc private func chooseDifficulty() {
+        let myAlert = MyAlertController(title: GV.language.getText(.tcChooseDifficulty),
+                                        message: "",
+                                        size: CGSize(width: GV.actWidth * (GV.onIpad ? 0.5 : 0.8), height: GV.actHeight * 0.5),
+                                          target: self,
+                                          type: .Green)
+
+        myAlert.addAction(text: .tcEasy, action: #selector(setEasyGame), isActive: GV.basicData.gameDifficulty == EasyGame)
+        myAlert.addAction(text: .tcMedium, action: #selector(setMediumGame), isActive: GV.basicData.gameDifficulty == MediumGame)
+        myAlert.addAction(text: .tcHard, action: #selector(setHardGame), isActive: GV.basicData.gameDifficulty == HardGame)
+        myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
+        myAlert.presentAlert()
+        self.addChild(myAlert)
+    }
+    @objc private func setEasyGame() {
         try! realm.safeWrite {
-            GV.basicData.showDots = false
+            GV.basicData.gameDifficulty = EasyGame
             setGameArrayToActualState()
         }
     }
     
-    @objc private func setShowDots() {
+    @objc private func setMediumGame() {
         try! realm.safeWrite {
-            GV.basicData.showDots = true
+            GV.basicData.gameDifficulty = MediumGame
+            setGameArrayToActualState()
+        }
+    }
+    
+    @objc private func setHardGame() {
+        try! realm.safeWrite {
+            GV.basicData.gameDifficulty = HardGame
             setGameArrayToActualState()
         }
     }

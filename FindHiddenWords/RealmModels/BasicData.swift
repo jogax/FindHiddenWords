@@ -71,6 +71,10 @@ enum MaxScoreType: Int {
 
 }
 
+let EasyGame = 0
+let MediumGame = 1
+let HardGame = 2
+
 class BasicData: Object {
     @objc dynamic var showDemo = true
     @objc dynamic var ID = 0
@@ -83,7 +87,7 @@ class BasicData: Object {
     @objc dynamic var countPlaysToday = 0
     @objc dynamic var lastPlayingDay = 0
     @objc dynamic var deviceType = 0
-    @objc dynamic var showDots = false
+    @objc dynamic var gameDifficulty = EasyGame
     @objc dynamic var land = 0
     @objc dynamic var version = 0
     @objc dynamic var countPlays = 0

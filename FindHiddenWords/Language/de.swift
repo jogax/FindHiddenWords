@@ -73,6 +73,8 @@ let deDictionary: [TextConstants: String] = [
     .tcSettings:                "Einstellungen",
     .tcTipp:                    "Tipp",
     .tcChooseShowingType:       "Gefundene Buchstaben oder Punkte anzeigen",
-    .tcShowLetters:             "Buchstaben anzeigen",
-    .tcShowDots:                "Punkte anzeigen",
+    .tcEasy:                    "Einfach",
+    .tcMedium:                  "Mittel",
+    .tcHard:                    "Schwer",
+    .tcChooseDifficulty:        "Schwierigkeit",
 ]

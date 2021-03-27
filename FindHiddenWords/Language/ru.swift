@@ -73,6 +73,8 @@ let ruDictionary: [TextConstants: String] = [
     .tcSettings:                "Настройки",
     .tcTipp:                    "Помощь",
     .tcChooseShowingType:        "Показывать найденные буквы или точки",
-    .tcShowLetters:             "Показать буквы",
-    .tcShowDots:                 "Показать точки",
+    .tcEasy:                    "Лёгкая игра",
+    .tcMedium:                  "Средняя игра",
+    .tcHard:                    "Сложная игра",
+    .tcChooseDifficulty:        "Сложность",
 ]

@@ -75,8 +75,10 @@ enum TextConstants: Int {
     tcSettings,
     tcTipp,
     tcChooseShowingType,
-    tcShowLetters,
-    tcShowDots
+    tcEasy,
+    tcMedium,
+    tcHard,
+    tcChooseDifficulty
 }
     let LanguageEN = "en" // index 0
     let LanguageDE = "de" // index 1

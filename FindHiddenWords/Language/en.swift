@@ -75,6 +75,8 @@ let enDictionary: [TextConstants: String] = [
     .tcSettings:                "Settings",
     .tcTipp:                    "Tip",
     .tcChooseShowingType:       "Show fouded letters or dots",
-    .tcShowLetters:             "Show letters",
-    .tcShowDots:             "Show Dots",
+    .tcEasy:                    "Easy",
+    .tcMedium:                  "Medium",
+    .tcHard:                    "Hard",
+    .tcChooseDifficulty:        "Difficulty",
 ]
