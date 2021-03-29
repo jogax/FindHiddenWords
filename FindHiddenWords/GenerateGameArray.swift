@@ -155,10 +155,10 @@ class GenerateGameArray {
             for row in 0..<size {
                 GV.gameArray[col][row].position = grid!.gridPosition(col: col, row: row) //+
 //                GV.gameArray[col][row].name = "GBD/\(col)/\(row)"
-                GV.gameArray[col][row].setNeighbor(direction: .Down, neighbor: row == size - 1 ? nil : GV.gameArray[col][row + 1])
-                GV.gameArray[col][row].setNeighbor(direction: .Up, neighbor: row == 0 ? nil : GV.gameArray[col][row - 1])
-                GV.gameArray[col][row].setNeighbor(direction: .Right, neighbor: col == size - 1 ? nil : GV.gameArray[col + 1][row])
-                GV.gameArray[col][row].setNeighbor(direction: .Left, neighbor: col == 0 ? nil : GV.gameArray[col - 1][row])
+//                GV.gameArray[col][row].setNeighbor(direction: .Down, neighbor: row == size - 1 ? nil : GV.gameArray[col][row + 1])
+//                GV.gameArray[col][row].setNeighbor(direction: .Up, neighbor: row == 0 ? nil : GV.gameArray[col][row - 1])
+//                GV.gameArray[col][row].setNeighbor(direction: .Right, neighbor: col == size - 1 ? nil : GV.gameArray[col + 1][row])
+//                GV.gameArray[col][row].setNeighbor(direction: .Left, neighbor: col == 0 ? nil : GV.gameArray[col - 1][row])
                 GV.gameArray[col][row].col = col
                 GV.gameArray[col][row].row = row
                 grid!.addChild(GV.gameArray[col][row])

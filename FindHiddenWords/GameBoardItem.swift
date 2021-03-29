@@ -8,6 +8,7 @@
 
 import Foundation
 import GameplayKit
+import SpriteKit
 
 enum ItemStatus: Int {
     case Empty = 0, Temporary, Used, WholeWord, FixUsed, FixWholeWord, FixItem, Error, DarkGreenStatus, GoldStatus, DarkGoldStatus, OrigStatus, Lila
@@ -38,6 +39,26 @@ public struct ConnectionType {
     func isSet() -> Bool {
         return left || leftTop || top || rightTop || right || rightBottom || bottom || leftBottom
     }
+    mutating func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
+        if col1 >  col2 && row1 == row2 {left = false}
+        if col1 >  col2 && row1 >  row2 {leftTop = false}
+        if col1 == col2 && row1 >  row2 {top = false}
+        if col1 <  col2 && row1 >  row2 {rightTop = false}
+        if col1 <  col2 && row1 == row2 {right = false}
+        if col1 <  col2 && row1 <  row2 {rightBottom = false}
+        if col1 == col2 && row1 <  row2 {bottom = false}
+        if col1 >  col2 && row1 <  row2 {leftBottom = false}
+    }
+    mutating func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
+        if col1 >  col2 && row1 == row2 {left = true}
+        if col1 >  col2 && row1 >  row2 {leftTop = true}
+        if col1 == col2 && row1 >  row2 {top = true}
+        if col1 <  col2 && row1 >  row2 {rightTop = true}
+        if col1 <  col2 && row1 == row2 {right = true}
+        if col1 <  col2 && row1 <  row2 {rightBottom = true}
+        if col1 == col2 && row1 <  row2 {bottom = true}
+        if col1 >  col2 && row1 <  row2 {leftBottom = true}
+    }
 }
 
 
@@ -64,6 +85,7 @@ class GameboardItem: SKSpriteNode {
     public var checked = false
     public var fixItem = false
     public var countFreeConnections = 0
+    private var lettersToModify = [SKLabelNode]()
     public var inFreeArray = -1
     struct StatusType: Hashable {
         var itemStatus: ItemStatus = .Empty
@@ -188,19 +210,19 @@ class GameboardItem: SKSpriteNode {
         }
     }
     
-    public func setNeighbor(direction: Direction, neighbor: GameboardItem?) {
-        switch direction {
-        case .Down:
-            lowerNeighbor = neighbor
-        case .Up:
-            upperNeighbor = neighbor
-        case .Left:
-            leftNeighbor = neighbor
-        case .Right:
-            rightNeighbor = neighbor
-        }
-    }
-    
+//    public func setNeighbor(direction: Direction, neighbor: GameboardItem?) {
+//        switch direction {
+//        case .Down:
+//            lowerNeighbor = neighbor
+//        case .Up:
+//            upperNeighbor = neighbor
+//        case .Left:
+//            leftNeighbor = neighbor
+//        case .Right:
+//            rightNeighbor = neighbor
+//        }
+//    }
+//    
     public func checkFreeCells(direction: Direction) {
         switch direction {
         case .Up:
@@ -246,10 +268,6 @@ class GameboardItem: SKSpriteNode {
         countOccurencesInWords = 0
     }
     
-//    public func getColor()->MyColor {
-//        return myColor
-//    }
-//
     public func getCountOccurencesInWords()->Int {
         return countOccurencesInWords
     }
@@ -358,35 +376,46 @@ class GameboardItem: SKSpriteNode {
         setTexture()
     }
     
-    public func setConnectionType(connectionType: ConnectionType) {
-        if connectionType.left {
-            self.connectionType.left = true
-        }
-        if connectionType.top {
-            self.connectionType.top = true
-        }
-        if connectionType.right {
-            self.connectionType.right = true
-        }
-        if connectionType.bottom {
-            self.connectionType.bottom = true
-        }
-        if connectionType.leftBottom {
-            self.connectionType.leftBottom = true
-        }
-        if connectionType.leftTop {
-            self.connectionType.leftTop = true
-        }
-        if connectionType.rightTop {
-            self.connectionType.rightTop = true
-        }
-        if connectionType.rightBottom {
-            self.connectionType.rightBottom = true
-        }
-//        setTexture()
+//    public func setConnectionType(connectionType: ConnectionType) {
+//        if connectionType.left {
+//            self.connectionType.left = true
+//        }
+//        if connectionType.top {
+//            self.connectionType.top = true
+//        }
+//        if connectionType.right {
+//            self.connectionType.right = true
+//        }
+//        if connectionType.bottom {
+//            self.connectionType.bottom = true
+//        }
+//        if connectionType.leftBottom {
+//            self.connectionType.leftBottom = true
+//        }
+//        if connectionType.leftTop {
+//            self.connectionType.leftTop = true
+//        }
+//        if connectionType.rightTop {
+//            self.connectionType.rightTop = true
+//        }
+//        if connectionType.rightBottom {
+//            self.connectionType.rightBottom = true
+//        }
+////        setTexture()
+//    }
+//
+    public func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
+        self.connectionType.resetConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+        setTexture()
     }
     
-    public func setStatus(/*toColor: MyColor = .myWhiteColor,*/ toStatus: ItemStatus, connectionType: ConnectionType = ConnectionType(), incrWords: Bool = false, decrWords: Bool = false) {
+    public func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
+        self.connectionType.setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+        setTexture()
+    }
+    
+
+    public func setStatus(toStatus: ItemStatus, incrWords: Bool = false, decrWords: Bool = false) {
         let newStatus = toStatus == .OrigStatus ? origStatus : toStatus
 //        let oldStatus = status
         switch (status, newStatus) {
@@ -423,13 +452,33 @@ class GameboardItem: SKSpriteNode {
         } else {
             self.countWordsLabel.text = ""
         }
-//        print("In SetStatus: caller: \(calledFrom), letter: \(letter), oldStatus: \(oldStatus), status: \(newStatus), newStatus: \(status)")
-//        if connectionType.isSet() {
-            setConnectionType(connectionType: connectionType)
-//        }
         let name = textureName[StatusType(itemStatus: status, fixItem: fixItem)]!
         self.texture = SKTexture(imageNamed: name)
- 
+        updateText()
+    }
+    
+    public func updateText() {
+        for index in 0..<lettersToModify.count {
+            switch (status, GV.basicData.gameDifficulty) {
+            case (.Used, EasyGame):
+                lettersToModify[index].text = self.letter
+                lettersToModify[index].fontColor = .black
+            case (.Used, MediumGame):
+                lettersToModify[index].text = GV.questionMark
+                lettersToModify[index].fontColor = .black
+            case (.Used, HardGame):
+                lettersToModify[index].text = GV.questionMark
+                lettersToModify[index].fontColor = .black
+            case (.WholeWord, _):
+                lettersToModify[index].text = self.letter
+//                lettersToModify[index].fontColor = .black
+            default:
+                break
+            }
+        }
+    }
+    public func addLetterForUpdate(letter: inout SKLabelNode) {
+        lettersToModify.append(letter)
     }
     
     var lastCol = 0
@@ -450,7 +499,7 @@ class GameboardItem: SKSpriteNode {
     }
     
     public func removeConnections() {
-        connectionType = ConnectionType()
+//        connectionType = ConnectionType()
         showConnections()
     }
     

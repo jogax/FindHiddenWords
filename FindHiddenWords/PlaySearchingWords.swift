@@ -926,7 +926,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 if index == cellsToAnimate.count - 1 {
                     if demoModus == .Demo || demoModus == .Help {
                         myActions.append(SKAction.wait(forDuration: 0.1))
-                        let undoAction = SKAction.run {
+                        let undoAction = SKAction.run { [self] in
                             for cell in cellsToAnimate {
                                 cell.setStatus(toStatus: .OrigStatus)
                             }
@@ -934,10 +934,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                 playedGame.myWords.removeLast()
                             }
                             self.choosedWord = UsedWord()
-                            self.iterateGameArray(doing: {(col: Int, row: Int) in
-                                GV.gameArray[col][row].removeConnections()
-                            })
-                            self.setGameArrayToActualState()
+                            removeUnnecessaryConnections(wordForUndo: newWord)
                         }
                         myActions.append(undoAction)
                     }
@@ -1034,6 +1031,36 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     
+    private func removeUnnecessaryConnections(wordForUndo: UsedWord) {
+        for index in 0..<wordForUndo.usedLetters.count-1 {
+            let item1 = wordForUndo.usedLetters[index]
+            let item2 = wordForUndo.usedLetters[index + 1]
+            let col1 = item1.col
+            let row1 = item1.row
+            let col2 = item2.col
+            let row2 = item2.row
+            let searchWord1 = "\(col1)\(row1)\(item1.letter)\(GV.innerSeparator)\(col2)\(row2)\(item2.letter)"
+            let searchWord2 = "\(col2)\(row2)\(item2.letter)\(GV.innerSeparator)\(col1)\(row1)\(item1.letter)"
+            let connectionCounter = playedGame.myWords.filter("usedLetters contains %d or usedLetters contains %d", searchWord1, searchWord2).count
+            if connectionCounter == 0 {
+                GV.gameArray[col1][row1].resetConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+                GV.gameArray[col2][row2].resetConnectionBetween(col1: col2, row1: row2, col2: col1, row2: row1)
+            }
+        }
+    }
+    
+    private func addNewConnections(forWord: UsedWord) {
+        for index in 0..<forWord.usedLetters.count-1 {
+            let item1 = forWord.usedLetters[index]
+            let item2 = forWord.usedLetters[index + 1]
+            let col1 = item1.col
+            let row1 = item1.row
+            let col2 = item2.col
+            let row2 = item2.row
+            GV.gameArray[col1][row1].setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+            GV.gameArray[col2][row2].setConnectionBetween(col1: col2, row1: row2, col2: col1, row2: row1)
+        }
+    }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         myTouchesEnded()
@@ -1088,7 +1115,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if saveChoosedWord() {
             animateLetters(newWord: choosedWord, type: .WordIsOK)
             mySounds.play(.OKWord)
-            setGameArrayToActualState()
+            setWordStatus(usedWord: choosedWord)
             let title = GV.language.getText(.tcShowMyWords, values: String(countWords))
             myWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         }
@@ -1173,63 +1200,63 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
 
     
-    private func setConnectionTypes(usedLetters: [UsedLetter])->[ConnectionType] {
-        var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
-        if usedLetters.count > 0 {
-            for index in 0..<usedLetters.count - 1 {
-                
-                if usedLetters[index].row < usedLetters[index + 1].row {
-                    if usedLetters[index].col < usedLetters[index + 1].col {
-                        connectionTypes[index].rightBottom = true
-                        connectionTypes[index + 1].leftTop = true
-                    } else if usedLetters[index].col > usedLetters[index + 1].col {
-                        connectionTypes[index].leftBottom = true
-                        connectionTypes[index + 1].rightTop = true
-                    } else {
-                        connectionTypes[index].bottom = true
-                        connectionTypes[index + 1].top = true
-                    }
-                }
-                if usedLetters[index].row > usedLetters[index + 1].row {
-                    if usedLetters[index].col > usedLetters[index + 1].col {
-                        connectionTypes[index].leftTop = true
-                        connectionTypes[index + 1].rightBottom = true
-                    } else if usedLetters[index].col < usedLetters[index + 1].col {
-                        connectionTypes[index].rightTop = true
-                        connectionTypes[index + 1].leftBottom = true
-                    } else {
-                        connectionTypes[index].top = true
-                        connectionTypes[index + 1].bottom = true
-                    }
-                }
-                if usedLetters[index].col < usedLetters[index + 1].col {
-                    if usedLetters[index].row < usedLetters[index + 1].row {
-                        connectionTypes[index].rightBottom = true
-                        connectionTypes[index + 1].leftTop = true
-                    } else if usedLetters[index].row > usedLetters[index + 1].row {
-                        connectionTypes[index].rightTop = true
-                        connectionTypes[index + 1].leftBottom = true
-                    } else {
-                        connectionTypes[index].right = true
-                        connectionTypes[index + 1].left = true
-                    }
-                }
-                if usedLetters[index].col > usedLetters[index + 1].col {
-                    if usedLetters[index].row < usedLetters[index + 1].row {
-                        connectionTypes[index].leftBottom = true
-                        connectionTypes[index + 1].rightTop = true
-                    } else if usedLetters[index].row > usedLetters[index + 1].row {
-                        connectionTypes[index].leftTop = true
-                        connectionTypes[index + 1].rightBottom = true
-                    } else {
-                        connectionTypes[index].left = true
-                        connectionTypes[index + 1].right = true
-                    }
-                }
-            }
-        }
-        return connectionTypes
-    }
+//    private func setConnectionTypes(usedLetters: [UsedLetter])->[ConnectionType] {
+//        var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
+//        if usedLetters.count > 0 {
+//            for index in 0..<usedLetters.count - 1 {
+//
+//                if usedLetters[index].row < usedLetters[index + 1].row {
+//                    if usedLetters[index].col < usedLetters[index + 1].col {
+//                        connectionTypes[index].rightBottom = true
+//                        connectionTypes[index + 1].leftTop = true
+//                    } else if usedLetters[index].col > usedLetters[index + 1].col {
+//                        connectionTypes[index].leftBottom = true
+//                        connectionTypes[index + 1].rightTop = true
+//                    } else {
+//                        connectionTypes[index].bottom = true
+//                        connectionTypes[index + 1].top = true
+//                    }
+//                }
+//                if usedLetters[index].row > usedLetters[index + 1].row {
+//                    if usedLetters[index].col > usedLetters[index + 1].col {
+//                        connectionTypes[index].leftTop = true
+//                        connectionTypes[index + 1].rightBottom = true
+//                    } else if usedLetters[index].col < usedLetters[index + 1].col {
+//                        connectionTypes[index].rightTop = true
+//                        connectionTypes[index + 1].leftBottom = true
+//                    } else {
+//                        connectionTypes[index].top = true
+//                        connectionTypes[index + 1].bottom = true
+//                    }
+//                }
+//                if usedLetters[index].col < usedLetters[index + 1].col {
+//                    if usedLetters[index].row < usedLetters[index + 1].row {
+//                        connectionTypes[index].rightBottom = true
+//                        connectionTypes[index + 1].leftTop = true
+//                    } else if usedLetters[index].row > usedLetters[index + 1].row {
+//                        connectionTypes[index].rightTop = true
+//                        connectionTypes[index + 1].leftBottom = true
+//                    } else {
+//                        connectionTypes[index].right = true
+//                        connectionTypes[index + 1].left = true
+//                    }
+//                }
+//                if usedLetters[index].col > usedLetters[index + 1].col {
+//                    if usedLetters[index].row < usedLetters[index + 1].row {
+//                        connectionTypes[index].leftBottom = true
+//                        connectionTypes[index + 1].rightTop = true
+//                    } else if usedLetters[index].row > usedLetters[index + 1].row {
+//                        connectionTypes[index].leftTop = true
+//                        connectionTypes[index + 1].rightBottom = true
+//                    } else {
+//                        connectionTypes[index].left = true
+//                        connectionTypes[index + 1].right = true
+//                    }
+//                }
+//            }
+//        }
+//        return connectionTypes
+//    }
 
     private func analyzeNodesAtLocation(location: CGPoint)->(OK: Bool, col: Int, row: Int) {
         let nodes = self.nodes(at: location)
@@ -1555,24 +1582,30 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
+    private func updateLetters() {
+        self.iterateGameArray(doing: {(col: Int, row: Int) in
+            GV.gameArray[col][row].updateText()
+        })
+
+    }
     @objc private func setEasyGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = EasyGame
-            setGameArrayToActualState()
+            updateLetters()
         }
     }
     
     @objc private func setMediumGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = MediumGame
-            setGameArrayToActualState()
+            updateLetters()
         }
     }
     
     @objc private func setHardGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = HardGame
-            setGameArrayToActualState()
+            updateLetters()
         }
     }
     
@@ -1771,27 +1804,26 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     }
 
+    private func setWordStatus(usedWord: UsedWord) {
+        for usedLetter in usedWord.usedLetters {
+            let cell = GV.gameArray[usedLetter.col][usedLetter.row]
+            if usedLetter.letter == cell.letter {
+                cell.setStatus(toStatus: .WholeWord)
+            }
+        }
+        addNewConnections(forWord: usedWord)
+        if let myLabel = myLabels.first(where: {$0.usedWord == usedWord}) {
+            if myLabel.children.count == usedWord.word.count + 4 {
+                for index in 4..<usedWord.word.count - 1 {
+                    (myLabel.children[index] as! SKLabelNode).fontColor = GV.darkGreen
+                }
+            }
+        }
+    }
+
     
     var myLabels = [MyFoundedWord]()
     private func setGameArrayToActualState() {
-//        var counter = 0
-//        iterateGameArray(doing: {(col: Int, row: Int) in
-//            GV.gameArray[col][row].resetCountOccurencesInWords()
-//        })
-        
-        func setWordStatus(usedWord: UsedWord) {
-            for usedLetter in usedWord.usedLetters {
-                let cell = GV.gameArray[usedLetter.col][usedLetter.row]
-                if usedLetter.letter == cell.letter {
-                    cell.setStatus(toStatus: .WholeWord)
-                }
-            }
-            let connectionTypes = setConnectionTypes(usedLetters: usedWord.usedLetters)
-            for (index, item) in usedWord.usedLetters.enumerated() {
-                GV.gameArray[item.col][item.row].setStatus(toStatus: .WholeWord, connectionType: connectionTypes[index], incrWords: true)
-            }
-        }
-//        if playedGame.myWords.count > 0 {
         if choosedWord.word.count > 0 {
             setWordStatus(usedWord: choosedWord)
         } else {
@@ -1803,14 +1835,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         for myWord in myLabels {
             if myWord.mandatory {
                 if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
-//                    if allWords.contains(where: {$0 == myWord.usedWord!}) {
                     myWord.fontColor = GV.darkGreen
                     myWord.founded = true
                 } else {
                     myWord.fontColor = .black
                     myWord.founded = false
                 }
-                myWord.setQuestionMarks()
            } else {
                 myWord.isHidden = true
                 myWord.fontColor = .red
