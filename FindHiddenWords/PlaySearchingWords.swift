@@ -927,6 +927,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     if demoModus == .Demo || demoModus == .Help {
                         myActions.append(SKAction.wait(forDuration: 0.1))
                         let undoAction = SKAction.run { [self] in
+                            setWordColor(usedWord: newWord, toColor: .black)
+                            updateLetters(inWord: newWord)
                             for cell in cellsToAnimate {
                                 cell.setStatus(toStatus: .OrigStatus)
                             }
@@ -1200,64 +1202,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
 
     
-//    private func setConnectionTypes(usedLetters: [UsedLetter])->[ConnectionType] {
-//        var connectionTypes = Array(repeating: ConnectionType(), count: usedLetters.count)
-//        if usedLetters.count > 0 {
-//            for index in 0..<usedLetters.count - 1 {
-//
-//                if usedLetters[index].row < usedLetters[index + 1].row {
-//                    if usedLetters[index].col < usedLetters[index + 1].col {
-//                        connectionTypes[index].rightBottom = true
-//                        connectionTypes[index + 1].leftTop = true
-//                    } else if usedLetters[index].col > usedLetters[index + 1].col {
-//                        connectionTypes[index].leftBottom = true
-//                        connectionTypes[index + 1].rightTop = true
-//                    } else {
-//                        connectionTypes[index].bottom = true
-//                        connectionTypes[index + 1].top = true
-//                    }
-//                }
-//                if usedLetters[index].row > usedLetters[index + 1].row {
-//                    if usedLetters[index].col > usedLetters[index + 1].col {
-//                        connectionTypes[index].leftTop = true
-//                        connectionTypes[index + 1].rightBottom = true
-//                    } else if usedLetters[index].col < usedLetters[index + 1].col {
-//                        connectionTypes[index].rightTop = true
-//                        connectionTypes[index + 1].leftBottom = true
-//                    } else {
-//                        connectionTypes[index].top = true
-//                        connectionTypes[index + 1].bottom = true
-//                    }
-//                }
-//                if usedLetters[index].col < usedLetters[index + 1].col {
-//                    if usedLetters[index].row < usedLetters[index + 1].row {
-//                        connectionTypes[index].rightBottom = true
-//                        connectionTypes[index + 1].leftTop = true
-//                    } else if usedLetters[index].row > usedLetters[index + 1].row {
-//                        connectionTypes[index].rightTop = true
-//                        connectionTypes[index + 1].leftBottom = true
-//                    } else {
-//                        connectionTypes[index].right = true
-//                        connectionTypes[index + 1].left = true
-//                    }
-//                }
-//                if usedLetters[index].col > usedLetters[index + 1].col {
-//                    if usedLetters[index].row < usedLetters[index + 1].row {
-//                        connectionTypes[index].leftBottom = true
-//                        connectionTypes[index + 1].rightTop = true
-//                    } else if usedLetters[index].row > usedLetters[index + 1].row {
-//                        connectionTypes[index].leftTop = true
-//                        connectionTypes[index + 1].rightBottom = true
-//                    } else {
-//                        connectionTypes[index].left = true
-//                        connectionTypes[index + 1].right = true
-//                    }
-//                }
-//            }
-//        }
-//        return connectionTypes
-//    }
-
     private func analyzeNodesAtLocation(location: CGPoint)->(OK: Bool, col: Int, row: Int) {
         let nodes = self.nodes(at: location)
         for node in nodes {
@@ -1300,7 +1244,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     let fontSize: CGFloat = GV.onIpad ? 22 : 18
     var movingLayer: SKSpriteNode?
     let MovingLayerName = "MovingLayer"
-    
+    let difficultyNameArray = [GV.language.getText(.tcEasy), GV.language.getText(.tcMedium), GV.language.getText(.tcHard)]
     
     public func playingGame() {
         let testLabel = MyLabel(text: "ABC", position: CGPoint(), fontName: GV.headerFontName, fontSize: fontSize)
@@ -1330,7 +1274,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                      LPos: CGPoint(x: gridLposX, y: firstYL - (4 * decrementY) - GV.playingGrid!.size.height * 0.50),
                                      PSize: GV.playingGrid!.size,
                                      LSize: GV.playingGrid!.size)
-        gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(GV.basicData.gameSize)x\(GV.basicData.gameSize)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
+        let difficultyText = difficultyNameArray[GV.basicData.gameDifficulty]
+        gameHeader = MyLabel(text: GV.language.getText(.tcSearchWords, values: "\(difficultyText), \(GV.basicData.gameSize)x\(GV.basicData.gameSize)"), position: gameHeaderPosition, fontName: GV.headerFontName, fontSize: fontSize)
         gameLayer.addChild(gameHeader) // index 0
         GV.playingGrid!.plPosSize = gridPosition
         GV.playingGrid!.setActPosSize()
@@ -1364,16 +1309,13 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
             if movingLayer == nil && labelsMoveable {
                 let labelsSize = CGSize(width: abs(maxPosition.x - myLabels.first!.frame.minX), height: abs(myLabels.first!.frame.maxY - maxPosition.y) + myLabels.first!.frame.size.height)
-//                let labelsMidPoint = CGPoint(x: abs(myLabels.last!.frame.maxX - myLabels.first!.frame.minX) / 2, y: labelsSize.height)
                 let labelsMidPoint = CGPoint(x: GV.actWidth / 2, y: labelsSize.height)
                 movingLayer = SKSpriteNode()
                 movingLayer!.position = labelsMidPoint
                 movingLayer!.size = labelsSize
-//                movingLayer!.color = .green
                 movingLayer!.name = MovingLayerName
                 gameLayer.addChild(movingLayer!)
             }
-//            setGameArrayToActualState()
             settingsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcSettings), action: #selector(settings), buttonType: .SettingsButton)
             tippButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcTipp), action: #selector(showTipp), buttonType: .TippButton)
             myWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
@@ -1582,30 +1524,41 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
-    private func updateLetters() {
-        self.iterateGameArray(doing: {(col: Int, row: Int) in
-            GV.gameArray[col][row].updateText()
-        })
-
+    private func updateLetters(inWord: UsedWord = UsedWord()) {
+        if inWord.word.count == 0 {
+            self.iterateGameArray(doing: {(col: Int, row: Int) in
+                GV.gameArray[col][row].updateText()
+            })
+        } else {
+            for item in inWord.usedLetters {
+                GV.gameArray[item.col][item.row].updateText()
+            }
+        }
+    }
+    
+    private func setGameHeader() {
+        updateLetters()
+        let difficultyText = difficultyNameArray[GV.basicData.gameDifficulty]
+        gameHeader.text = GV.language.getText(.tcSearchWords, values: "\(difficultyText), \(GV.basicData.gameSize)x\(GV.basicData.gameSize)")
     }
     @objc private func setEasyGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = EasyGame
-            updateLetters()
+            setGameHeader()
         }
     }
     
     @objc private func setMediumGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = MediumGame
-            updateLetters()
         }
+        setGameHeader()
     }
     
     @objc private func setHardGame() {
         try! realm.safeWrite {
             GV.basicData.gameDifficulty = HardGame
-            updateLetters()
+            setGameHeader()
         }
     }
     
@@ -1801,10 +1754,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if maxPosition.x + myLabels[0].frame.minX > GV.actWidth {
             labelsMoveable = true
         }
-
+        updateLetters()
     }
-
+    
+    private func setWordColor(usedWord: UsedWord, toColor: UIColor) {
+        if let myLabel = myLabels.first(where: {$0.usedWord == usedWord}) {
+            if myLabel.children.count == usedWord.word.count + 4 {
+                for index in 0..<usedWord.word.count {
+                    (myLabel.children[index + 4] as! SKLabelNode).fontColor = toColor
+                }
+            }
+        }
+    }
     private func setWordStatus(usedWord: UsedWord) {
+        setWordColor(usedWord: usedWord, toColor: GV.darkGreen)
         for usedLetter in usedWord.usedLetters {
             let cell = GV.gameArray[usedLetter.col][usedLetter.row]
             if usedLetter.letter == cell.letter {
@@ -1812,13 +1775,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         addNewConnections(forWord: usedWord)
-        if let myLabel = myLabels.first(where: {$0.usedWord == usedWord}) {
-            if myLabel.children.count == usedWord.word.count + 4 {
-                for index in 4..<usedWord.word.count - 1 {
-                    (myLabel.children[index] as! SKLabelNode).fontColor = GV.darkGreen
-                }
-            }
-        }
     }
 
     
@@ -1833,18 +1789,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         for myWord in myLabels {
-            if myWord.mandatory {
+//            if myWord.mandatory {
                 if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
                     myWord.fontColor = GV.darkGreen
                     myWord.founded = true
                 } else {
                     myWord.fontColor = .black
                     myWord.founded = false
-                }
-           } else {
-                myWord.isHidden = true
-                myWord.fontColor = .red
-            }
+//                }
+           }
         }
         let score = getScore()
         try! realm.safeWrite {

@@ -91,6 +91,20 @@ func == (left: MyDate, right: MyDate) -> Bool {
         abs(left.minute - right.minute) < 11
 }
 
+func == (left: UIColor, right: UIColor) -> Bool {
+    let minValue: CGFloat = 0.00001
+    let redDelta = abs(left.redComponent - right.redComponent)
+    let greenDelta = abs(left.greenComponent - right.greenComponent)
+    let blueDelta = abs(left.blueComponent - right.blueComponent)
+    return redDelta < minValue &&
+        greenDelta < minValue &&
+        blueDelta < minValue
+}
+
+func != (left: UIColor, right: UIColor) -> Bool {
+    return !(left == right)
+}
+
 struct AddingWordData {
     var countFinishedRecords = 0
     var finishedProLanguage = 0
@@ -176,7 +190,7 @@ struct GV {
     static let ownLabelInName = "Own-Label"
     static let headerFontName = "Menlo-Bold"
     static let wordsFontSize: CGFloat = GV.onIpad ? 18 : 15
-    static let darkGreen = UIColor(red: 11/255, green: 151/255, blue: 6/255, alpha: 1)
+    static let darkGreen = UIColor(red: 0.0429, green: 0.63, blue: 0.023, alpha: 1)
     static var touchTarget: AnyObject!
     static var touchSelector: Selector!
     static var touchParam1: Set<UITouch>!

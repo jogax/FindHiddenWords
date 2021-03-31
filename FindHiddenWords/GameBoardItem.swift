@@ -39,25 +39,25 @@ public struct ConnectionType {
     func isSet() -> Bool {
         return left || leftTop || top || rightTop || right || rightBottom || bottom || leftBottom
     }
-    mutating func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
-        if col1 >  col2 && row1 == row2 {left = false}
-        if col1 >  col2 && row1 >  row2 {leftTop = false}
-        if col1 == col2 && row1 >  row2 {top = false}
-        if col1 <  col2 && row1 >  row2 {rightTop = false}
-        if col1 <  col2 && row1 == row2 {right = false}
-        if col1 <  col2 && row1 <  row2 {rightBottom = false}
-        if col1 == col2 && row1 <  row2 {bottom = false}
-        if col1 >  col2 && row1 <  row2 {leftBottom = false}
-    }
-    mutating func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
-        if col1 >  col2 && row1 == row2 {left = true}
-        if col1 >  col2 && row1 >  row2 {leftTop = true}
-        if col1 == col2 && row1 >  row2 {top = true}
-        if col1 <  col2 && row1 >  row2 {rightTop = true}
-        if col1 <  col2 && row1 == row2 {right = true}
-        if col1 <  col2 && row1 <  row2 {rightBottom = true}
-        if col1 == col2 && row1 <  row2 {bottom = true}
-        if col1 >  col2 && row1 <  row2 {leftBottom = true}
+//    mutating func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
+//        if col1 >  col2 && row1 == row2 {left = false}
+//        if col1 >  col2 && row1 >  row2 {leftTop = false}
+//        if col1 == col2 && row1 >  row2 {top = false}
+//        if col1 <  col2 && row1 >  row2 {rightTop = false}
+//        if col1 <  col2 && row1 == row2 {right = false}
+//        if col1 <  col2 && row1 <  row2 {rightBottom = false}
+//        if col1 == col2 && row1 <  row2 {bottom = false}
+//        if col1 >  col2 && row1 <  row2 {leftBottom = false}
+//    }
+    mutating func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int, toValue: Bool) {
+        if col1 >  col2 && row1 == row2 {left = toValue}
+        if col1 >  col2 && row1 >  row2 {leftTop = toValue}
+        if col1 == col2 && row1 >  row2 {top = toValue}
+        if col1 <  col2 && row1 >  row2 {rightTop = toValue}
+        if col1 <  col2 && row1 == row2 {right = toValue}
+        if col1 <  col2 && row1 <  row2 {rightBottom = toValue}
+        if col1 == col2 && row1 <  row2 {bottom = toValue}
+        if col1 >  col2 && row1 <  row2 {leftBottom = toValue}
     }
 }
 
@@ -405,12 +405,12 @@ class GameboardItem: SKSpriteNode {
 //    }
 //
     public func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
-        self.connectionType.resetConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+        self.connectionType.setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2, toValue: false)
         setTexture()
     }
     
     public func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
-        self.connectionType.setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2)
+        self.connectionType.setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2, toValue: true)
         setTexture()
     }
     
@@ -459,6 +459,7 @@ class GameboardItem: SKSpriteNode {
     
     public func updateText() {
         for index in 0..<lettersToModify.count {
+
             switch (status, GV.basicData.gameDifficulty) {
             case (.Used, EasyGame):
                 lettersToModify[index].text = self.letter
@@ -469,9 +470,23 @@ class GameboardItem: SKSpriteNode {
             case (.Used, HardGame):
                 lettersToModify[index].text = GV.questionMark
                 lettersToModify[index].fontColor = .black
-            case (.WholeWord, _):
+            case (.WholeWord, EasyGame):
+                if lettersToModify[index].fontColor!  != GV.darkGreen {
+                    lettersToModify[index].text = self.letter
+                    lettersToModify[index].fontColor = .red
+                }
+            case (.WholeWord, MediumGame):
                 lettersToModify[index].text = self.letter
-//                lettersToModify[index].fontColor = .black
+                if lettersToModify[index].fontColor! != GV.darkGreen {
+                    lettersToModify[index].fontColor = .black
+                }
+            case (.WholeWord, HardGame):
+                if lettersToModify[index].fontColor! != GV.darkGreen {
+                    lettersToModify[index].text = GV.innerSeparator
+                    lettersToModify[index].fontColor = .black
+                } else {
+                    lettersToModify[index].text = self.letter
+                }
             default:
                 break
             }
