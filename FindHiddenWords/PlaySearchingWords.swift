@@ -53,11 +53,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     
-    var countButtons = 4
     let color = UIColor(red: 240/255, green: 240/255, blue: 240/255, alpha: 1.0)
+    let NormalButtonCount: CGFloat = 3
+    var countButtons: CGFloat = 0
 
     public func resetDeveloperButton() {
-        countButtons = 4
+        if countButtons == NormalButtonCount {
+            return
+        }
+        countButtons = NormalButtonCount
         if developerButton != nil {
             developerButton.removeFromParent()
             developerButton = nil
@@ -65,7 +69,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         setButtonsPositions()
     }
     public func generateDebugButton() {
-        countButtons = 5
+        countButtons = NormalButtonCount + 1
         developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
         setButtonsPositions()
     }
@@ -320,15 +324,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var headerMpx: CGFloat = 0
     
     private func setButtonsPositions() {
-        let firstPosXP = countButtons == 4 ? (GV.minSide / 4) / 2 : (GV.minSide / 5) / 2
-        let firstPosXL = countButtons == 4 ? (GV.maxSide / 4) / 2 : (GV.maxSide / 5) / 2
-        let xAdderP = countButtons == 4 ? GV.minSide / 4 : GV.minSide / 5
-        let xAdderL = countButtons == 4 ? GV.maxSide / 4 : GV.maxSide / 5
-        chooseSizeButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP, y: (GV.maxSide * posMpx)),
-                                             LPos: CGPoint(x: firstPosXL, y: (GV.maxSide * posMpx)),
-                                             PSize: buttonSize,
-                                             LSize: buttonSize)
-        chooseSizeButton.setActPosSize()
+        let firstPosXP = (GV.minSide / countButtons) / 2
+        let firstPosXL = (GV.maxSide / countButtons) / 2
+        let xAdderP = GV.minSide / countButtons
+        let xAdderL = GV.maxSide / countButtons
+//        chooseSizeButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP, y: (GV.maxSide * posMpx)),
+//                                             LPos: CGPoint(x: firstPosXL, y: (GV.maxSide * posMpx)),
+//                                             PSize: buttonSize,
+//                                             LSize: buttonSize)
+//        chooseSizeButton.setActPosSize()
         settingsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 1 * xAdderP, y: (GV.maxSide * posMpx)),
                                          LPos: CGPoint(x: firstPosXL + 1 * xAdderL, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
@@ -361,8 +365,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         buttonSize = CGSize(width: GV.minSide * sizeMpx, height: GV.minSide * sizeMpx)
         var texture: SKTexture!
         switch buttonType {
-        case .SizeButton:
-            texture = SKTexture(imageNamed: "Numbers")
+//        case .SizeButton:
+//            texture = SKTexture(imageNamed: "Numbers")
         case .SettingsButton:
             texture = SKTexture(image: DrawImages.drawSettings())
         case .WordsButton:
@@ -384,33 +388,33 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             button.setButtonAction(target: self, triggerEvent: .TouchUpInside, action: action)
         }
         button.zPosition = self.zPosition + 20
-        let firstPosX = countButtons == 4 ? (GV.actWidth / 4) / 2 : (GV.actWidth / 5) / 2
-        let xAdder = countButtons == 4 ? GV.actWidth / 4 : GV.actWidth / 5
+        let firstPosX = (GV.actWidth / countButtons) / 2
+        let xAdder = GV.actWidth / countButtons
         switch buttonType {
-        case .SizeButton:
-                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
-                                             LPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
-                                             PSize: buttonSize,
-                                             LSize: buttonSize)
+//        case .SizeButton:
+//                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
+//                                             LPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
+//                                             PSize: buttonSize,
+//                                             LSize: buttonSize)
         case .SettingsButton:
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX, y: (GV.maxSide * posMpx)),
+                                         PSize: buttonSize,
+                                         LSize: buttonSize)
+        case .TippButton:
             button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 1 * xAdder, y: (GV.maxSide * posMpx)),
                                          LPos: CGPoint(x: firstPosX + 1 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
-        case .TippButton:
+        case .WordsButton:
             button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 2 * xAdder, y: (GV.maxSide * posMpx)),
                                          LPos: CGPoint(x: firstPosX + 2 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
-        case .WordsButton:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
-                                         PSize: buttonSize,
-                                         LSize: buttonSize)
         case .DeveloperButton:
             if GV.developerModus {
-                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 4 * xAdder, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: firstPosX + 4 * xAdder, y: (GV.maxSide * posMpx)),
+                button.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosX + 3 * xAdder, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
             }
@@ -458,8 +462,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     enum ButtonType: Int {
-        case /*SizeButton = 0, LanguageButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, */
-            SizeButton, SettingsButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, TippButton
+        case SettingsButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, TippButton
     }
     
     @objc private func goBack() {
@@ -812,18 +815,19 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
         } else if col == MovingValue {
-            if (touchLocation.x - actPosition.x) > 0 {
-                if myLabels.first!.frame.minX < 10 {
+            let delta = touchLocation.x - actPosition.x
+            if delta > 0 {
+//                if myLabels.first!.frame.minX < 10 {
                     for label in myLabels {
-                        label.position.x += (touchLocation.x - actPosition.x)
+                        label.position.x += delta
                     }
-                }
+//                }
             } else {
-                if myLabels.last!.frame.maxX > GV.actWidth - 15 {
+//                if myLabels.last!.frame.maxX > GV.actWidth - 15 {
                     for label in myLabels {
-                        label.position.x += (touchLocation.x - actPosition.x)
+                        label.position.x += delta
                     }
-                }
+//                }
             }
             actPosition.x = touchLocation.x
         }
@@ -849,7 +853,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(stopDemoModus), buttonType: .StopDemoModus)
         showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
         settingsButton.isHidden = true
-        chooseSizeButton.isHidden = true
+//        chooseSizeButton.isHidden = true
         tippButton.isHidden = true
         if developerButton != nil {
             developerButton.isHidden = true
@@ -861,7 +865,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     @objc private func stopDemoModus(later: Bool = false) {
         demoModus = .Normal
         settingsButton.isHidden = false
-        chooseSizeButton.isHidden = false
+//        chooseSizeButton.isHidden = false
         tippButton.isHidden = false
         if developerButton != nil {
             developerButton.isHidden = false
@@ -1229,7 +1233,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var positions = [ObjectSP]()
     var fixWordsHeader: MyLabel!
     var gameHeader: MyLabel!
-    var chooseSizeButton: MyButton!
+//    var chooseSizeButton: MyButton!
     var tippButton: MyButton!
     var myWordsButton: MyButton!
     var settingsButton: MyButton!
@@ -1241,12 +1245,17 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var myScoreLabel: MyLabel!
     var myBestScoreLabel: MyLabel!
     var worldBestScoreLabel: MyLabel!
-    let fontSize: CGFloat = GV.onIpad ? 22 : 18
-    var movingLayer: SKSpriteNode?
+    let fontSize: CGFloat = GV.onIpad ? 22 : 15
     let MovingLayerName = "MovingLayer"
-    let difficultyNameArray = [GV.language.getText(.tcEasy), GV.language.getText(.tcMedium), GV.language.getText(.tcHard)]
+    var difficultyNameArray = [String]()
+    
+    private func setDifficultyNameArray() {
+        difficultyNameArray = [GV.language.getText(.tcEasy), GV.language.getText(.tcMedium), GV.language.getText(.tcHard)]
+    }
     
     public func playingGame() {
+        setDifficultyNameArray()
+        countButtons = NormalButtonCount
         let testLabel = MyLabel(text: "ABC", position: CGPoint(), fontName: GV.headerFontName, fontSize: fontSize)
         let decrementY = testLabel.frame.height * 1.2
         let firstYP = GV.maxSide - (UIDevice.current.hasNotch ? 60 : 40)
@@ -1299,24 +1308,29 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             } else {
                 playedGame = myGame.first!
             }
-            chooseSizeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
-//            chooseSizeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcChooseSize), action: #selector(chooseSize), buttonType: .SizeButton)
-            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
-            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (chooseSizeButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
+            settingsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcSettings), action: #selector(settings), buttonType: .SettingsButton)
+            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (settingsButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
+            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (settingsButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             generateLabels()
-
-            if movingLayer == nil && labelsMoveable {
-                let labelsSize = CGSize(width: abs(maxPosition.x - myLabels.first!.frame.minX), height: abs(myLabels.first!.frame.maxY - maxPosition.y) + myLabels.first!.frame.size.height)
-                let labelsMidPoint = CGPoint(x: GV.actWidth / 2, y: labelsSize.height)
-                movingLayer = SKSpriteNode()
-                movingLayer!.position = labelsMidPoint
-                movingLayer!.size = labelsSize
-                movingLayer!.name = MovingLayerName
-                gameLayer.addChild(movingLayer!)
+            if let nodeToRemove = childNode(withName: MovingLayerName) {
+                nodeToRemove.removeFromParent()
             }
-            settingsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcSettings), action: #selector(settings), buttonType: .SettingsButton)
+            if labelsMoveable {
+//                test on iphone 5S!!!!!!
+                let distanceBetweenLines = myLabels[0].frame.maxY - myLabels[1].frame.maxY
+                let possibleLineCount = CGFloat(Int(possibleLineCountP))
+                let labelsSize = CGSize(width: abs(myLabels.first!.frame.maxX - myLabels.last!.frame.minX), height: distanceBetweenLines * possibleLineCount)
+                let labelsMidPoint = CGPoint(x: GV.actWidth / 2, y: myLabels.first!.frame.midY - myLabels[Int(possibleLineCountP - 1)].frame.midY / 2)
+                let movingLayer = SKSpriteNode()
+                movingLayer.position = labelsMidPoint
+                movingLayer.size = labelsSize
+                movingLayer.name = MovingLayerName
+//                movingLayer.color = UIColor(red: 1, green: 0, blue: 0, alpha: 0.8)
+                self.gameLayer.addChild(movingLayer)
+            }
+
             tippButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcTipp), action: #selector(showTipp), buttonType: .TippButton)
             myWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
             if GV.developerModus {
@@ -1573,18 +1587,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func setEnglish() {
         setLanguage(language: GV.language.getText(.tcEnglishShort))
+        setDifficultyNameArray()
     }
     
     @objc private func setGerman() {
         setLanguage(language: GV.language.getText(.tcGermanShort))
+        setDifficultyNameArray()
     }
 
     @objc private func setHungarian() {
         setLanguage(language: GV.language.getText(.tcHungarianShort))
+        setDifficultyNameArray()
     }
 
     @objc private func setRussian() {
         setLanguage(language: GV.language.getText(.tcRussianShort))
+        setDifficultyNameArray()
     }
 
     let wordFont = UIFont(name: GV.headerFontName, size: GV.wordsFontSize)
@@ -1727,7 +1745,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let colL = counter / Int(possibleLineCountL)
             let rowP = counter % Int(possibleLineCountP)
             let rowL = counter % Int(possibleLineCountL)
-            let wordWidth = CGFloat("A".fill(with: "A", toLength: 15).width(font: wordFont!))
+            let wordWidth = CGFloat("A".fill(with: "A", toLength: 18).width(font: wordFont!))
             let wordHeight = CGFloat("A".height(font: wordFont!))
             return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidth), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
                              LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidth), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
@@ -1751,8 +1769,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
-        if maxPosition.x + myLabels[0].frame.minX > GV.actWidth {
+        if myLabels.last!.frame.maxX - myLabels.first!.frame.minX > GV.actWidth {
             labelsMoveable = true
+        } else {
+            labelsMoveable = false
         }
         updateLetters()
     }

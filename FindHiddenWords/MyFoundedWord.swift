@@ -33,6 +33,7 @@ class MyFoundedWord: MyLabel {
             child.fontColor = .black
             child.position = CGPoint(x: index * Int(String(letter).width(font: UIFont(name: GV.headerFontName, size: GV.wordsFontSize)!)), y: 0)
             addChild(child)
+            child.zPosition = self.zPosition - 2
             if index >= prefix.length {
                 let col = usedWord.usedLetters[index - prefix.length].col
                 let row = usedWord.usedLetters[index - prefix.length].row
