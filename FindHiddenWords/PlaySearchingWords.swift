@@ -97,8 +97,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     @objc private func disableDeveloperMenu() {
         if developerButton != nil {
-            developerButton.isHidden = true
+            developerButton!.removeFromParent()
+            developerButton = nil
         }
+        countButtons = NormalButtonCount
+        setButtonsPositions()
     }
 
     override func update(_ currentTime: TimeInterval) {
@@ -319,6 +322,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         gameLayer.size = self.size
         setBackground(to: gameLayer)
         gameLayer.setPosAndSizeForAllChildren()
+        setButtonsPositions()
     }
     
     var headerMpx: CGFloat = 0
@@ -333,24 +337,24 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //                                             PSize: buttonSize,
 //                                             LSize: buttonSize)
 //        chooseSizeButton.setActPosSize()
-        settingsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 1 * xAdderP, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: firstPosXL + 1 * xAdderL, y: (GV.maxSide * posMpx)),
+        settingsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
         settingsButton.setActPosSize()
-        tippButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 2 * xAdderP, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: firstPosXL + 2 * xAdderL, y: (GV.maxSide * posMpx)),
+        tippButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 1 * xAdderP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL + 1 * xAdderL, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
         tippButton.setActPosSize()
-        myWordsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 3 * xAdderP, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: firstPosXL + 3 * xAdderL, y: (GV.maxSide * posMpx)),
+        myWordsButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 2 * xAdderP, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: firstPosXL + 2 * xAdderL, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
         myWordsButton.setActPosSize()
-        if GV.developerModus {
-            developerButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 4 * xAdderP, y: (GV.maxSide * posMpx)),
-                                     LPos: CGPoint(x: firstPosXL + 4 * xAdderL, y: (GV.maxSide * posMpx)),
+        if GV.developerModus && developerButton != nil {
+            developerButton.plPosSize = PLPosSize(PPos: CGPoint(x: firstPosXP + 3 * xAdderP, y: (GV.maxSide * posMpx)),
+                                     LPos: CGPoint(x: firstPosXL + 3 * xAdderL, y: (GV.maxSide * posMpx)),
                                      PSize: buttonSize,
                                      LSize: buttonSize)
             developerButton.setActPosSize()
@@ -1333,8 +1337,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
             tippButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcTipp), action: #selector(showTipp), buttonType: .TippButton)
             myWordsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowMyWords, values: String(countWords)), action: #selector(showMyWords), buttonType: .WordsButton)
-            if GV.developerModus {
-                developerButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcDeveloper), action: #selector(developerMenu), buttonType: .DeveloperButton)
+            if GV.developerModus && developerButton == nil {
+                generateDebugButton()
             }
             let myScore = getScore()
             let (_, myBestScore) = GV.basicData.getMaxScore(type: .Device)
@@ -1745,7 +1749,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let colL = counter / Int(possibleLineCountL)
             let rowP = counter % Int(possibleLineCountP)
             let rowL = counter % Int(possibleLineCountL)
-            let wordWidth = CGFloat("A".fill(with: "A", toLength: 18).width(font: wordFont!))
+            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthFoMyLabels).width(font: wordFont!))
             let wordHeight = CGFloat("A".height(font: wordFont!))
             return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidth), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
                              LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidth), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
@@ -1769,7 +1773,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
-        if myLabels.last!.frame.maxX - myLabels.first!.frame.minX > GV.actWidth {
+        if self.myLabels.last!.frame.maxX - myLabels.first!.frame.minX > GV.actWidth {
             labelsMoveable = true
         } else {
             labelsMoveable = false
