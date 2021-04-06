@@ -1224,7 +1224,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             
-            if node.name == MovingLayerName && labelsMoveable {
+            if node.name == MovingLayerName && labelsMoveable && GV.actHeight > GV.actWidth {
                 if GV.deviceOrientation == .Portrait {
                     return(OK: false, col: MovingValue, row: 0)
                 }
@@ -1313,8 +1313,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 playedGame = myGame.first!
             }
             settingsButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcSettings), action: #selector(settings), buttonType: .SettingsButton)
-            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (settingsButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
-            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (settingsButton.frame.maxY)) / (1.2 * ("A".height(font: wordFont!)))
+            possibleLineCountP = abs((fixWordsHeader.plPosSize?.PPos.y)! - (settingsButton.frame.maxY)) / (1.1 * ("A".height(font: wordFont!)))
+            possibleLineCountL = abs((fixWordsHeader.plPosSize?.LPos.y)! - (settingsButton.frame.maxY)) / (1.05 * ("A".height(font: wordFont!)))
             firstWordPositionYP = ((fixWordsHeader.plPosSize?.PPos.y)!) - GV.maxSide * 0.04
             firstWordPositionYL = ((fixWordsHeader.plPosSize?.LPos.y)!) - GV.maxSide * 0.04
             generateLabels()
@@ -1323,10 +1323,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             if labelsMoveable {
 //                test on iphone 5S!!!!!!
-                let distanceBetweenLines = myLabels[0].frame.maxY - myLabels[1].frame.maxY
-                let possibleLineCount = CGFloat(Int(possibleLineCountP))
-                let labelsSize = CGSize(width: abs(myLabels.first!.frame.maxX - myLabels.last!.frame.minX), height: distanceBetweenLines * possibleLineCount)
-                let labelsMidPoint = CGPoint(x: GV.actWidth / 2, y: myLabels.first!.frame.midY - myLabels[Int(possibleLineCountP - 1)].frame.midY / 2)
+                let countRows = Int(possibleLineCountP)
+                let countCols = myLabels.count / countRows
+                let firstLabel = myLabels.first!
+                let lastLabelInRow = myLabels[countRows * countCols - 1]
+                let lastLabelInCol = myLabels[countRows - 1]
+                
+                let maxX = lastLabelInRow.plPosSize!.PPos.x + lastLabelInRow.usedWord.word.width(font: wordFont!) / 2
+                let minX = firstLabel.plPosSize!.PPos.x      - firstLabel.usedWord.word.width(font: wordFont!) / 2
+                let maxY = firstLabel.plPosSize!.PPos.y      + "A".height(font: wordFont!) / 2
+                let minY = lastLabelInCol.plPosSize!.PPos.y  - "A".height(font: wordFont!) / 2
+
+//                let distanceBetweenLines = myLabels[0].frame.maxY - myLabels[1].frame.maxY
+//                let possibleLineCount = CGFloat(Int(possibleLineCountP))
+                let labelsSize = CGSize(width: maxX - minX, height: maxY - minY)
+                let labelsMidPoint = CGPoint(x: minX + (maxX - minX) / 2, y: minY + (maxY - minY) / 2)
                 let movingLayer = SKSpriteNode()
                 movingLayer.position = labelsMidPoint
                 movingLayer.size = labelsSize
@@ -1749,7 +1760,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let colL = counter / Int(possibleLineCountL)
             let rowP = counter % Int(possibleLineCountP)
             let rowL = counter % Int(possibleLineCountL)
-            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthFoMyLabels).width(font: wordFont!))
+            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthForMyLabels).width(font: wordFont!))
             let wordHeight = CGFloat("A".height(font: wordFont!))
             return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidth), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
                              LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidth), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
@@ -1773,7 +1784,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
-        if self.myLabels.last!.frame.maxX - myLabels.first!.frame.minX > GV.actWidth {
+        let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.text!.width(font: wordFont!)) / 2
+        let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.text!.width(font: wordFont!)) / 2
+        if (maxX - minX) > GV.actWidth {
             labelsMoveable = true
         } else {
             labelsMoveable = false
