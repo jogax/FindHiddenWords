@@ -341,7 +341,11 @@ public func setFirstTime()->Int {
     return timer.count - 1
 }
 
-public func showTime(num: Int, string: String) {
+public func showTime(num: Int = 0, string: String) {
+    if timer.count == 0 {
+        let time = Date()
+        timer.append(time)
+    }
     let date = Date()
     print("time at \(string): \((date.timeIntervalSince(timer[num]) * 1000).nDecimals(10))")
     timer[num] = Date()

@@ -1224,7 +1224,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             
-            if node.name == MovingLayerName && labelsMoveable && GV.actHeight > GV.actWidth {
+            if node.name == MovingLayerName && labelsMoveableP && GV.actHeight > GV.actWidth {
                 if GV.deviceOrientation == .Portrait {
                     return(OK: false, col: MovingValue, row: 0)
                 }
@@ -1321,7 +1321,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             if let nodeToRemove = childNode(withName: MovingLayerName) {
                 nodeToRemove.removeFromParent()
             }
-            if labelsMoveable {
+            if labelsMoveableP {
 //                test on iphone 5S!!!!!!
                 let countRows = Int(possibleLineCountP)
                 let countCols = myLabels.count / countRows
@@ -1751,22 +1751,39 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     let LabelName = "WordToFind"
-    var labelsMoveable = false
+    var labelsMoveableP = false
+    var labelsMoveableL = false
     var maxPosition = CGPoint(x: 0, y: 10000)
     private func generateLabels() {
         var counter = 0
+        var firstUsedWordInColP = playedGame.wordsToFind[0].getUsedWord()
+        var firstUsedWordInColL = playedGame.wordsToFind[0].getUsedWord()
+        let adder = 9
+//        var maxWordLengthInColumnP = firstUsedWordInColP.word.count + 5
+//        var maxWordLengthInColumnL = firstUsedWordInColL.word.count + 5
+        var wordWidthP: CGFloat = 0
+        var wordWidthL: CGFloat = 0
         func setPLPos(counter: Int)->PLPosSize {
             let colP = counter / Int(possibleLineCountP)
             let colL = counter / Int(possibleLineCountL)
             let rowP = counter % Int(possibleLineCountP)
             let rowL = counter % Int(possibleLineCountL)
-            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthForMyLabels).width(font: wordFont!))
+//            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthForMyLabels).width(font: wordFont!))
+            if rowP == 0 {
+                firstUsedWordInColP = playedGame.wordsToFind[counter].getUsedWord()
+                wordWidthP = CGFloat("A".fill(with: "_", toLength: firstUsedWordInColP.word.count + adder).width(font: wordFont!))
+            }
+            if rowL == 0 {
+                firstUsedWordInColL = playedGame.wordsToFind[counter].getUsedWord()
+                wordWidthL = CGFloat("A".fill(with: "_", toLength: firstUsedWordInColL.word.count + adder).width(font: wordFont!))
+            }
             let wordHeight = CGFloat("A".height(font: wordFont!))
-            return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidth), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
-                             LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidth), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
+            return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidthP), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
+                             LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidthL), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
         }
 //        for item in mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
-        for item in playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
+        let sortedItems = playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)})
+        for item in  sortedItems {
             if !myLabels.contains(where: {$0.usedWord! == item.getUsedWord()}) {
                 let myWord = MyFoundedWord(usedWord: item.getUsedWord(), mandatory: true, prefixValue: counter + 1)
                 myWord.name = LabelName
@@ -1786,10 +1803,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
         let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.text!.width(font: wordFont!)) / 2
         let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.text!.width(font: wordFont!)) / 2
-        if (maxX - minX) > GV.actWidth {
-            labelsMoveable = true
+        if (maxX - minX) > GV.minSide {
+            labelsMoveableP = true
         } else {
-            labelsMoveable = false
+            labelsMoveableP = false
         }
         updateLetters()
     }
@@ -1820,10 +1837,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if choosedWord.word.count > 0 {
             setWordStatus(usedWord: choosedWord)
         } else {
+            showTime(string: "Before addNewConnections")
             for item in playedGame.myWords {
                 let usedWord = item.getUsedWord()
                 setWordStatus(usedWord: usedWord)
             }
+            showTime(string: "After addNewConnections")
         }
         for myWord in myLabels {
 //            if myWord.mandatory {
@@ -1851,10 +1870,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
             worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
         }
-//        }
+        showTime(string: "Before showConnections")
         iterateGameArray(doing: {(col: Int, row: Int) in
             GV.gameArray[col][row].showConnections()
         })
+        showTime(string: "After showConnections")
     }
         
     private func iterateGameArray(doing: (_ col: Int, _ row: Int)->()) {

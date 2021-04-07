@@ -39,16 +39,6 @@ public struct ConnectionType {
     func isSet() -> Bool {
         return left || leftTop || top || rightTop || right || rightBottom || bottom || leftBottom
     }
-//    mutating func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
-//        if col1 >  col2 && row1 == row2 {left = false}
-//        if col1 >  col2 && row1 >  row2 {leftTop = false}
-//        if col1 == col2 && row1 >  row2 {top = false}
-//        if col1 <  col2 && row1 >  row2 {rightTop = false}
-//        if col1 <  col2 && row1 == row2 {right = false}
-//        if col1 <  col2 && row1 <  row2 {rightBottom = false}
-//        if col1 == col2 && row1 <  row2 {bottom = false}
-//        if col1 >  col2 && row1 <  row2 {leftBottom = false}
-//    }
     mutating func setConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int, toValue: Bool) {
         if col1 >  col2 && row1 == row2 {left = toValue}
         if col1 >  col2 && row1 >  row2 {leftTop = toValue}
