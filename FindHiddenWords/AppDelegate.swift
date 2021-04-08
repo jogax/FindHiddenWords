@@ -25,7 +25,7 @@ let newWordListRealm:Realm = try! Realm(configuration: newWordListConfig)
 let origGamesConfig = Realm.Configuration(
 fileURL: URL(string: Bundle.main.path(forResource: "OrigGames", ofType: "realm")!),
 readOnly: true,
-schemaVersion: 1,
+schemaVersion: 2,
     objectTypes: [GameModel.self, FoundedWords.self])
 //var gamesRealm: Realm = try! Realm(configuration: origGamesConfig)
 var originalGamesRealm: Realm = try! Realm(configuration: origGamesConfig)

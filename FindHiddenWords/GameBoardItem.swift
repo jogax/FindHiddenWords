@@ -49,6 +49,71 @@ public struct ConnectionType {
         if col1 == col2 && row1 <  row2 {bottom = toValue}
         if col1 >  col2 && row1 <  row2 {leftBottom = toValue}
     }
+    public func toString()->String {
+        func convertToChar(bit4: Bool, bit2: Bool, bit1: Bool, bit0: Bool)->String {
+            switch(bit4, bit2, bit1, bit0) {
+            case (true, true, true, true):      return "F"
+            case (true, true, true, false):     return "E"
+            case (true, true, false, true):     return "D"
+            case (true, true, false, false):    return "C"
+            case (true, false, true, true):      return "B"
+            case (true, false, true, false):     return "A"
+            case (true, false, false, true):     return "9"
+            case (true, false, false, false):    return "8"
+            case (false, true, true, true):      return "7"
+            case (false, true, true, false):     return "6"
+            case (false, true, false, true):     return "5"
+            case (false, true, false, false):    return "4"
+            case (false, false, true, true):      return "3"
+            case (false, false, true, false):     return "2"
+            case (false, false, false, true):     return "1"
+            case (false, false, false, false):    return "0"
+            }
+        }
+        let ch1 = convertToChar(bit4: left, bit2: leftTop, bit1: top, bit0: rightTop)
+        let ch2 = convertToChar(bit4: right, bit2: rightBottom, bit1: bottom, bit0: leftBottom)
+        return ch1 + ch2
+    }
+    public mutating func fromString(string: String) {
+        switch string.firstChar() {
+        case "F": left = true; leftTop = true; top = true; rightTop = true
+        case "E": left = true; leftTop = true; top = true; rightTop = false
+        case "D": left = true; leftTop = true; top = false; rightTop = true
+        case "C": left = true; leftTop = true; top = false; rightTop = false
+        case "B": left = true; leftTop = false; top = true; rightTop = true
+        case "A": left = true; leftTop = false; top = true; rightTop = false
+        case "9": left = true; leftTop = false; top = false; rightTop = true
+        case "8": left = true; leftTop = false; top = false; rightTop = false
+        case "7": left = false; leftTop = true; top = true; rightTop = true
+        case "6": left = false; leftTop = true; top = true; rightTop = false
+        case "5": left = false; leftTop = true; top = false; rightTop = true
+        case "4": left = false; leftTop = true; top = false; rightTop = false
+        case "3": left = false; leftTop = false; top = true; rightTop = true
+        case "2": left = false; leftTop = false; top = true; rightTop = false
+        case "1": left = false; leftTop = false; top = false; rightTop = true
+        case "0": left = false; leftTop = false; top = false; rightTop = false
+        default: break
+        }
+        switch string.lastChar() {
+        case "F": right = true; rightBottom = true; bottom = true; leftBottom = true
+        case "E": right = true; rightBottom = true; bottom = true; leftBottom = false
+        case "D": right = true; rightBottom = true; bottom = false; leftBottom = true
+        case "C": right = true; rightBottom = true; bottom = false; leftBottom = false
+        case "B": right = true; rightBottom = false; bottom = true; leftBottom = true
+        case "A": right = true; rightBottom = false; bottom = true; leftBottom = false
+        case "9": right = true; rightBottom = false; bottom = false; leftBottom = true
+        case "8": right = true; rightBottom = false; bottom = false; leftBottom = false
+        case "7": right = false; rightBottom = true; bottom = true; leftBottom = true
+        case "6": right = false; rightBottom = true; bottom = true; leftBottom = false
+        case "5": right = false; rightBottom = true; bottom = false; leftBottom = true
+        case "4": right = false; rightBottom = true; bottom = false; leftBottom = false
+        case "3": right = false; rightBottom = false; bottom = true; leftBottom = true
+        case "2": right = false; rightBottom = false; bottom = true; leftBottom = false
+        case "1": right = false; rightBottom = false; bottom = false; leftBottom = true
+        case "0": right = false; rightBottom = false; bottom = false; leftBottom = false
+        default: break
+        }
+    }
 }
 
 
@@ -64,7 +129,7 @@ class GameboardItem: SKSpriteNode {
     private var blockSize:CGFloat = 0
     private var label: SKLabelNode
     private var countWordsLabel: SKLabelNode
-    private var connectionType = ConnectionType()
+    public var connectionType = ConnectionType()
     private var countOccurencesInWords = 0
     public var upperNeighbor: GameboardItem?
     public var lowerNeighbor: GameboardItem?
@@ -366,34 +431,6 @@ class GameboardItem: SKSpriteNode {
         setTexture()
     }
     
-//    public func setConnectionType(connectionType: ConnectionType) {
-//        if connectionType.left {
-//            self.connectionType.left = true
-//        }
-//        if connectionType.top {
-//            self.connectionType.top = true
-//        }
-//        if connectionType.right {
-//            self.connectionType.right = true
-//        }
-//        if connectionType.bottom {
-//            self.connectionType.bottom = true
-//        }
-//        if connectionType.leftBottom {
-//            self.connectionType.leftBottom = true
-//        }
-//        if connectionType.leftTop {
-//            self.connectionType.leftTop = true
-//        }
-//        if connectionType.rightTop {
-//            self.connectionType.rightTop = true
-//        }
-//        if connectionType.rightBottom {
-//            self.connectionType.rightBottom = true
-//        }
-////        setTexture()
-//    }
-//
     public func resetConnectionBetween(col1: Int, row1: Int, col2: Int, row2: Int) {
         self.connectionType.setConnectionBetween(col1: col1, row1: row1, col2: col2, row2: row2, toValue: false)
         setTexture()

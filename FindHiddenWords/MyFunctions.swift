@@ -143,7 +143,24 @@ public func getPlayedGamesRealm()->Realm {
     let gamesURL = documentsURL.appendingPathComponent("PlayedGames.realm")
     let origGamesConfig = Realm.Configuration(
         fileURL: gamesURL,
-        schemaVersion: 6,
+        schemaVersion: 7,
+        objectTypes: [GameModel.self, FoundedWords.self])
+    let realm = try! Realm(configuration: origGamesConfig)
+    return realm
+}
+
+public func updateOrigGamesRealm()->Realm {
+    let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    let gamesURL = documentsURL.appendingPathComponent("OrigGames.realm")
+    let origGamesConfig = Realm.Configuration(
+        fileURL: gamesURL,
+        schemaVersion: 2,
+//        migrationBlock: { migration, oldSchemaVersion in
+//                migration.enumerateObjects(ofType: GameModel.className())
+//                { oldObject, newObject in
+//
+//                }
+//        },
         objectTypes: [GameModel.self, FoundedWords.self])
     let realm = try! Realm(configuration: origGamesConfig)
     return realm

@@ -292,7 +292,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     public func start(delegate: GameMenuScene! = nil) {
 //        newWordListRealm = getNewWordList()
-        
+//        let xxx = updateOrigGamesRealm()
         oldOrientation = UIDevice.current.orientation.isPortrait
         GV.language.setLanguage(GV.basicData.actLanguage)
 //        setGlobalSizes()
@@ -1838,9 +1838,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             setWordStatus(usedWord: choosedWord)
         } else {
             showTime(string: "Before addNewConnections")
-            for item in playedGame.myWords {
-                let usedWord = item.getUsedWord()
-                setWordStatus(usedWord: usedWord)
+            if playedGame.connections.count > 0 {
+                var index = 0
+                iterateGameArray(doing: {(col: Int, row: Int) in
+                    let string = playedGame.connections.subString(at: index, length: 2)
+                    GV.gameArray[col][row].connectionType.fromString(string: string)
+                    if GV.gameArray[col][row].connectionType.isSet() {
+                        GV.gameArray[col][row].setStatus(toStatus: .WholeWord)
+                    }
+                    index += 2
+                })
+            } else {
+                for item in playedGame.myWords {
+                    let usedWord = item.getUsedWord()
+                    setWordStatus(usedWord: usedWord)
+                }
             }
             showTime(string: "After addNewConnections")
         }
@@ -1978,6 +1990,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             return true
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
+        }
+        if returnValue {
+            var connectionsToSave = ""
+                iterateGameArray(doing: {(col: Int, row: Int) in
+                    connectionsToSave += GV.gameArray[col][row].connectionType.toString()
+                })
+            try! playedGamesRealm!.safeWrite {
+                playedGame.connections = connectionsToSave
+            }
         }
         return returnValue
     }

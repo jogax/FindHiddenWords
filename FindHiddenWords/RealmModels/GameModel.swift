@@ -8,13 +8,14 @@
 import Foundation
 import RealmSwift
 
-//var playedGame = GameModel()
+var playedGame = GameModel()
 class GameModel: Object {
     @objc dynamic var primary = ""
     @objc dynamic var language = ""
     @objc dynamic var gameNumber = 0
     @objc dynamic var gameSize = 0
     @objc dynamic var gameArray = ""
+    @objc dynamic var connections = ""
     var wordsToFind = List<FoundedWords>()
     var myWords = List<FoundedWords>()
     var myDemos = List<FoundedWords>()
