@@ -960,7 +960,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         case .Help:
                             stopDemoModus()
                         case .Normal:
-                            break
+                            updateLetters(inWord: newWord)
                         }
                     }
                     myActions.append(finishAction)
@@ -1126,6 +1126,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             animateLetters(newWord: choosedWord, type: .WordIsOK)
             mySounds.play(.OKWord)
             setWordStatus(usedWord: choosedWord)
+            var connectionsToSave = ""
+                iterateGameArray(doing: {(col: Int, row: Int) in
+                    connectionsToSave += GV.gameArray[col][row].connectionType.toString()
+                })
+            try! playedGamesRealm!.safeWrite {
+                playedGame.connections = connectionsToSave
+            }
+
             let title = GV.language.getText(.tcShowMyWords, values: String(countWords))
             myWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
         }
@@ -1405,6 +1413,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
+    let FingerNodeName = "FingerNode"
     @objc private func animateWords() {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
@@ -1414,6 +1423,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
             fingerSprite.zPosition += 100
             fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
+            fingerSprite.name = FingerNodeName
+            if let nodeToRemove = gameLayer.childNode(withName: FingerNodeName) {
+                nodeToRemove.removeFromParent()
+            }
             gameLayer.addChild(fingerSprite)
             let item = wordsToAnimate.first!
             wordsToAnimate.removeFirst()
@@ -1754,6 +1767,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var labelsMoveableP = false
     var labelsMoveableL = false
     var maxPosition = CGPoint(x: 0, y: 10000)
+    
     private func generateLabels() {
         var counter = 0
         var firstUsedWordInColP = playedGame.wordsToFind[0].getUsedWord()
@@ -1837,7 +1851,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if choosedWord.word.count > 0 {
             setWordStatus(usedWord: choosedWord)
         } else {
-            showTime(string: "Before addNewConnections")
+//            showTime(string: "Before addNewConnections")
             if playedGame.connections.count > 0 {
                 var index = 0
                 iterateGameArray(doing: {(col: Int, row: Int) in
@@ -1846,15 +1860,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     if GV.gameArray[col][row].connectionType.isSet() {
                         GV.gameArray[col][row].setStatus(toStatus: .WholeWord)
                     }
+                    GV.gameArray[col][row].showConnections()
                     index += 2
                 })
-            } else {
-                for item in playedGame.myWords {
-                    let usedWord = item.getUsedWord()
-                    setWordStatus(usedWord: usedWord)
-                }
+            }// else {
+            for item in playedGame.myWords {
+                let usedWord = item.getUsedWord()
+                setWordStatus(usedWord: usedWord)
             }
-            showTime(string: "After addNewConnections")
+//            }
+//            showTime(string: "After addNewConnections")
         }
         for myWord in myLabels {
 //            if myWord.mandatory {
@@ -1882,11 +1897,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
             worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
         }
-        showTime(string: "Before showConnections")
-        iterateGameArray(doing: {(col: Int, row: Int) in
-            GV.gameArray[col][row].showConnections()
-        })
-        showTime(string: "After showConnections")
+//        showTime(string: "Before showConnections")
+//        iterateGameArray(doing: {(col: Int, row: Int) in
+//            GV.gameArray[col][row].showConnections()
+//        })
+//        showTime(string: "After showConnections")
     }
         
     private func iterateGameArray(doing: (_ col: Int, _ row: Int)->()) {
@@ -1990,15 +2005,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             return true
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)
-        }
-        if returnValue {
-            var connectionsToSave = ""
-                iterateGameArray(doing: {(col: Int, row: Int) in
-                    connectionsToSave += GV.gameArray[col][row].connectionType.toString()
-                })
-            try! playedGamesRealm!.safeWrite {
-                playedGame.connections = connectionsToSave
-            }
         }
         return returnValue
     }

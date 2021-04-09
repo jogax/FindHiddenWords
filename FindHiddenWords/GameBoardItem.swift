@@ -498,7 +498,7 @@ class GameboardItem: SKSpriteNode {
                 lettersToModify[index].text = GV.questionMark
                 lettersToModify[index].fontColor = .black
             case (.WholeWord, EasyGame):
-                if lettersToModify[index].fontColor!  != GV.darkGreen {
+                if lettersToModify[index].fontColor! != GV.darkGreen {
                     lettersToModify[index].text = self.letter
                     lettersToModify[index].fontColor = .red
                 }

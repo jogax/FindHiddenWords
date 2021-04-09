@@ -15,6 +15,9 @@ class MyFoundedWord: MyLabel {
     var mandatory: Bool = false
     var founded: Bool = false
     init(usedWord: UsedWord, mandatory: Bool, prefixValue: Int) {
+        if usedWord.word == "BETEG" {
+            print("Stop hier")
+        }
         self.usedWord = usedWord
         self.mandatory = mandatory
         let prefix = (prefixValue < 10 ? "0" : "") + "\(prefixValue). "

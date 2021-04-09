@@ -106,8 +106,8 @@ public func printConnectios() {
     for row in 0..<GV.basicData.gameSize {
         var infoLine = "|"
         for col in 0..<GV.basicData.gameSize {
-            let char = String(GV.gameArray[col][row].countFreeConnections)
-            infoLine += " " + (char == "" ? " " : char) + " " + "|"
+            let char = String(GV.gameArray[col][row].connectionType.toString())
+            infoLine += " " + char + " " + "|"
         }
         print(infoLine)
     }
