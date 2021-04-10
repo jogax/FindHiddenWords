@@ -1929,6 +1929,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     
+//    private func changeLettersToModify(label: MyFoundedWord, newUsedWord: UsedWord) {
+//        let prefixLength = 4
+//        let origUsedWord: UsedWord! = label.usedWord
+//        for index in 0..<origUsedWord.word.count {
+//            if origUsedWord.usedLetters[index] != newUsedWord.usedLetters[index] {
+//                let origCol = origUsedWord.usedLetters[index].col
+//                let origRow = origUsedWord.usedLetters[index].row
+//                let newCol = newUsedWord.usedLetters[index].col
+//                let newRow = newUsedWord.usedLetters[index].row
+//                var oldLetter = label.children[index + prefixLength - 1] as! SKLabelNode
+//                GV.gameArray[origCol][origRow].removeLetterToModify(letter: &oldLetter)
+//                GV.gameArray[newCol][newRow].addLetterForUpdate(letter: &oldLetter)
+//                print("change letter")
+//            }
+//        }
+//    }
     private func saveChoosedWord()->Bool {
         var returnValue = true
         var earlierWord: UsedWord!
@@ -1936,8 +1952,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         for (itemIndex, item) in myLabels.enumerated() {
             if item.mandatory && !item.founded && choosedWord.word == item.usedWord!.word {
 //                var mandatoryWordOK = false
-                for choosedItem in choosedWord.usedLetters {
-                    if item.usedWord.usedLetters.contains(where: {$0 == choosedItem}) {
+                for usedLetter in choosedWord.usedLetters {
+                    if item.usedWord.usedLetters.contains(where: {$0 == usedLetter}) {
                         mandatoryWordFounded = true
                         choosedWord.mandatory = true
                         break
@@ -1945,7 +1961,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
                 if mandatoryWordFounded {
                     myLabels[itemIndex].founded = true
-                    myLabels[itemIndex].usedWord = choosedWord
+                    if !(myLabels[itemIndex].usedWord == choosedWord) {
+//                        changeLettersToModify(label: myLabels[itemIndex], newUsedWord: choosedWord)
+                        myLabels[itemIndex].updateLetters(newWord: choosedWord)
+                    }
+//                        myLabels[itemIndex].usedWord = choosedWord
                     let foundedMandatoryWords = playedGame.wordsToFind.filter("word = %d", choosedWord.word)
                     if foundedMandatoryWords.count == 1 {
                         try! playedGamesRealm!.safeWrite {

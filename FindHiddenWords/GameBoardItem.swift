@@ -523,6 +523,18 @@ class GameboardItem: SKSpriteNode {
         lettersToModify.append(letter)
     }
     
+    public func removeLetterToModify(letter: inout SKLabelNode) {
+        for (index, item) in lettersToModify.enumerated() {
+            if (item.parent as! MyFoundedWord).usedWord == (letter.parent as! MyFoundedWord).usedWord {
+                if item == letter {
+                    lettersToModify.remove(at: index)
+                }
+                print ("hier in GameBoardItem after remove")
+                break
+            }
+        }
+    }
+    
     var lastCol = 0
     var lastRow = 0
     var timer = Date()
