@@ -759,10 +759,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         }
     }
     var colRowTable = [ColRow]()
-    enum DemoModus: Int {
-        case Demo = 0, Help, Normal
-    }
-    var demoModus: DemoModus = .Normal
+//    var demoModus: DemoModus = .Normal
     
     public func hideWorldBestResults() {
         worldBestScoreLabel.isHidden = true
@@ -782,7 +779,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         
         if OK {
             let actLetter = UsedLetter(col: col, row: row, letter: GV.gameArray[col][row].letter)
-            if demoModus == .Demo || demoModus == .Help {
+            if GV.demoModus == .Demo || GV.demoModus == .Help {
                 choosedWord.append(UsedLetter(col:col, row: row, letter: GV.gameArray[col][row].letter))
                 GV.gameArray[col][row].setStatus(toStatus: .Temporary)
                 return
@@ -867,7 +864,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     
     @objc private func stopDemoModus(later: Bool = false) {
-        demoModus = .Normal
+        GV.demoModus = .Normal
         settingsButton.isHidden = false
 //        chooseSizeButton.isHidden = false
         tippButton.isHidden = false
@@ -932,7 +929,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     cell.setStatus(toStatus: .WholeWord)
                 })
                 if index == cellsToAnimate.count - 1 {
-                    if demoModus == .Demo || demoModus == .Help {
+                    if GV.demoModus == .Demo || GV.demoModus == .Help {
                         myActions.append(SKAction.wait(forDuration: 0.1))
                         let undoAction = SKAction.run { [self] in
                             setWordColor(usedWord: newWord, toColor: .black)
@@ -949,10 +946,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         myActions.append(undoAction)
                     }
                     let finishAction = SKAction.run { [self] in
-                        switch demoModus {
+                        switch GV.demoModus {
                         case .Demo:
                             if wordsToAnimate.count > 0 {
-                                demoModus = .Demo
+                                GV.demoModus = .Demo
                                 animateWords()
                             } else {
                                 stopDemoModus()
@@ -1126,6 +1123,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             animateLetters(newWord: choosedWord, type: .WordIsOK)
             mySounds.play(.OKWord)
             setWordStatus(usedWord: choosedWord)
+            saveScores()
             var connectionsToSave = ""
                 iterateGameArray(doing: {(col: Int, row: Int) in
                     connectionsToSave += GV.gameArray[col][row].connectionType.toString()
@@ -1378,8 +1376,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         var calculatedDiagonalConnections = 0
     }
     var wordsToAnimate = [WordsToAnimate]()
+    @objc private func tipTimerExpired(timerX: Timer) {
+        GV.tipChecked = false
+        tipTimer!.invalidate()
+        tipTimer = nil
+    }
+    var tipTimer: Timer? = nil
+
     
     @objc private func showTipp() {
+        wordsToAnimate.removeAll()
+        if tipTimer != nil {
+            tipTimer!.invalidate()
+            tipTimer = nil
+        }
+        GV.tipChecked = true
+        tipTimer = Timer.scheduledTimer(timeInterval: 120.0, target: self, selector: #selector(tipTimerExpired(timerX: )), userInfo: nil, repeats: false)
         var tippsForShow = [FoundedWords]()
         for item in playedGame.wordsToFind {
             let usedWord = item.getUsedWord()
@@ -1390,12 +1402,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let index = Int.random(min: 0, max: tippsForShow.count - 1)
         let item = tippsForShow[index]
         let usedWord = item.getUsedWord()
+        GV.lastTip = usedWord
         let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
         wordsToAnimate.append(wordToAppend)
-        demoModus = .Help
+        GV.demoModus = .Help
         animateWords()
 
     }
+    
     private func showDemo() {
         
         for item in playedGame.wordsToFind {
@@ -1408,7 +1422,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count > $1.word.count) ||
 //            ($0.calculatedDiagonalConnections==$1.calculatedDiagonalConnections && $0.word.count == $1.word.count && $0.word > $1.word)
 //        })
-        demoModus = .Demo
+        GV.demoModus = .Demo
         animateWords()
     }
     
@@ -1872,21 +1886,23 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //            showTime(string: "After addNewConnections")
         }
         for myWord in myLabels {
-//            if myWord.mandatory {
                 if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
                     myWord.fontColor = GV.darkGreen
                     myWord.founded = true
                 } else {
                     myWord.fontColor = .black
                     myWord.founded = false
-//                }
            }
         }
+        saveScores()
+    }
+        
+    private func saveScores() {
         let score = getScore()
         try! realm.safeWrite {
             GV.basicData.setLocalMaxScore(score: score)
         }
-        if demoModus == .Normal {
+        if GV.demoModus == .Normal {
                 GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
                 GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
         }
@@ -1897,13 +1913,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             myBestScoreLabel!.text = GV.language.getText(.tcDeviceBestScore, values: String(myBestScore))
             worldBestScoreLabel!.text = GV.language.getText(.tcWorldBestScore, values: player, String(worldBestScore))
         }
-//        showTime(string: "Before showConnections")
-//        iterateGameArray(doing: {(col: Int, row: Int) in
-//            GV.gameArray[col][row].showConnections()
-//        })
-//        showTime(string: "After showConnections")
     }
-        
     private func iterateGameArray(doing: (_ col: Int, _ row: Int)->()) {
         for col in 0..<GV.basicData.gameSize {
             for row in 0..<GV.basicData.gameSize {
@@ -2021,7 +2031,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
 
 
-        } else if demoModus == .Demo {
+        } else if GV.demoModus == .Demo {
             return true
         } else {
             animateLetters(newWord: choosedWord, earlierWord: earlierWord, type: .WordIsActiv)

@@ -498,10 +498,11 @@ class GameboardItem: SKSpriteNode {
                 lettersToModify[index].text = GV.questionMark
                 lettersToModify[index].fontColor = .black
             case (.WholeWord, EasyGame):
+                lettersToModify[index].text = self.letter
                 if lettersToModify[index].fontColor! != GV.darkGreen {
                     lettersToModify[index].text = self.letter
                     lettersToModify[index].fontColor = .red
-                }
+                } 
             case (.WholeWord, MediumGame):
                 lettersToModify[index].text = self.letter
                 if lettersToModify[index].fontColor! != GV.darkGreen {
@@ -529,7 +530,7 @@ class GameboardItem: SKSpriteNode {
                 if item == letter {
                     lettersToModify.remove(at: index)
                 }
-                print ("hier in GameBoardItem after remove")
+//                print ("hier in GameBoardItem after remove")
                 break
             }
         }

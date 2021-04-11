@@ -61,7 +61,15 @@ class FoundedWords: Object {
         self.usedLetters = ""
     }
     
+    let TippMpx = 30
+    let EasyMpx = 50
+    let MediumMpx = 70
+    let HardMpx = 100
     private func calculateScore()->Int {
+        if GV.demoModus != .Normal {
+            return 0
+        }
+        var calculatedScore = 0
         let positions = self.usedLetters.components(separatedBy: GV.innerSeparator)
         var countLetters = 1
         for index in 0...positions.count - 2 {
@@ -71,7 +79,20 @@ class FoundedWords: Object {
             let row2 = Int(positions[index + 1].char(at: 1))!
             countLetters += abs(col1 - col2) + abs(row1 - row2)
         }
-        return countLetters * 50
+        if GV.tipChecked && GV.lastTip == self.getUsedWord() {
+            calculatedScore = countLetters * TippMpx
+        } else if mandatory {
+            if GV.basicData.gameDifficulty == EasyGame {
+                calculatedScore = countLetters * EasyMpx
+            } else if GV.basicData.gameDifficulty == MediumGame {
+                calculatedScore = countLetters * MediumMpx
+            } else if GV.basicData.gameDifficulty == HardGame {
+                calculatedScore = countLetters * HardMpx
+            }
+        } else {
+            calculatedScore = countLetters * EasyMpx
+        }
+        return calculatedScore
     }
     
     public var calculatedDiagonalConnections: Int {

@@ -28,6 +28,10 @@ let ConnectionName = "Connection"
 public enum RealmType: Int {
     case GamesRealm, PlayedGameRealm
 }
+public enum DemoModus: Int {
+    case Demo = 0, Help, Normal
+}
+
 
 public enum TouchType: Int {
     case Began = 0, Moved, Ended
@@ -171,6 +175,9 @@ struct GV {
     static let language = Language()
     static var basicData = BasicData()
     static var gameNumber = 0
+    static var tipChecked = false
+    static var lastTip = UsedWord()
+    static var demoModus: DemoModus = .Normal
     static var games = Games()
     static var blockSize = CGFloat(0)
     static var parentScene = SKScene()
