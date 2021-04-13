@@ -103,6 +103,9 @@ class DrawImages {
     }
 
     static func drawConnections (size: CGSize, connections: ConnectionType) -> SKTexture {
+        if GV.connectionImages[connections] != nil {
+            return GV.connectionImages[connections]!
+        }
         UIGraphicsBeginImageContextWithOptions(size, false, 1)
         let ctx = UIGraphicsGetCurrentContext()
         let lineWidth: CGFloat = 2
@@ -163,9 +166,9 @@ class DrawImages {
         
 
         if let image = UIGraphicsGetImageFromCurrentImageContext() {
-            return image.texture()
+            GV.connectionImages[connections] = image.texture()
         }
-        return SKTexture()
+        return GV.connectionImages[connections]!
     }
 
     static func drawButton(size: CGSize, outerColor: UIColor = .green, innerColor: UIColor = .lightGray) -> SKTexture {

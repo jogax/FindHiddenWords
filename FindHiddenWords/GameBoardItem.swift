@@ -17,7 +17,7 @@ enum ItemStatus: Int {
     }
 }
 
-public struct ConnectionType {
+public struct ConnectionType: Hashable {
     var left = false
     var leftTop = false
     var top = false
@@ -571,7 +571,9 @@ class GameboardItem: SKSpriteNode {
         let p2 = GV.gameArray[0][2].position
         let distance = abs(p2.y - p1.y)
         let size = CGSize(width: distance, height: distance)
+//        showTime(string: "--------------------------before DrawImages")
         let connectedSprite = DrawImages.drawConnections(size: size, connections: connectionType)
+//        showTime(string: "--------------------------after DrawImages")
         let child = SKSpriteNode(texture: connectedSprite) // imageNamed: connectionName)
 //        child.size = self.size * 1.1
         child.zPosition = self.zPosition - 10

@@ -369,8 +369,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         buttonSize = CGSize(width: GV.minSide * sizeMpx, height: GV.minSide * sizeMpx)
         var texture: SKTexture!
         switch buttonType {
-//        case .SizeButton:
-//            texture = SKTexture(imageNamed: "Numbers")
         case .SettingsButton:
             texture = SKTexture(image: DrawImages.drawSettings())
         case .WordsButton:
@@ -379,8 +377,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             texture = SKTexture(imageNamed: "developer")
         case .StopDemoModus:
             texture = SKTexture(image: DrawImages.drawStop())
-        case .ShowDemoLater:
-            texture = SKTexture(image: DrawImages.drawLater())
         case .TippButton:
             texture = SKTexture(image: DrawImages.drawTipps())
         }
@@ -423,15 +419,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                                          LSize: buttonSize)
             }
         case .StopDemoModus:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.30, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.30, y: (GV.maxSide * posMpx)),
+            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.50, y: (GV.maxSide * posMpx)),
+                                         LPos: CGPoint(x: GV.maxSide * 0.50, y: (GV.maxSide * posMpx)),
                                          PSize: buttonSize,
                                          LSize: buttonSize)
-        case .ShowDemoLater:
-            button.plPosSize = PLPosSize(PPos: CGPoint(x: GV.minSide * 0.80, y: (GV.maxSide * posMpx)),
-                                         LPos: CGPoint(x: GV.maxSide * 0.80, y: (GV.maxSide * posMpx)),
-                                         PSize: buttonSize,
-                                         LSize: buttonSize)
+
         }
         button.myType = .MyButton
         button.setActPosSize()
@@ -466,7 +458,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     enum ButtonType: Int {
-        case SettingsButton, WordsButton, DeveloperButton, StopDemoModus, ShowDemoLater, TippButton
+        case SettingsButton, WordsButton, DeveloperButton, StopDemoModus, TippButton
     }
     
     @objc private func goBack() {
@@ -704,7 +696,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var movingLocations = [CGPoint]()
     let MovingValue = 1000
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        stopDemoModus()
         let touchLocation = touches.first!.location(in: self)
         myTouchesBegan(touchLocation: touchLocation)
     }
@@ -851,8 +842,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var counter = 0
     
     private func startDemoModus() {
-        stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(stopDemoModus), buttonType: .StopDemoModus)
-        showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
+        stopDemoButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcStopDemo), action: #selector(setStopDemoModus), buttonType: .StopDemoModus)
+//        showDemoNextTimeButton = addButtonPL(to: gameLayer, text: GV.language.getText(.tcShowDemoLater), action: #selector(showDemoLater), buttonType: .ShowDemoLater)
         settingsButton.isHidden = true
 //        chooseSizeButton.isHidden = true
         tippButton.isHidden = true
@@ -862,11 +853,15 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myWordsButton.isHidden = true
     }
     
+    @objc private func setStopDemoModus() {
+        demoModusStopped = true
+        stopDemoButton.alpha = 0.5
+    }
     
-    @objc private func stopDemoModus(later: Bool = false) {
+    
+    @objc private func stopDemoModus() {
         GV.demoModus = .Normal
         settingsButton.isHidden = false
-//        chooseSizeButton.isHidden = false
         tippButton.isHidden = false
         if developerButton != nil {
             developerButton.isHidden = false
@@ -874,12 +869,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         myWordsButton.isHidden = false
         if stopDemoButton != nil {
             stopDemoButton.removeFromParent()
-            showDemoNextTimeButton.removeFromParent()
             stopDemoButton = nil
-            showDemoNextTimeButton = nil
         }
         try! realm.safeWrite {
-            GV.basicData.showDemo = later
+            GV.basicData.showDemo = false
+        }
+        try! playedGamesRealm?.safeWrite {
+            playedGame.connections = ""
+            playedGame.myWords.removeAll()
         }
         if fingerSprite.hasActions() {
             fingerSprite.removeAllActions()
@@ -899,9 +896,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         })
     }
     
-    @objc private func showDemoLater() {
-        stopDemoModus(later: true)
-    }
+    var demoModusStopped = false
+    
     private func animateLetters(newWord: UsedWord, earlierWord: UsedWord? = nil, type: animationType) {
         var cellsToAnimate = [GameboardItem]()
         var oldCellsToAnimate = [GameboardItem]()
@@ -948,11 +944,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     let finishAction = SKAction.run { [self] in
                         switch GV.demoModus {
                         case .Demo:
-                            if wordsToAnimate.count > 0 {
-                                GV.demoModus = .Demo
-                                animateWords()
-                            } else {
+                            if demoModusStopped {
+                                demoModusStopped = false
                                 stopDemoModus()
+                            } else {
+                                if wordsToAnimate.count > 0 {
+                                    GV.demoModus = .Demo
+                                    animateWords()
+                                } else {
+                                    stopDemoModus()
+                                }
                             }
                         case .Help:
                             stopDemoModus()
@@ -1249,7 +1250,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     var settingsButton: MyButton!
     var developerButton: MyButton!
     var stopDemoButton: MyButton!
-    var showDemoNextTimeButton: MyButton!
+//    var showDemoNextTimeButton: MyButton!
     var sizeButton: MyButton!
 
     var myScoreLabel: MyLabel!
@@ -1411,7 +1412,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     private func showDemo() {
-        
         for item in playedGame.wordsToFind {
             let usedWord = item.getUsedWord()
             let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
@@ -1870,11 +1870,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 var index = 0
                 iterateGameArray(doing: {(col: Int, row: Int) in
                     let string = playedGame.connections.subString(at: index, length: 2)
+//                    showTime(string: "before fromString")
                     GV.gameArray[col][row].connectionType.fromString(string: string)
                     if GV.gameArray[col][row].connectionType.isSet() {
                         GV.gameArray[col][row].setStatus(toStatus: .WholeWord)
                     }
+//                    showTime(string: "after fromString")
                     GV.gameArray[col][row].showConnections()
+//                    showTime(string: "after showConnection")
                     index += 2
                 })
             }// else {
@@ -1894,7 +1897,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     myWord.founded = false
            }
         }
+        showTime(string: "before saveScores")
         saveScores()
+        showTime(string: "after saveScores")
     }
         
     private func saveScores() {

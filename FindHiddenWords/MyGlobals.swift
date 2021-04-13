@@ -174,6 +174,7 @@ struct GV {
     static var mainView: UIViewController?
     static let language = Language()
     static var basicData = BasicData()
+    static var connectionImages = [ConnectionType: SKTexture]()
     static var gameNumber = 0
     static var tipChecked = false
     static var lastTip = UsedWord()
