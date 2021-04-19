@@ -1784,33 +1784,31 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func generateLabels() {
         var counter = 0
-        var firstUsedWordInColP = playedGame.wordsToFind[0].getUsedWord()
-        var firstUsedWordInColL = playedGame.wordsToFind[0].getUsedWord()
-        let adder = 9
-//        var maxWordLengthInColumnP = firstUsedWordInColP.word.count + 5
-//        var maxWordLengthInColumnL = firstUsedWordInColL.word.count + 5
-        var wordWidthP: CGFloat = 0
-        var wordWidthL: CGFloat = 0
+        let adder = 8
+        let sortedItems = playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)})
+        var firstUsedWordInColP = sortedItems[0].getUsedWord()
+        var firstUsedWordInColL = sortedItems[0].getUsedWord()
+        var wordWidthsP = [CGFloat]()
+        var wordWidthsL = [CGFloat]()
         func setPLPos(counter: Int)->PLPosSize {
-            let colP = counter / Int(possibleLineCountP)
-            let colL = counter / Int(possibleLineCountL)
             let rowP = counter % Int(possibleLineCountP)
             let rowL = counter % Int(possibleLineCountL)
-//            let wordWidth = CGFloat("A".fill(with: "_", toLength: GV.wordLengthForMyLabels).width(font: wordFont!))
             if rowP == 0 {
-                firstUsedWordInColP = playedGame.wordsToFind[counter].getUsedWord()
-                wordWidthP = CGFloat("A".fill(with: "_", toLength: firstUsedWordInColP.word.count + adder).width(font: wordFont!))
+                firstUsedWordInColP = sortedItems[counter].getUsedWord()
+                wordWidthsP.append(CGFloat("".fill(with: "_", toLength: firstUsedWordInColP.word.count + adder).width(font: wordFont!)))
             }
             if rowL == 0 {
-                firstUsedWordInColL = playedGame.wordsToFind[counter].getUsedWord()
-                wordWidthL = CGFloat("A".fill(with: "_", toLength: firstUsedWordInColL.word.count + adder).width(font: wordFont!))
+                firstUsedWordInColL = sortedItems[counter].getUsedWord()
+                wordWidthsL.append(CGFloat("".fill(with: "_", toLength: firstUsedWordInColL.word.count + adder).width(font: wordFont!)))
             }
             let wordHeight = CGFloat("A".height(font: wordFont!))
-            return PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + (CGFloat(colP) * wordWidthP), y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
-                             LPos: CGPoint(x: (GV.maxSide * 0.05) + (CGFloat(colL) * wordWidthL), y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
+            let actPosP = wordWidthsP.reduce(0, +) - wordWidthsP.last!
+            let actPosL = wordWidthsL.reduce(0, +) - wordWidthsL.last!
+            let returnValue = PLPosSize(PPos: CGPoint(x: (GV.minSide * 0.1) + actPosP, y: firstWordPositionYP - wordHeight * CGFloat(rowP)),
+                                        LPos: CGPoint(x: (GV.maxSide * 0.05) + actPosL, y: firstWordPositionYL - wordHeight * CGFloat(rowL)))
+            return returnValue
         }
 //        for item in mandatoryWords.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)}) {
-        let sortedItems = playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)})
         for item in  sortedItems {
             if !myLabels.contains(where: {$0.usedWord! == item.getUsedWord()}) {
                 let myWord = MyFoundedWord(usedWord: item.getUsedWord(), mandatory: true, prefixValue: counter + 1)
@@ -1897,9 +1895,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     myWord.founded = false
            }
         }
-        showTime(string: "before saveScores")
+//        showTime(string: "before saveScores")
         saveScores()
-        showTime(string: "after saveScores")
+//        showTime(string: "after saveScores")
     }
         
     private func saveScores() {
@@ -1907,9 +1905,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         try! realm.safeWrite {
             GV.basicData.setLocalMaxScore(score: score)
         }
-        if GV.demoModus == .Normal {
-                GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
-                GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
+        if GV.demoModus == .Normal && !GV.developerModus {
+            GCHelper.shared.sendScoreToGameCenter(score: GV.basicData.getLocalMaxScore(), completion: {[unowned self] in self.modifyScoreLabel()})
+            GCHelper.shared.getBestScore(completion: {[unowned self] in self.modifyScoreLabel()})
         }
         if myScoreLabel != nil {
             myScoreLabel!.text = GV.language.getText(.tcMyScore, values: String(score))

@@ -17,14 +17,14 @@ class MyFoundedWord: MyLabel {
     var founded: Bool = false
     var myText = ""
     init(usedWord: UsedWord, mandatory: Bool, prefixValue: Int) {
-        if usedWord.word == "BETEG" {
-            print("Stop hier")
-        }
+//        if usedWord.word == "BETEG" {
+//            print("Stop hier")
+//        }
         self.usedWord = usedWord
         self.mandatory = mandatory
         let prefix = (prefixValue < 10 ? "0" : "") + "\(prefixValue). "
         myText =  prefix + (mandatory ? GV.questionMark.fill(with: GV.questionMark, toLength: usedWord.word.length) : usedWord.word)
-        let dummyText = " ".fixLength(length: myText.count)
+        let dummyText = " "//.fixLength(length: myText.count)
 //        let myName = usedWord.word + (mandatory ? GV.mandatoryLabelInName : GV.ownLabelInName)
 //        super.init(text: myText, position: CGPoint(x: 0, y: 0), fontName: GV.headerFontName, fontSize: GV.wordsFontSize)
         super.init(text: dummyText, position: CGPoint(x: 0, y: 0), fontName: GV.headerFontName, fontSize: GV.wordsFontSize)
