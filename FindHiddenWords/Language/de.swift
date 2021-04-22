@@ -36,7 +36,7 @@ let deDictionary: [TextConstants: String] = [
     .tcGameSize:                "Spielgröße: %",
     .tcGameNumber:              "#%",
     .tcGameHeader:              "Spiel: #%",
-    .tcFixWords:                "Wörter zu finden:",
+    .tcFixWords:                "Gefundene Wörter: (%/%)",
     .tcPlayGame:                "Neues Spiel",
     .tcFinishedGame:            "Fertige Spiele",
     .tcAlphabet:                "ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß",

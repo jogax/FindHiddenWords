@@ -36,7 +36,7 @@ let huDictionary: [TextConstants: String] = [
     .tcGameSize:                "Játék mérete: %",
     .tcGameNumber:              "#%",
     .tcGameHeader:              "Játék: #%",
-    .tcFixWords:                "Keresendő szavak:",
+    .tcFixWords:                "Megtalált szavak: (%/%)",
     .tcPlayGame:                "Új játék",
     .tcFinishedGame:            "Befejezett játékok",
     .tcAlphabet:                "AÁBCDEÉFGHIÍJKLMNOÓÖŐPRSTUÚÜŰVZY",

@@ -38,7 +38,7 @@ let enDictionary: [TextConstants: String] = [
     .tcGameSize:                "Gamesize: %",
     .tcGameNumber:              "#%",
     .tcGameHeader:              "Game: #%",
-    .tcFixWords:                "Words to find:",
+    .tcFixWords:                "Found words: (%/%)",
     .tcPlayGame:                 "New game",
     .tcFinishedGame:            "Finished Games",
     .tcAlphabet:                "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
