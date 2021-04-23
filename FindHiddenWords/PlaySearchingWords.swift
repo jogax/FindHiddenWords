@@ -487,6 +487,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         for cell in cellsToAnimate {
+            cell.clearConnectionType()
             cell.zPosition += 100
             myActions.removeAll()
             let targetPoint = CGPoint(x: cell.position.x, y: -GV.playingGrid!.position.y)
@@ -1115,7 +1116,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         clearTemporaryCells()
-        let countGreenWords = playedGame.myWords.filter("mandatory = true").count
+        let countGreenWords = getCountWords(type: .CountMandatoryWords)// playedGame.myWords.filter("mandatory = true").count
         
         if countGreenWords >= playedGame.wordsToFind.count  {//|| countGreenWords >= 0 {
             congratulation()
@@ -1405,15 +1406,16 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 tippsForShow.append(item)
             }
         }
-        let index = Int.random(min: 0, max: tippsForShow.count - 1)
-        let item = tippsForShow[index]
-        let usedWord = item.getUsedWord()
-        GV.lastTip = usedWord
-        let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
-        wordsToAnimate.append(wordToAppend)
-        GV.demoModus = .Help
-        animateWords()
-
+        if tippsForShow.count > 0 {
+            let index = Int.random(min: 0, max: tippsForShow.count - 1)
+            let item = tippsForShow[index]
+            let usedWord = item.getUsedWord()
+            GV.lastTip = usedWord
+            let wordToAppend = WordsToAnimate(word: usedWord.word, usedLetters: usedWord.usedLetters, calculatedDiagonalConnections: item.calculatedDiagonalConnections)
+            wordsToAnimate.append(wordToAppend)
+            GV.demoModus = .Help
+            animateWords()
+        }
     }
     
     private func showDemo() {
@@ -2067,7 +2069,14 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         var countFoundedMandatoryWords = 0
         var countNewWords = 0
         let countAllWords = playedGame.myWords.count
-        for item in playedGame.myWords {
+        for (itemIndex, item) in playedGame.myWords.enumerated() {
+            if !item.mandatory {
+                if playedGame.wordsToFind.contains(where: {$0.word == item.word && $0.usedLetters == item.usedLetters}) {
+                    try! playedGamesRealm!.safeWrite {
+                        playedGame.myWords[itemIndex].mandatory = true
+                    }
+                }
+            }
             if item.mandatory {
                 countFoundedMandatoryWords += 1
             } else {
