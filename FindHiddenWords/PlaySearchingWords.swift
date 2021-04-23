@@ -897,6 +897,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cell.setStatus(toStatus: .WholeWord)
             }
         })
+        for item in myLabels {
+            item.founded = false
+        }
+        fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(0), String(playedGame.wordsToFind.count))
     }
     
     var demoModusStopped = false
@@ -1140,7 +1144,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             let title = GV.language.getText(.tcShowMyWords, values: String(getCountWords(type: .CountAllWords)))
             myWordsButton.setButtonLabel(title: title, font: UIFont(name: GV.fontName, size: GV.minSide * 0.04)!)
             fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(getCountWords(type: .CountMandatoryWords)), String(playedGame.wordsToFind.count))
-            
         }
     }
     
