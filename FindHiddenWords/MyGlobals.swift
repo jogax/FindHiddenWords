@@ -55,10 +55,12 @@ struct PlayerData {
     var device = ""
     var version = ""
     var land = ""
-    var easyBestScore: Int64 = 0
-    var mediumBestScore: Int64 = 0
-    var easyActScore = ""
-    var mediumActScore = ""
+    var score5x5: Int64 = 0
+    var score6x6: Int64 = 0
+    var score7x7: Int64 = 0
+    var score8x8: Int64 = 0
+    var score9x9: Int64 = 0
+    var score10x10: Int64 = 0
     var countPlays = ""
 }
 enum ScoreType: Int {

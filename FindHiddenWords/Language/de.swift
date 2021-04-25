@@ -67,7 +67,7 @@ let deDictionary: [TextConstants: String] = [
     .tcGameCenter:              "GameCenter ViewController",
     .tcSearchingMoreWords:      "Suche neue Wörter",
     .tcStopSearching:           "Suche anhalten",
-    .tcDisable:                 "DeveloperButton Deaktivieren",
+//    .tcDisable:                 "DeveloperButton Deaktivieren",
     .tcStopDemo:                "Demo beenden",
     .tcShowDemoLater:           "Zeige später",
     .tcSettings:                "Einstellungen",

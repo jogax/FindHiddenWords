@@ -75,9 +75,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func developerMenu() {
+        let heightOfLine = "A".height(font: wordFont!)
+        let countOfLines: CGFloat = 6
         let myAlert = MyAlertController(title: GV.language.getText(.tcDeveloperMenuTitle),
                                         message: "",
-                                          size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
+                                        size: CGSize(width: GV.actWidth * 0.8, height: heightOfLine * countOfLines * 2.4),
                                           target: self,
                                           type: .Green)
         myAlert.addAction(text: .tcShowGameCenter, action: #selector(self.showGameCenter))
@@ -88,22 +90,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         } else {
             myAlert.addAction(text: .tcSearchingMoreWords, action: #selector(self.findMoreWords))
         }
-        myAlert.addAction(text: .tcDisable, action: #selector(self.disableDeveloperMenu))
+//        myAlert.addAction(text: .tcDisable, action: #selector(self.disableDeveloperMenu))
         myAlert.addAction(text: .tcBack, action: #selector(self.doNothing))
         myAlert.presentAlert()
         self.addChild(myAlert)
     }
     var lastAddingData = AddingWordData()
     
-    @objc private func disableDeveloperMenu() {
-        if developerButton != nil {
-            developerButton!.removeFromParent()
-            developerButton = nil
-        }
-        countButtons = NormalButtonCount
-        setButtonsPositions()
-    }
-
+//    @objc private func disableDeveloperMenu() {
+//        if developerButton != nil {
+//            developerButton!.removeFromParent()
+//            developerButton = nil
+//        }
+//        countButtons = NormalButtonCount
+//        setButtonsPositions()
+//    }
+//
     override func update(_ currentTime: TimeInterval) {
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
@@ -897,9 +899,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 cell.setStatus(toStatus: .WholeWord)
             }
         })
-        for item in myLabels {
-            item.founded = false
-        }
         fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(0), String(playedGame.wordsToFind.count))
     }
     
@@ -937,6 +936,10 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         let undoAction = SKAction.run { [self] in
                             setWordColor(usedWord: newWord, toColor: .black)
                             updateLetters(inWord: newWord)
+                            let label  = myLabels.first(where: {$0.usedWord == newWord})
+                            if label != nil {
+                                label!.founded = false
+                            }
                             for cell in cellsToAnimate {
                                 cell.setStatus(toStatus: .OrigStatus)
                             }
@@ -1122,7 +1125,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         clearTemporaryCells()
         let countGreenWords = getCountWords(type: .CountMandatoryWords)// playedGame.myWords.filter("mandatory = true").count
         
-        if countGreenWords >= playedGame.wordsToFind.count  {//|| countGreenWords >= 0 {
+        if countGreenWords >= playedGame.wordsToFind.count && GV.demoModus == .Normal {//|| countGreenWords >= 0 {
             congratulation()
         }
     }
@@ -1873,28 +1876,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         if choosedWord.word.count > 0 {
             setWordStatus(usedWord: choosedWord)
         } else {
-//            showTime(string: "Before addNewConnections")
             if playedGame.connections.count > 0 {
                 var index = 0
                 iterateGameArray(doing: {(col: Int, row: Int) in
                     let string = playedGame.connections.subString(at: index, length: 2)
-//                    showTime(string: "before fromString")
                     GV.gameArray[col][row].connectionType.fromString(string: string)
                     if GV.gameArray[col][row].connectionType.isSet() {
                         GV.gameArray[col][row].setStatus(toStatus: .WholeWord)
                     }
-//                    showTime(string: "after fromString")
                     GV.gameArray[col][row].showConnections()
-//                    showTime(string: "after showConnection")
                     index += 2
                 })
-            }// else {
+            }
             for item in playedGame.myWords {
                 let usedWord = item.getUsedWord()
                 setWordStatus(usedWord: usedWord)
             }
-//            }
-//            showTime(string: "After addNewConnections")
         }
         for myWord in myLabels {
                 if playedGame.myWords.contains(where: {$0.getUsedWord() == myWord.usedWord}) {
@@ -1905,9 +1902,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     myWord.founded = false
            }
         }
-//        showTime(string: "before saveScores")
         saveScores()
-//        showTime(string: "after saveScores")
     }
         
     private func saveScores() {
@@ -1943,31 +1938,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             playedGame.gameNumber = origGame.gameNumber
             playedGame.gameSize = origGame.gameSize
             playedGame.gameArray = origGame.gameArray
-//            let myWords = origGame.words.components(separatedBy: GV.outerSeparator)
-//            for item in myWords {
-//                playedGame.wordsToFind.append(FoundedWords(from: item))
-//            }
             playedGame.timeStamp = NSDate()
             playedGamesRealm!.add(playedGame)
         }
     }
     
-//    private func changeLettersToModify(label: MyFoundedWord, newUsedWord: UsedWord) {
-//        let prefixLength = 4
-//        let origUsedWord: UsedWord! = label.usedWord
-//        for index in 0..<origUsedWord.word.count {
-//            if origUsedWord.usedLetters[index] != newUsedWord.usedLetters[index] {
-//                let origCol = origUsedWord.usedLetters[index].col
-//                let origRow = origUsedWord.usedLetters[index].row
-//                let newCol = newUsedWord.usedLetters[index].col
-//                let newRow = newUsedWord.usedLetters[index].row
-//                var oldLetter = label.children[index + prefixLength - 1] as! SKLabelNode
-//                GV.gameArray[origCol][origRow].removeLetterToModify(letter: &oldLetter)
-//                GV.gameArray[newCol][newRow].addLetterForUpdate(letter: &oldLetter)
-//                print("change letter")
-//            }
-//        }
-//    }
     private func saveChoosedWord()->Bool {
         var returnValue = true
         var earlierWord: UsedWord!
