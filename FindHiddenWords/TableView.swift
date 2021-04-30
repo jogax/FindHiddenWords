@@ -9,7 +9,7 @@
 import SpriteKit
 import UIKit
 
-public protocol TableViewDelegate: class {
+public protocol TableViewDelegate: AnyObject {
     
     /// Method called when a new Word is saved
     func getNumberOfSections()->Int

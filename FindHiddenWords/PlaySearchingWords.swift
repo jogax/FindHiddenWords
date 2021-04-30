@@ -14,7 +14,7 @@ import GameplayKit
 import AVFoundation
 import GameKit
 
-public protocol PlaySearchingWordsDelegate: class {
+public protocol PlaySearchingWordsDelegate: AnyObject {
     func goBack()
 }
 class ObjectSP {
@@ -674,9 +674,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             myActions.append(SKAction.run { [self] in
                 if item.cell.col == GV.basicData.gameSize - 1 && item.cell.row == GV.basicData.gameSize - 1 {
                     setGameArrayToActualState()
-                    if GV.justStarted && GV.basicData.showDemo {
+                    if GV.basicData.showDemo {
                         startDemoModus()
-                        GV.justStarted = false
+                        try! realm.safeWrite {
+                            GV.basicData.showDemo = false
+                        }
                         showDemo()
                     }
 
@@ -876,12 +878,12 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             stopDemoButton.removeFromParent()
             stopDemoButton = nil
         }
-        try! realm.safeWrite {
-            GV.basicData.showDemo = false
-        }
         try! playedGamesRealm?.safeWrite {
             playedGame.connections = ""
             playedGame.myWords.removeAll()
+        }
+        try! realm.safeWrite {
+            GV.basicData.showDemo = false
         }
         if fingerSprite.hasActions() {
             fingerSprite.removeAllActions()
@@ -1643,6 +1645,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     @objc private func setEnglish() {
         setLanguage(language: GV.language.getText(.tcEnglishShort))
         setDifficultyNameArray()
+//        if GV.developerModus {
+//            GV.justStarted = true
+//        }
     }
     
     @objc private func setGerman() {

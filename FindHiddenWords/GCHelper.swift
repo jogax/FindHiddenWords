@@ -31,7 +31,7 @@ import GameKit
 import RealmSwift
 
 /// Custom delegate used to provide information to the application implementing GCHelper.
-public protocol GCHelperDelegate: class {
+public protocol GCHelperDelegate: AnyObject {
     
     /// Method called when a match has been initiated.
     func matchStarted()

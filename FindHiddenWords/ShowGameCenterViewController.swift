@@ -16,7 +16,7 @@ enum DataSource: Int {
     case GameCenter = 0, ICloud
 }
 
-public protocol ShowGameCenterViewControllerDelegate: class {
+public protocol ShowGameCenterViewControllerDelegate: AnyObject {
     func backFromShowGameCenterViewController()
 }
 class ShowGameCenterViewController: UIViewController, TableViewDelegate {
