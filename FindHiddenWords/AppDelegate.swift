@@ -58,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // Set the new schema version. This must be greater than the previously used
             // version (if you've never set a schema version before, the version is 0).
             //            schemaVersion: 3,
-            schemaVersion: 1, // used since 2020-05-12
+            schemaVersion: 2, // used since 2020-05-12
            // Set the block which will be called automatically when opening a Realm with
             // a schema version lower than the one set above
             migrationBlock: { migration, oldSchemaVersion in
@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //                    }
                 default: migration.enumerateObjects(ofType: BasicData.className())
                     { oldObject, newObject in
-//                        newObject!["buttonType"] = GV.ButtonTypeSimple
+//                        newObject!["showDemo"] = false
                     }
 
                 }
