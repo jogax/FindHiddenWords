@@ -107,6 +107,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //    }
 //
     override func update(_ currentTime: TimeInterval) {
+//        if movingFingerSprite != nil && labelsMoveableP {
+//            print("FingerSpritePosition: \(movingFingerSprite!.position)")
+//        }
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.plPosSize?.PPos.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
@@ -1382,7 +1385,53 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             gameLayer.addChild(myBestScoreLabel!) // index 0
             gameLayer.addChild(worldBestScoreLabel!) // index 0
             GCHelper.shared.getBestScore(completion: { [self] in modifyScoreLabel()})
+            showHowToMoveWordList()
          }
+    }
+    var movingFingerSprite: SKSpriteNode?
+    
+    private func showHowToMoveWordList() {
+
+        var lastXPos:CGFloat = 0
+        var lastYPos:CGFloat = GV.maxSide
+        var countRows = 0
+        var countCols = 0
+        var myActions = [SKAction]()
+        if labelsMoveableP {
+            movingFingerSprite = SKSpriteNode(imageNamed: "finger.png")
+            movingFingerSprite!.name = FingerNodeName
+            movingFingerSprite!.isHidden = false
+
+//            movingFingerSprite!.plPosSize?.PSize = CGSize(width: GV.blockSize, height: GV.blockSize)
+//            movingFingerSprite!.setActPosSize()
+            movingFingerSprite!.zPosition += 100
+            for label in myLabels {
+                if (label.plPosSize?.PPos.x)! > lastXPos {
+                    lastXPos = (label.plPosSize?.PPos.x)!
+                    countCols += 1
+                }
+                if (label.plPosSize?.PPos.y)! < lastYPos {
+                    lastYPos = (label.plPosSize?.PPos.y)!
+                    countRows += 1
+                }
+            }
+            let xPos = GV.minSide * 0.9
+            let yPos = myLabels[countRows / 2].plPosSize!.PPos.y
+            movingFingerSprite!.position = CGPoint(x: xPos, y: yPos)
+            movingFingerSprite!.size = CGSize(width: GV.blockSize, height: GV.blockSize)
+            self.movingFingerSprite!.name = FingerNodeName
+            if let nodeToRemove = gameLayer.childNode(withName: FingerNodeName) {
+                nodeToRemove.removeFromParent()
+            }
+            gameLayer.addChild(fingerSprite)
+            myActions.append(SKAction.wait(forDuration: 2.0))
+            let moveAction = SKAction.moveTo(x: GV.minSide * 0.1, duration: 5.0)
+            myActions.append(moveAction)
+            let moveActionReversed = SKAction.moveTo(x: GV.minSide * 0.9, duration: 5.0)
+            myActions.append(moveActionReversed)
+            let sequence = SKAction.sequence(myActions)
+            movingFingerSprite!.run(sequence)
+        }
     }
     
     struct WordsToAnimate {
@@ -1443,12 +1492,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
     let FingerNodeName = "FingerNode"
+    
     @objc private func animateWords() {
         var myActions = [SKAction]()
         if wordsToAnimate.count > 0 {
-//            let fingerSprite = SKSpriteNode(imageNamed: "finger.png")
             fingerSprite.isHidden = false
-//            demoModus = demo
             fingerSprite.size = CGSize(width: GV.blockSize, height: GV.blockSize)
             fingerSprite.zPosition += 100
             fingerSprite.position = CGPoint(x: GV.playingGrid!.frame.midX, y: GV.playingGrid!.frame.midY)
@@ -1845,8 +1893,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
-        let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.text!.width(font: wordFont!)) / 2
-        let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.text!.width(font: wordFont!)) / 2
+        let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.myText.width(font: wordFont!)) / 2
+        let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.myText.width(font: wordFont!)) / 2
         if (maxX - minX) > GV.minSide {
             labelsMoveableP = true
         } else {
