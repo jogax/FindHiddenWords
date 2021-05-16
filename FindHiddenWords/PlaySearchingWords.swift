@@ -96,20 +96,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         self.addChild(myAlert)
     }
     var lastAddingData = AddingWordData()
+    enum TouchType: Int {
+        case FirstTouch = 0, MovingTouch, LastTouch
+    }
+    var touchType: TouchType = .FirstTouch
     
-//    @objc private func disableDeveloperMenu() {
-//        if developerButton != nil {
-//            developerButton!.removeFromParent()
-//            developerButton = nil
-//        }
-//        countButtons = NormalButtonCount
-//        setButtonsPositions()
-//    }
-//
     override func update(_ currentTime: TimeInterval) {
-//        if movingFingerSprite != nil && labelsMoveableP {
-//            print("FingerSpritePosition: \(movingFingerSprite!.position)")
-//        }
+        if labelsMoveableP && movingFingerSprite != nil {
+            if touchType == .FirstTouch {
+                myTouchesBegan(touchLocation: movingFingerSprite!.position)
+                touchType = .MovingTouch
+            } else if touchType == .MovingTouch {
+                myTouchesMoved(touchLocation: movingFingerSprite!.position)
+            }
+        }
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.plPosSize?.PPos.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
@@ -1248,7 +1248,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             
-            if node.name == MovingLayerName && labelsMoveableP && GV.actHeight > GV.actWidth {
+            if (node.name == MovingLayerName || node.name == FingerNodeName) && labelsMoveableP && GV.actHeight > GV.actWidth {
                 if GV.deviceOrientation == .Portrait {
                     return(OK: false, col: MovingValue, row: 0)
                 }
@@ -1415,22 +1415,31 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                     countRows += 1
                 }
             }
-            let xPos = GV.minSide * 0.9
+            let xPos = GV.minSide * 0.99
             let yPos = myLabels[countRows / 2].plPosSize!.PPos.y
             movingFingerSprite!.position = CGPoint(x: xPos, y: yPos)
-            movingFingerSprite!.size = CGSize(width: GV.blockSize, height: GV.blockSize)
+            movingFingerSprite!.size = CGSize(width: 2 * GV.blockSize, height: 2 * GV.blockSize)
             self.movingFingerSprite!.name = FingerNodeName
-            if let nodeToRemove = gameLayer.childNode(withName: FingerNodeName) {
-                nodeToRemove.removeFromParent()
-            }
-            gameLayer.addChild(fingerSprite)
+            gameLayer.addChild(movingFingerSprite!)
             myActions.append(SKAction.wait(forDuration: 2.0))
-            let moveAction = SKAction.moveTo(x: GV.minSide * 0.1, duration: 5.0)
+            let moveAction = SKAction.moveTo(x: GV.minSide * -0.5, duration: 3.0)
             myActions.append(moveAction)
-            let moveActionReversed = SKAction.moveTo(x: GV.minSide * 0.9, duration: 5.0)
+            let moveActionReversed = SKAction.moveTo(x: GV.minSide * 0.99, duration: 3.0)
             myActions.append(moveActionReversed)
+            let lastTouchAction = SKAction.run {[self] in
+                movingFingerSprite!.removeFromParent()
+                movingFingerSprite = nil
+                setMyLabelsToOrigPosition()
+            }
+            myActions.append(lastTouchAction)
             let sequence = SKAction.sequence(myActions)
             movingFingerSprite!.run(sequence)
+        }
+    }
+    
+    private func setMyLabelsToOrigPosition() {
+        for (index, _) in myLabels.enumerated() {
+            myLabels[index].position = myLabelsOrigPositions[index]
         }
     }
     
@@ -1549,9 +1558,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     @objc private func chooseSize() {
+        let rowHeight = ("5x5").height(font: myFont)
+        let countLines: CGFloat = 7
         let myAlert = MyAlertController(title: GV.language.getText(.tcSizeMenuTitle),
                                         message: "",
-                                          size: CGSize(width: GV.actWidth * 0.5, height: GV.actHeight * 0.5),
+                                          size: CGSize(width: GV.actWidth * 0.5, height: rowHeight * (countLines * 2)),
                                           target: self,
                                           type: .Green)
         myAlert.addAction(text: "5 x 5", action: #selector(self.choosed5), isActive: GV.basicData.gameSize == 5 ? true : false)
@@ -1854,6 +1865,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let sortedItems = playedGame.wordsToFind.sorted(by: {$0.word.count > $1.word.count || ($0.word.count > $1.word.count && $0.word < $1.word)})
         var firstUsedWordInColP = sortedItems[0].getUsedWord()
         var firstUsedWordInColL = sortedItems[0].getUsedWord()
+        labelsMoveableP = false
+        myLabelsOrigPositions.removeAll()
         var wordWidthsP = [CGFloat]()
         var wordWidthsL = [CGFloat]()
         func setPLPos(counter: Int)->PLPosSize {
@@ -1881,6 +1894,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 myWord.name = LabelName
                 myWord.plPosSize = setPLPos(counter: counter)
                 myWord.setActPosSize()
+                myLabelsOrigPositions.append(myWord.plPosSize!.PPos)
                 myWord.zPosition = GV.playingGrid!.zPosition
                 gameLayer.addChild(myWord)
                 myLabels.append(myWord)
@@ -1893,8 +1907,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
-        let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.myText.width(font: wordFont!)) / 2
-        let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.myText.width(font: wordFont!)) / 2
+        let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.myText.width(font: wordFont!))
+        let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.myText.width(font: wordFont!))
         if (maxX - minX) > GV.minSide {
             labelsMoveableP = true
         } else {
@@ -1925,6 +1939,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     var myLabels = [MyFoundedWord]()
+    var myLabelsOrigPositions = [CGPoint]()
     private func setGameArrayToActualState() {
         if choosedWord.word.count > 0 {
             setWordStatus(usedWord: choosedWord)
@@ -2049,8 +2064,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         }
         if returnValue {
-//            let addString = choosedWord.toString()
-//            let separator = playedGame.myWords.count == 0 ? "" : GV.outerSeparator
             try! playedGamesRealm!.safeWrite {
                 playedGame.myWords.append(FoundedWords(fromUsedWord: choosedWord))
                 playedGame.timeStamp = Date() as NSDate
@@ -2068,7 +2081,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                         [self] in modifyScoreLabel()
                     })
                 })
-//                GCHelper.shared.getBestScore(completion: { [self] in modifyScoreLabel()})
             }
 
 
