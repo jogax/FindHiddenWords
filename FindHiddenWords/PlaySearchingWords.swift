@@ -96,20 +96,20 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         self.addChild(myAlert)
     }
     var lastAddingData = AddingWordData()
-    enum TouchType: Int {
-        case FirstTouch = 0, MovingTouch, LastTouch
-    }
-    var touchType: TouchType = .FirstTouch
     
+//    @objc private func disableDeveloperMenu() {
+//        if developerButton != nil {
+//            developerButton!.removeFromParent()
+//            developerButton = nil
+//        }
+//        countButtons = NormalButtonCount
+//        setButtonsPositions()
+//    }
+//
     override func update(_ currentTime: TimeInterval) {
-        if labelsMoveableP && movingFingerSprite != nil {
-            if touchType == .FirstTouch {
-                myTouchesBegan(touchLocation: movingFingerSprite!.position)
-                touchType = .MovingTouch
-            } else if touchType == .MovingTouch {
-                myTouchesMoved(touchLocation: movingFingerSprite!.position)
-            }
-        }
+//        if movingFingerSprite != nil && labelsMoveableP {
+//            print("FingerSpritePosition: \(movingFingerSprite!.position)")
+//        }
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.plPosSize?.PPos.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
@@ -965,6 +965,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             } else {
                                 if wordsToAnimate.count > 0 {
                                     GV.demoModus = .Demo
+                                    fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(0), String(playedGame.wordsToFind.count))
                                     animateWords()
                                 } else {
                                     stopDemoModus()
@@ -972,6 +973,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             }
                         case .Help:
                             choosedWord = UsedWord()
+                            fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(getCountWords(type: .CountMandatoryWords)), String(playedGame.wordsToFind.count))
                             GV.demoModus = .Normal
                         case .Normal:
                             updateLetters(inWord: newWord)
@@ -1248,7 +1250,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             
-            if (node.name == MovingLayerName || node.name == FingerNodeName) && labelsMoveableP && GV.actHeight > GV.actWidth {
+            if node.name == MovingLayerName && labelsMoveableP && GV.actHeight > GV.actWidth {
                 if GV.deviceOrientation == .Portrait {
                     return(OK: false, col: MovingValue, row: 0)
                 }
@@ -1385,62 +1387,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             gameLayer.addChild(myBestScoreLabel!) // index 0
             gameLayer.addChild(worldBestScoreLabel!) // index 0
             GCHelper.shared.getBestScore(completion: { [self] in modifyScoreLabel()})
-            showHowToMoveWordList()
          }
-    }
-    var movingFingerSprite: SKSpriteNode?
-    
-    private func showHowToMoveWordList() {
-
-        var lastXPos:CGFloat = 0
-        var lastYPos:CGFloat = GV.maxSide
-        var countRows = 0
-        var countCols = 0
-        var myActions = [SKAction]()
-        if labelsMoveableP {
-            movingFingerSprite = SKSpriteNode(imageNamed: "finger.png")
-            movingFingerSprite!.name = FingerNodeName
-            movingFingerSprite!.isHidden = false
-
-//            movingFingerSprite!.plPosSize?.PSize = CGSize(width: GV.blockSize, height: GV.blockSize)
-//            movingFingerSprite!.setActPosSize()
-            movingFingerSprite!.zPosition += 100
-            for label in myLabels {
-                if (label.plPosSize?.PPos.x)! > lastXPos {
-                    lastXPos = (label.plPosSize?.PPos.x)!
-                    countCols += 1
-                }
-                if (label.plPosSize?.PPos.y)! < lastYPos {
-                    lastYPos = (label.plPosSize?.PPos.y)!
-                    countRows += 1
-                }
-            }
-            let xPos = GV.minSide * 0.99
-            let yPos = myLabels[countRows / 2].plPosSize!.PPos.y
-            movingFingerSprite!.position = CGPoint(x: xPos, y: yPos)
-            movingFingerSprite!.size = CGSize(width: 2 * GV.blockSize, height: 2 * GV.blockSize)
-            self.movingFingerSprite!.name = FingerNodeName
-            gameLayer.addChild(movingFingerSprite!)
-            myActions.append(SKAction.wait(forDuration: 2.0))
-            let moveAction = SKAction.moveTo(x: GV.minSide * -0.5, duration: 3.0)
-            myActions.append(moveAction)
-            let moveActionReversed = SKAction.moveTo(x: GV.minSide * 0.99, duration: 3.0)
-            myActions.append(moveActionReversed)
-            let lastTouchAction = SKAction.run {[self] in
-                movingFingerSprite!.removeFromParent()
-                movingFingerSprite = nil
-                setMyLabelsToOrigPosition()
-            }
-            myActions.append(lastTouchAction)
-            let sequence = SKAction.sequence(myActions)
-            movingFingerSprite!.run(sequence)
-        }
-    }
-    
-    private func setMyLabelsToOrigPosition() {
-        for (index, _) in myLabels.enumerated() {
-            myLabels[index].position = myLabelsOrigPositions[index]
-        }
     }
     
     struct WordsToAnimate {
@@ -1582,7 +1529,6 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func choosed(size: Int) {
         try! realm.safeWrite {
-            GV.basicData.gameSize = size
             GV.basicData.gameSize = size
         }
         self.start()
