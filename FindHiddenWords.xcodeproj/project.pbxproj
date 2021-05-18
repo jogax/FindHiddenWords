@@ -99,6 +99,7 @@
 		D09E5F4125B87E86001291D9 /* LilaOctagon.png in Resources */ = {isa = PBXBuildFile; fileRef = D09E5F4025B87E86001291D9 /* LilaOctagon.png */; };
 		D0B3DFF325C5B8FE00A2BD11 /* FoundedWords.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0B3DFF225C5B8FE00A2BD11 /* FoundedWords.swift */; };
 		D0E1904425FFBA4C001A49FA /* developer.png in Resources */ = {isa = PBXBuildFile; fileRef = D0E1904325FFBA4C001A49FA /* developer.png */; };
+		D0E220F82653B49D009C07F8 /* Arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = D0E220F72653B49D009C07F8 /* Arrow.png */; };
 		D0E64EAE25A899D7006BACC6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */; };
 		D0E64EB025A899D7006BACC6 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EAF25A899D7006BACC6 /* GameScene.sks */; };
 		D0E64EB225A899D7006BACC6 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = D0E64EB125A899D7006BACC6 /* Actions.sks */; };
@@ -207,6 +208,7 @@
 		D0B94E5E25A8B3B20058F9B8 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
 		D0B94E6125A8B3B80058F9B8 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../../../Documents/_Realm/Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
 		D0E1904325FFBA4C001A49FA /* developer.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = developer.png; sourceTree = "<group>"; };
+		D0E220F72653B49D009C07F8 /* Arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Arrow.png; sourceTree = "<group>"; };
 		D0E64EAA25A899D7006BACC6 /* FindHiddenWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FindHiddenWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0E64EAD25A899D7006BACC6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D0E64EAF25A899D7006BACC6 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 		D0124FF725A8AE87000BCF89 /* Pic */ = {
 			isa = PBXGroup;
 			children = (
+				D0E220F72653B49D009C07F8 /* Arrow.png */,
 				D0E1904325FFBA4C001A49FA /* developer.png */,
 				D0E7CC6A25FD36E000C8B400 /* Numbers.png */,
 				D0E7CC6325FD178400C8B400 /* myRoundButton.png */,
@@ -483,6 +486,7 @@
 				D01EE31D25D02DA40099C1E9 /* finger.png in Resources */,
 				D03301C225DFDAF000268A69 /* OrigGames.realm in Resources */,
 				D012503C25A8AEEB000BCF89 /* Connection1000.png in Resources */,
+				D0E220F82653B49D009C07F8 /* Arrow.png in Resources */,
 				D012502925A8AEEB000BCF89 /* RedOctagon.png in Resources */,
 				D012503D25A8AEEB000BCF89 /* Connection0000x.png in Resources */,
 				D012502825A8AEEB000BCF89 /* Connection1010.png in Resources */,

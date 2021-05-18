@@ -683,6 +683,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                             GV.basicData.showDemo = false
                         }
                         showDemo()
+                    } else if GV.actWidth < GV.actHeight && labelsMoveableP {
+                        showFinger()
                     }
 
                 }
@@ -905,6 +907,36 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
         })
         fixWordsHeader.text = GV.language.getText(.tcFixWords, values: String(0), String(playedGame.wordsToFind.count))
+        if labelsMoveableP && GV.actWidth < GV.actHeight {
+            showFinger()
+        }
+    }
+    
+    let arrowSpriteName = "ArrowSprite"
+    
+    private func showFinger() {
+        var myActions = [SKAction]()
+        let arrowSprite = SKSpriteNode(imageNamed: "finger.png")
+        let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
+        arrowSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
+        arrowSprite.alpha = 1.0
+        arrowSprite.size = arrowSprite.size * 0.3
+        arrowSprite.name = arrowSpriteName
+        arrowSprite.zPosition = 1000
+        gameLayer.addChild(arrowSprite)
+        myActions.append(SKAction.wait(forDuration: 3))
+        let moveAction = SKAction.moveTo(x: GV.minSide * 0.95 - firstColDistance, duration: 2)
+        myActions.append(moveAction)
+        myActions.append(SKAction.wait(forDuration: 1))
+        let moveBackAction = SKAction.moveTo(x: GV.minSide * 0.95, duration: 2)
+        myActions.append(moveBackAction)
+        myActions.append(SKAction.wait(forDuration: 1))
+        myActions.append(moveAction)
+        myActions.append(SKAction.wait(forDuration: 1))
+        myActions.append(moveBackAction)
+        myActions.append(SKAction.removeFromParent())
+        let sequence = SKAction.sequence(myActions)
+        arrowSprite.run(sequence)
     }
     
     var demoModusStopped = false
@@ -1284,6 +1316,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     public func playingGame() {
+        if let nodeToRemove = childNode(withName: arrowSpriteName) {
+            nodeToRemove.removeFromParent()
+        }
         setDifficultyNameArray()
         countButtons = NormalButtonCount
         let testLabel = MyLabel(text: "ABC", position: CGPoint(), fontName: GV.headerFontName, fontSize: fontSize)
@@ -1853,6 +1888,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
             }
             counter += 1
         }
+        getCountersColsAndRows()
         let maxX = self.myLabels.last!.plPosSize!.PPos.x + (self.myLabels.last!.myText.width(font: wordFont!))
         let minX = self.myLabels.first!.plPosSize!.PPos.x - (self.myLabels.first!.myText.width(font: wordFont!))
         if (maxX - minX) > GV.minSide {
@@ -1863,6 +1899,22 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         updateLetters()
     }
     
+    private func getCountersColsAndRows() {
+        countMyLabelsCols = 0
+        countMyLabelsRows = 0
+        var lastPosX = CGFloat(0)
+        var lastPosY = CGFloat(10000)
+        for label in myLabels {
+            if lastPosY > label.position.y {
+                lastPosY = label.position.y
+                countMyLabelsRows += 1
+            }
+            if lastPosX < label.position.x {
+                lastPosX = label.position.x
+                countMyLabelsCols += 1
+            }
+        }
+    }
     private func setWordColor(usedWord: UsedWord, toColor: UIColor) {
         if let myLabel = myLabels.first(where: {$0.usedWord == usedWord}) {
             if myLabel.children.count == usedWord.word.count + 4 {
@@ -1885,6 +1937,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 
     
     var myLabels = [MyFoundedWord]()
+    var countMyLabelsCols = 0
+    var countMyLabelsRows = 0
     var myLabelsOrigPositions = [CGPoint]()
     private func setGameArrayToActualState() {
         if choosedWord.word.count > 0 {
