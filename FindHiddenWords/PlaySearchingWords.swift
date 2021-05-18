@@ -106,10 +106,21 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
 //        setButtonsPositions()
 //    }
 //
+    var movingFingerSprite: SKSpriteNode!
+    var firstTouch = true
     override func update(_ currentTime: TimeInterval) {
-//        if movingFingerSprite != nil && labelsMoveableP {
-//            print("FingerSpritePosition: \(movingFingerSprite!.position)")
-//        }
+        if fingerIsMoving {
+            if firstTouch {
+                myTouchesBegan(touchLocation: movingFingerSprite.position)
+                firstTouch = false
+            } else  {
+                myTouchesMoved(touchLocation: movingFingerSprite.position)
+            }
+        } else {
+            if !firstTouch {
+                firstTouch = true
+            }
+        }
         if AW.addNewWordsRunning {
             if lastAddingData.callIndexesLeft != AW.addingWordData.callIndexesLeft || AW.addingWordData.lastWord != "" || lastAddingData.gameSize != AW.addingWordData.gameSize{
                 fixWordsHeader.plPosSize?.PPos.x = GV.actWidth * (GV.onIpad ? 0.5 : 0.0)
@@ -913,30 +924,56 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     }
     
     let arrowSpriteName = "ArrowSprite"
+    var fingerIsMoving = false
+    
+    private func makeTextBox(size: CGSize)->SKShapeNode {
+        let shape = SKShapeNode()
+        shape.path = UIBezierPath(roundedRect: CGRect(x: size.width / 2, y: size.height / 2, width: size.width, height: size.height), cornerRadius: 64).cgPath
+        shape.position = CGPoint(x: frame.midX, y:    frame.midY)
+        shape.fillColor = UIColor.red
+        shape.strokeColor = UIColor.blue
+        shape.lineWidth = 10
+        return shape
+    }
     
     private func showFinger() {
         var myActions = [SKAction]()
-        let arrowSprite = SKSpriteNode(imageNamed: "finger.png")
+        movingFingerSprite = SKSpriteNode(imageNamed: "finger.png")
         let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
-        arrowSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
-        arrowSprite.alpha = 1.0
-        arrowSprite.size = arrowSprite.size * 0.3
-        arrowSprite.name = arrowSpriteName
-        arrowSprite.zPosition = 1000
-        gameLayer.addChild(arrowSprite)
+        let textBox = makeTextBox(size: CGSize(width: GV.minSide * 0.5, height: 100))
+        textBox.zPosition = 1000
+        let textLabel = SKLabelNode(text: "Igy mozgasd a szöveget")
+        textLabel.position = textBox.position
+        textBox.addChild(textLabel)
+        gameLayer.addChild(textBox)
+        movingFingerSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
+        movingFingerSprite.alpha = 1.0
+        movingFingerSprite.size = movingFingerSprite.size * 0.3
+        movingFingerSprite.name = arrowSpriteName
+        movingFingerSprite.zPosition = 1000
+        gameLayer.addChild(movingFingerSprite)
         myActions.append(SKAction.wait(forDuration: 3))
         let moveAction = SKAction.moveTo(x: GV.minSide * 0.95 - firstColDistance, duration: 2)
-        myActions.append(moveAction)
-        myActions.append(SKAction.wait(forDuration: 1))
         let moveBackAction = SKAction.moveTo(x: GV.minSide * 0.95, duration: 2)
+        let setFingerMovingAction = SKAction.run {
+            self.fingerIsMoving = true
+        }
+        let setFingerNotMovingAction = SKAction.run {
+            self.fingerIsMoving = false
+            textBox.removeFromParent()
+        }
+        myActions.append(setFingerMovingAction)
+        myActions.append(moveAction)
+        myActions.append(SKAction.wait(forDuration: 1))
         myActions.append(moveBackAction)
         myActions.append(SKAction.wait(forDuration: 1))
         myActions.append(moveAction)
         myActions.append(SKAction.wait(forDuration: 1))
         myActions.append(moveBackAction)
+        myActions.append(setFingerNotMovingAction)
         myActions.append(SKAction.removeFromParent())
         let sequence = SKAction.sequence(myActions)
-        arrowSprite.run(sequence)
+        movingFingerSprite.run(sequence)
     }
     
     var demoModusStopped = false
@@ -1282,7 +1319,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 }
             }
             
-            if node.name == MovingLayerName && labelsMoveableP && GV.actHeight > GV.actWidth {
+            if fingerIsMoving || node.name == MovingLayerName && labelsMoveableP && GV.actHeight > GV.actWidth {
                 if GV.deviceOrientation == .Portrait {
                     return(OK: false, col: MovingValue, row: 0)
                 }
