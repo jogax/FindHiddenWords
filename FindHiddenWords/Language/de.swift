@@ -77,4 +77,5 @@ let deDictionary: [TextConstants: String] = [
     .tcMedium:                  "Mittel",
     .tcHard:                    "Schwer",
     .tcChooseDifficulty:        "Schwierigkeit",
+    .tcHowToMoveWords:          "So können Sie°alle Wörter ansehen,°die Sie finden müssen.",
 ]

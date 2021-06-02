@@ -79,4 +79,5 @@ let enDictionary: [TextConstants: String] = [
     .tcMedium:                  "Medium",
     .tcHard:                    "Hard",
     .tcChooseDifficulty:        "Difficulty",
+    .tcHowToMoveWords:          "This way you can see°all the words°you must find",
 ]

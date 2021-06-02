@@ -77,4 +77,5 @@ let ruDictionary: [TextConstants: String] = [
     .tcMedium:                  "Средняя игра",
     .tcHard:                    "Сложная игра",
     .tcChooseDifficulty:        "Сложность",
+    .tcHowToMoveWords:          "Таким образом вы можете°увидеть все слова,°которые вам нужно найти.",
 ]
