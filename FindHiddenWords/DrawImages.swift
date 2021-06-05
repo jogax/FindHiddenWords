@@ -101,6 +101,31 @@ class DrawImages {
         }
         return UIImage()
     }
+    
+    static func drawBoxWithRoundedEdges(size: CGSize) -> SKTexture {
+        UIGraphicsBeginImageContextWithOptions(size, false, 1)
+        let ctx = UIGraphicsGetCurrentContext()
+        let lineWidth: CGFloat = 5
+        let center = CGPoint(x: size.width / 2, y: size.height / 2)
+        ctx!.setLineWidth(lineWidth)
+        ctx!.setStrokeColor(UIColor.blue.cgColor)
+        ctx!.setFillColor(UIColor.yellow.cgColor)
+        ctx!.setLineJoin (.round)
+        ctx!.setLineCap (.round)
+        let upperLeftCornew = CGPoint(x: 0, y: 0)
+        let upperRightConer = CGPoint(x: size.width, y: 0)
+        let bottomLeftCornew = CGPoint(x: 0, y: size.height)
+        let bottomRightConer = CGPoint(x: size.width, y: size.height)
+        ctx!.move(to: upperLeftCornew)
+        ctx!.addLine(to: upperRightConer)
+        ctx!.addLine(to: bottomRightConer)
+        ctx!.addLine(to: bottomLeftCornew)
+        ctx!.addLine(to: upperLeftCornew)
+        ctx!.fillPath()
+        ctx!.strokePath()
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        return image!.texture()
+    }
 
     static func drawConnections (size: CGSize, connections: ConnectionType) -> SKTexture {
         if GV.connectionImages[connections] != nil {

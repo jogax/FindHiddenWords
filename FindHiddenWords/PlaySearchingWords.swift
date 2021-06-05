@@ -926,12 +926,11 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     let arrowSpriteName = "ArrowSprite"
     var fingerIsMoving = false
     
-    private func makeTextBox()->SKShapeNode {
+    private func makeTextBox()->SKSpriteNode {
         var maxWidth: CGFloat = 0
-        let shape = SKShapeNode()
-        let fontSize = GV.minSide * 0.01
+        let fontSize: CGFloat = GV.onIpad ? 10 : 15 // GV.minSide * 0.02
         let textFont = UIFont(name: GV.headerFontName, size: fontSize)
-        let textHeight = "A".height(font: textFont!) * 1.0
+        let textHeight = "A".height(font: textFont!) * 1.2
         let textFragments = GV.language.getText(.tcHowToMoveWords).components(separatedBy:GV.innerSeparator)
         for text in textFragments {
             let textWidth = text.width(font: textFont!)
@@ -939,24 +938,24 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
                 maxWidth = textWidth
             }
         }
-        shape.path = UIBezierPath(roundedRect: CGRect(x: GV.minSide * 0.5, y: GV.maxSide * 0.5, width: maxWidth, height: textHeight * CGFloat(textFragments.count)), cornerRadius: 7.5).cgPath
-        shape.fillColor = UIColor.yellow
-        shape.strokeColor = UIColor.blue
-        shape.lineWidth = 3
+        let size = CGSize(width: maxWidth * 1.05, height: textHeight * CGFloat(textFragments.count))
+        let node = SKSpriteNode(texture:  DrawImages.drawBoxWithRoundedEdges(size:size))
+//        shape.path = UIBezierPath(roundedRect: CGRect(x: GV.minSide * 0.5, y: GV.maxSide * 0.5, width: maxWidth * 1.05, height: textHeight * CGFloat(textFragments.count)), cornerRadius: 7.5).cgPath
+//        node.fillColor = UIColor.yellow
         var line:CGFloat = 0
         for text in textFragments {
             let textLabel = SKLabelNode(text: text)
             textLabel.fontName = GV.headerFontName
             textLabel.fontSize = fontSize
             textLabel.fontColor = .black
-            textLabel.position = CGPoint(x: shape.frame.midX, y: shape.frame.maxY - line * textHeight)
+            textLabel.position = CGPoint(x: node.frame.midX, y: node.frame.maxY - (1 + line) * textHeight * 0.8)
             textLabel.zPosition = 1001
             textLabel.horizontalAlignmentMode = .center
             textLabel.verticalAlignmentMode = .center
             line += 1
-            shape.addChild(textLabel)
+            node.addChild(textLabel)
         }
-        return shape
+        return node
     }
     
     private func showFinger() {
@@ -965,7 +964,8 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
         let textBox = makeTextBox()
         textBox.zPosition = 1000
-        textBox.position = CGPoint(x: self.position.x, y: GV.maxSide / 2)
+        textBox.position = CGPoint(x: -GV.minSide * 0.200, y: GV.maxSide * 0.01)
+        textBox.position = CGPoint(x: textBox.frame.width / 2, y: self.frame.height / 2)
         self.gameLayer.addChild(textBox)
         movingFingerSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
         movingFingerSprite.alpha = 1.0
