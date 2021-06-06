@@ -928,9 +928,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
     
     private func makeTextBox()->SKSpriteNode {
         var maxWidth: CGFloat = 0
-        let fontSize: CGFloat = GV.onIpad ? 10 : 15 // GV.minSide * 0.02
+        let fontSize: CGFloat = GV.onIpad ? 25 : 18 // GV.minSide * 0.02
         let textFont = UIFont(name: GV.headerFontName, size: fontSize)
-        let textHeight = "A".height(font: textFont!) * 1.2
+        let textHeight = "A".height(font: textFont!) * 1.5
         let textFragments = GV.language.getText(.tcHowToMoveWords).components(separatedBy:GV.innerSeparator)
         for text in textFragments {
             let textWidth = text.width(font: textFont!)
@@ -964,8 +964,9 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
         let textBox = makeTextBox()
         textBox.zPosition = 1000
-        textBox.position = CGPoint(x: -GV.minSide * 0.200, y: GV.maxSide * 0.01)
-        textBox.position = CGPoint(x: textBox.frame.width / 2, y: self.frame.height / 2)
+//        textBox.position = CGPoint(x: -GV.minSide * 0.200, y: GV.maxSide * 0.01)
+        textBox.position = CGPoint(x: textBox.frame.width * (GV.onIpad ? 1.2 : 0.75), y: self.frame.height * 0.6)
+        textBox.position = CGPoint(x: GV.minSide * 0.5, y: self.frame.height * 0.6)
         self.gameLayer.addChild(textBox)
         movingFingerSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
         movingFingerSprite.alpha = 1.0

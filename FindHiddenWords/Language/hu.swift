@@ -77,5 +77,5 @@ let huDictionary: [TextConstants: String] = [
     .tcMedium:                  "Közepes",
     .tcHard:                    "Nehéz",
     .tcChooseDifficulty:        "Nehézség",
-    .tcHowToMoveWords:          "Igy nézheted meg°az összes keresett szót",
+    .tcHowToMoveWords:          "Az elrejtett szavak°listájának balra és jobbra°mozgatásával megtekinthető°az összes megtalálandó szó.",
 ]
