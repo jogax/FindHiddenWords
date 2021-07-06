@@ -199,8 +199,8 @@ struct GV {
     static let mandatoryLabelInName = "Mandatory-Label"
     static let ownLabelInName = "Own-Label"
     static let headerFontName = "Menlo-Bold"
-//    static let wordsFontSize: CGFloat = GV.onIpad ? 18 : 15
-    static let wordsFontSize: CGFloat = GV.onIpad ? 28 : 20
+    static let wordsFontSize: CGFloat = GV.onIpad ? 18 : 15
+//    static let wordsFontSize: CGFloat = GV.onIpad ? 28 : 20
     static let darkGreen = UIColor(red: 0.0429, green: 0.63, blue: 0.023, alpha: 1)
     static var touchTarget: AnyObject!
     static var touchSelector: Selector!

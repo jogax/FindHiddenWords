@@ -958,8 +958,50 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         return node
     }
     
+//    private func showFinger() {
+//        var myActions = [SKAction]()
+//        print("maxPosition: \(maxPosition), GV.minSide: \(GV.minSide)")
+//        movingFingerSprite = SKSpriteNode(imageNamed: "finger.png")
+//        let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
+//        let textBox = makeTextBox()
+//        textBox.zPosition = 1000
+////        textBox.position = CGPoint(x: -GV.minSide * 0.200, y: GV.maxSide * 0.01)
+//        textBox.position = CGPoint(x: textBox.frame.width * (GV.onIpad ? 1.2 : 0.75), y: self.frame.height * 0.6)
+//        textBox.position = CGPoint(x: GV.minSide * 0.5, y: self.frame.height * 0.6)
+//        self.gameLayer.addChild(textBox)
+//        movingFingerSprite.position = CGPoint(x: GV.minSide * 0.95, y: myLabels[countMyLabelsRows / 2].position.y)
+//        movingFingerSprite.alpha = 1.0
+//        movingFingerSprite.size = movingFingerSprite.size * 0.3
+//        movingFingerSprite.name = arrowSpriteName
+//        movingFingerSprite.zPosition = 1000
+//        gameLayer.addChild(movingFingerSprite)
+//        myActions.append(SKAction.wait(forDuration: 3))
+//        let moveAction = SKAction.moveTo(x: GV.minSide * 0.95 - firstColDistance, duration: 2)
+//        let moveBackAction = SKAction.moveTo(x: GV.minSide * 0.95, duration: 2)
+//        let setFingerMovingAction = SKAction.run {
+//            self.fingerIsMoving = true
+//        }
+//        let setFingerNotMovingAction = SKAction.run {
+//            self.fingerIsMoving = false
+//            textBox.removeFromParent()
+//        }
+//        myActions.append(setFingerMovingAction)
+//        myActions.append(moveAction)
+//        myActions.append(SKAction.wait(forDuration: 1))
+//        myActions.append(moveBackAction)
+//        myActions.append(SKAction.wait(forDuration: 1))
+//        myActions.append(moveAction)
+//        myActions.append(SKAction.wait(forDuration: 1))
+//        myActions.append(moveBackAction)
+//        myActions.append(setFingerNotMovingAction)
+//        myActions.append(SKAction.removeFromParent())
+//        let sequence = SKAction.sequence(myActions)
+//        movingFingerSprite.run(sequence)
+//    }
+    
     private func showFinger() {
         var myActions = [SKAction]()
+//        print("maxPosition: \(maxPosition), GV.minSide: \(GV.minSide)")
         movingFingerSprite = SKSpriteNode(imageNamed: "finger.png")
         let firstColDistance = myLabels[countMyLabelsRows].position.x - myLabels[0].position.x
         let textBox = makeTextBox()
@@ -974,6 +1016,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         movingFingerSprite.name = arrowSpriteName
         movingFingerSprite.zPosition = 1000
         gameLayer.addChild(movingFingerSprite)
+//        let countMoves = (maxPosition.x - GV.minSide) / (GV.minSide * 0.9)
         myActions.append(SKAction.wait(forDuration: 3))
         let moveAction = SKAction.moveTo(x: GV.minSide * 0.95 - firstColDistance, duration: 2)
         let moveBackAction = SKAction.moveTo(x: GV.minSide * 0.95, duration: 2)
@@ -1285,7 +1328,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         calculateColumnWidths()
         let suffix = " (\(wordList.countWords))"
         let headerText = (GV.language.getText(.tcWordsOverLetter, values: choosedWord.usedLetters.first!.letter) + suffix)
-        let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.2
+        let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.1
 
         showWordsOverPositionTableView.setDelegate(delegate: self)
         showWordsOverPositionTableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")
@@ -1837,7 +1880,7 @@ class PlaySearchingWords: SKScene, TableViewDelegate, ShowGameCenterViewControll
         calculateColumnWidths()
         let suffix = " (\(myWordsForShow.countWords)/\(myWordsForShow.countAllWords)/\(myWordsForShow.score))"
         let headerText = (GV.language.getText(.tcCollectedOwnWords) + suffix)
-        let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.2
+        let actWidth = max(tableHeader.width(font: myTableFont), headerText.width(font: myTableFont)) * 1.1
 
         showMyWordsTableView.setDelegate(delegate: self)
         showMyWordsTableView.register(CustomTableViewCell.self, forCellReuseIdentifier: "cell")

@@ -106,7 +106,6 @@ class DrawImages {
         UIGraphicsBeginImageContextWithOptions(size, false, 1)
         let ctx = UIGraphicsGetCurrentContext()
         let lineWidth: CGFloat = 5
-        let center = CGPoint(x: size.width / 2, y: size.height / 2)
         ctx!.setLineWidth(lineWidth)
         ctx!.setStrokeColor(UIColor.blue.cgColor)
         ctx!.setFillColor(UIColor.yellow.cgColor)
